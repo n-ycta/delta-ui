@@ -1968,5 +1968,22 @@
     "scan": "Scan",
     "invalidQr": "No valid Delta invitation found",
     "qr": "Invitation QR"
+  },
+  "auth": {
+    "title": "Sign in",
+    "description": "This panel controls your Delta node. Sign in with an enrolled key, an existing API token, or a one-use setup code.",
+    "key": "Key",
+    "token": "Token",
+    "setup": "Setup",
+    "setupCode": "One-use setup code",
+    "apiToken": "Existing API token",
+    "endpoint": "API endpoint",
+    "setupHint": "Obtain the five-minute setup link from the installer on your own node. It opens a one-hour setup session. Create and save a recovery key before it expires.",
+    "noRegistration": "Public owner registration is disabled. Only an existing owner can enroll another key or issue a token.",
+    "language": "Language",
+    "retry": "Retry",
+    "invalidEndpoint": "Invalid API endpoint",
+    "https": "Use HTTPS or a localhost SSH tunnel before sending credentials.",
+    "setupSession": "Temporary setup session: create and save a recovery key, then sign in with it."
   }
 }

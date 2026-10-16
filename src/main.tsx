@@ -15,6 +15,7 @@ import { App } from './App';
 import { discoverHost } from './host/browser';
 import { installHostBridge } from './host/contract';
 import {startNativeLifecycle} from './host/lifecycle';
+import {WebAuthGate} from './auth/WebAuthGate';
 import {projectNative} from './host/projection';
 
 document.title = tr('runtime.appTitle');
@@ -24,6 +25,6 @@ async function boot() {
  const root=createRoot(document.getElementById('root')!);
 
  const api=createCoreApi();
- root.render(<StrictMode><ApiProvider api={api}><App /></ApiProvider></StrictMode>);
+ root.render(<StrictMode><ApiProvider api={api}><WebAuthGate><App /></WebAuthGate></ApiProvider></StrictMode>);
 }
 void boot().catch(() => { document.getElementById('root')!.textContent=tr('host.unavailable'); });

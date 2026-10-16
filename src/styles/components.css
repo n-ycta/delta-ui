@@ -474,3 +474,8 @@ select option, select optgroup { color: var(--ink); background-color: var(--surf
 .dependency-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--rule);min-width:0}.dependency-row>.grow{flex:1 1 220px;min-width:min(100%,180px);overflow-wrap:anywhere}.dependency-row:last-child{border-bottom:0}
 
 @media(max-width:640px){.dependency-row>.grow{flex-basis:100%}}
+
+/* Authentication is deliberately outside the authenticated application shell. */
+.auth-page{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:var(--bg)}
+.auth-card{width:100%;max-width:460px;min-width:0}.auth-card .input{width:100%;min-width:0}.auth-card .banner{overflow-wrap:anywhere}.auth-card header .select{width:auto}
+@media(max-height:650px){.auth-page{align-items:flex-start}}

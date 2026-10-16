@@ -2,6 +2,10 @@
 
 ## 0.1.3
 
+- Require authenticated Web identity before mounting management screens.
+- Add explicit key/token/setup sign-in, disable implicit production demo mode and complete first-owner key enrollment.
+- Keep browser private-key derivation/signatures local and clear key buffers after use.
+
 - Full shared UI over credential-private native IPC, without a Web server.
 - Explicit service-node selection, QR invitations and system file/share adapters.
 - Android Keystore-backed profile/documents and independent foreground-service runtime.

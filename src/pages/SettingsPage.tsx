@@ -22,6 +22,7 @@ import { queryClient, useQuery } from '../app/query';
 import { toast, usePrefs, type Density, type Theme } from '../app/stores';
 import { PALETTES, useResolvedTheme } from '../app/theme';
 import {
+  demoAvailable,
   createCoreApi,
   readConnectionSettings,
   toApiError,
@@ -315,7 +316,7 @@ function Connection() {
             value={draft.mode}
             onChange={(m) => setDraft({ ...draft, mode: m })}
             options={[
-              { value: 'mock', label: tr('pages.SettingsPage.s_303e0ca407') },
+              ...(demoAvailable?[{ value: 'mock' as const, label: tr('pages.SettingsPage.s_303e0ca407') }]:[]),
               { value: 'http', label: tr('pages.SettingsPage.s_3c4b103be6') },
             ]}
           />
