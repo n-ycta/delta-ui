@@ -1,11 +1,11 @@
 import { isSettingVisible, settingsPayload } from './visibility';
 import { mergeProfileValues, type SettingsProfiles } from './profiles';
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import { useEffect, useMemo, useState } from 'react';
-import type { SettingField } from '@/core/contracts';
+import type { SettingField } from '../../core/contracts';
 import { Maximize2, Trash2 } from 'lucide-react';
-import { Confirm, Modal } from '@/ui/overlays';
-import { Badge, Button, Field, Switch } from '@/ui/primitives';
+import { Confirm, Modal } from '../../ui/overlays';
+import { Badge, Button, Field, Switch } from '../../ui/primitives';
 
 export function defaultsOf(fields: SettingField[]) {
   return Object.fromEntries(

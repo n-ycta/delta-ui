@@ -1,4 +1,4 @@
-import { tr, locale } from '@/i18n';
+import { tr, locale } from '../../i18n';
 export const MIN = 60_000, HOUR = 3_600_000, DAY = 86_400_000;
 
 const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto', style: 'short' });

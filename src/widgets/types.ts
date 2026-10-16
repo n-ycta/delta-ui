@@ -1,4 +1,4 @@
-import type { MetricDescriptor, PluginEntry, TimeRangePreset, WidgetConfig, WidgetDisplay } from '@/core/contracts';
+import type { MetricDescriptor, PluginEntry, TimeRangePreset, WidgetConfig, WidgetDisplay } from '../core/contracts';
 
 export interface WidgetContext {
   range: TimeRangePreset;

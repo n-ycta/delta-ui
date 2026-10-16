@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { tr } from "@/i18n";
-import { useMutation, useQuery, queryClient } from "@/app/query";
-import { Modal, Confirm } from "@/ui/overlays";
-import { Button, Field } from "@/ui/primitives";
-import type { SSHProbe, SSHInstall } from "@/api";
+import { tr } from "../../i18n";
+import { useMutation, useQuery, queryClient } from "../../app/query";
+import { Modal, Confirm } from "../../ui/overlays";
+import { Button, Field } from "../../ui/primitives";
+import type { SSHProbe, SSHInstall } from "../../api";
 const JOB = "delta.ssh.job";
 export function SSHConnectDialog({
   open,

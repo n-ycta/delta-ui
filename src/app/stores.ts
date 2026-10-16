@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { CoreEvent, Role, Severity } from '@/core/contracts';
-import { ROLE_PERMISSIONS, type ConsolePermission } from '@/core/contracts';
-import { uid } from '@/core/lib/random';
+import type { CoreEvent, Role, Severity } from '../core/contracts';
+import { ROLE_PERMISSIONS, type ConsolePermission } from '../core/contracts';
+import { uid } from '../core/lib/random';
 
 export type Theme = 'light' | 'dark' | 'system';
 export type Density = 'compact' | 'comfortable';

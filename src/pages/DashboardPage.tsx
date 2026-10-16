@@ -1,18 +1,18 @@
-import { tr } from '@/i18n';
+import { tr } from '../i18n';
 import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Download, MoreHorizontal, Pencil, RotateCcw, Trash2 } from 'lucide-react';
-import { useDashboards, usePlugin } from '@/app/data';
-import { useCan } from '@/app/stores';
-import { generatePluginDashboard, mergeGeneratedDashboard } from '@/core/registry/autodash';
-import { widgetRegistry } from '@/widgets/registry';
-import { DashboardView } from '@/dashboards/DashboardView';
-import { downloadJson, useDashboardActions } from '@/dashboards/useDashboardActions';
-import { Button, Field, PageHead } from '@/ui/primitives';
-import { Confirm, Menu, Modal } from '@/ui/overlays';
-import { Empty, ErrorState, Skeleton } from '@/ui/states';
-import { Icon } from '@/ui/Icon';
-import type { DashboardConfig } from '@/core/contracts';
+import { useDashboards, usePlugin } from '../app/data';
+import { useCan } from '../app/stores';
+import { generatePluginDashboard, mergeGeneratedDashboard } from '../core/registry/autodash';
+import { widgetRegistry } from '../widgets/registry';
+import { DashboardView } from '../dashboards/DashboardView';
+import { downloadJson, useDashboardActions } from '../dashboards/useDashboardActions';
+import { Button, Field, PageHead } from '../ui/primitives';
+import { Confirm, Menu, Modal } from '../ui/overlays';
+import { Empty, ErrorState, Skeleton } from '../ui/states';
+import { Icon } from '../ui/Icon';
+import type { DashboardConfig } from '../core/contracts';
 
 export function DashboardPage() {
   const { id = '' } = useParams();

@@ -1,4 +1,4 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import type { ComponentType } from 'react';
 import type { MetricDescriptor, WidgetConfig, WidgetDisplay } from '../contracts';
 import { parse } from '../lib/semver';

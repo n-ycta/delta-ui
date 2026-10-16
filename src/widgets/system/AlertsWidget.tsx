@@ -1,13 +1,13 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import { Link } from 'react-router-dom';
 import { CheckCircle2 } from 'lucide-react';
 import type { WidgetProps } from '../types';
-import { useNodes, usePlugins } from '@/app/data';
-import { hasUpdate } from '@/core/registry/plugins';
-import { Dot } from '@/ui/primitives';
-import { ago } from '@/core/lib/format';
-import { Empty, SkeletonRows } from '@/ui/states';
-import type { Tone } from '@/ui/status';
+import { useNodes, usePlugins } from '../../app/data';
+import { hasUpdate } from '../../core/registry/plugins';
+import { Dot } from '../../ui/primitives';
+import { ago } from '../../core/lib/format';
+import { Empty, SkeletonRows } from '../../ui/states';
+import type { Tone } from '../../ui/status';
 
 export interface Alert { id: string; tone: Tone; title: string; detail: string; to: string; ts?: number }
 

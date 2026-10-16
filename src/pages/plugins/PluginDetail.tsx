@@ -1,7 +1,7 @@
 import { ActionOutput } from './ActionOutput';
 import { PluginDataViews } from './PluginDataViews';
-import { PluginNotices } from '@/ui/PluginNotices';
-import { tr, language } from '@/i18n';
+import { PluginNotices } from '../../ui/PluginNotices';
+import { tr, language } from '../../i18n';
 import { useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
@@ -16,14 +16,14 @@ import {
   Trash2,
   Zap,
 } from 'lucide-react';
-import { useNodes, usePlugin } from '@/app/data';
-import { useMutation, useQuery } from '@/app/query';
-import { toast, useCan } from '@/app/stores';
-import { hasUpdate, isInstalled } from '@/core/registry/plugins';
-import { widgetRegistry } from '@/widgets/registry';
-import { KNOWN_CAPABILITIES, NODE_KIND_LABEL, type PluginEntry } from '@/core/contracts';
-import { diffKind } from '@/core/lib/semver';
-import { ago, fmtTime } from '@/core/lib/format';
+import { useNodes, usePlugin } from '../../app/data';
+import { useMutation, useQuery } from '../../app/query';
+import { toast, useCan } from '../../app/stores';
+import { hasUpdate, isInstalled } from '../../core/registry/plugins';
+import { widgetRegistry } from '../../widgets/registry';
+import { KNOWN_CAPABILITIES, NODE_KIND_LABEL, type PluginEntry } from '../../core/contracts';
+import { diffKind } from '../../core/lib/semver';
+import { ago, fmtTime } from '../../core/lib/format';
 import {
   Badge,
   Button,
@@ -34,11 +34,11 @@ import {
   StatusBadge,
   Switch,
   Tabs,
-} from '@/ui/primitives';
-import { Confirm, Menu, Modal } from '@/ui/overlays';
-import { Empty, ErrorState, Skeleton, SkeletonRows } from '@/ui/states';
-import { Icon } from '@/ui/Icon';
-import { NODE_STATUS, PLUGIN_STATUS } from '@/ui/status';
+} from '../../ui/primitives';
+import { Confirm, Menu, Modal } from '../../ui/overlays';
+import { Empty, ErrorState, Skeleton, SkeletonRows } from '../../ui/states';
+import { Icon } from '../../ui/Icon';
+import { NODE_STATUS, PLUGIN_STATUS } from '../../ui/status';
 import { SettingsForm } from './SettingsForm';
 import { InstallDialog } from './InstallDialog';
 import { CATEGORY_LABEL } from './PluginsPage';

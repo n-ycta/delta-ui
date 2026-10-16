@@ -1,4 +1,4 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import { z } from 'zod';
 import { PANEL_CONTRACT_VERSION } from './common';
 import { KNOWN_CAPABILITIES, PluginManifest } from './plugin';

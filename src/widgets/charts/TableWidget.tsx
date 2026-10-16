@@ -1,9 +1,9 @@
 import { PluginRowsTable } from './PluginRowsTable';
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import type { WidgetProps } from '../types';
 import { MetricData, toRows } from '../shared';
-import { fmtDateTime, fmtValue } from '@/core/lib/format';
-import type { MetricResult } from '@/core/contracts';
+import { fmtDateTime, fmtValue } from '../../core/lib/format';
+import type { MetricResult } from '../../core/contracts';
 
 const csv = (v: unknown) =>
   '"' +

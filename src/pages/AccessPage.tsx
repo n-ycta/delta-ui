@@ -1,14 +1,14 @@
-import { tr } from '@/i18n';
+import { tr } from '../i18n';
 import { useState } from 'react';
 import { Copy, Eye, KeyRound, Plus, ShieldCheck, Trash2 } from 'lucide-react';
-import { useMutation, useQuery } from '@/app/query';
-import { toast, useCan, usePrefs, useRole } from '@/app/stores';
-import { CONSOLE_PERMISSIONS, ROLE_LABEL, ROLE_PERMISSIONS, type Principal, type Role } from '@/core/contracts';
-import { ago, fmtDate, fmtDateTime } from '@/core/lib/format';
-import { Badge, Button, Field, PageHead, Panel, Segmented, Tabs } from '@/ui/primitives';
-import { Confirm, Modal } from '@/ui/overlays';
-import { Empty, ErrorState, SkeletonRows } from '@/ui/states';
-import { Icon } from '@/ui/Icon';
+import { useMutation, useQuery } from '../app/query';
+import { toast, useCan, usePrefs, useRole } from '../app/stores';
+import { CONSOLE_PERMISSIONS, ROLE_LABEL, ROLE_PERMISSIONS, type Principal, type Role } from '../core/contracts';
+import { ago, fmtDate, fmtDateTime } from '../core/lib/format';
+import { Badge, Button, Field, PageHead, Panel, Segmented, Tabs } from '../ui/primitives';
+import { Confirm, Modal } from '../ui/overlays';
+import { Empty, ErrorState, SkeletonRows } from '../ui/states';
+import { Icon } from '../ui/Icon';
 
 const ROLES: Role[] = ['owner', 'operator', 'analyst', 'viewer'];
 const ROLE_DESC: Record<Role, string> = {

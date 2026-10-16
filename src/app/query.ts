@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useApi } from './ApiContext';
-import type { CoreApi } from '@/api';
-import { CoreApiError, toApiError } from '@/api';
+import type { CoreApi } from '../api';
+import { CoreApiError, toApiError } from '../api';
 
 /**
  * Tiny query cache (stale-while-revalidate) — enough for a control panel without pulling a data library.

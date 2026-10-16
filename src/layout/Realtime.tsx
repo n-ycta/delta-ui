@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import { useApi } from '@/app/ApiContext';
-import { queryClient } from '@/app/query';
-import { toast, useUi } from '@/app/stores';
-import type { NodeInfo } from '@/core/contracts';
+import { useApi } from '../app/ApiContext';
+import { queryClient } from '../app/query';
+import { toast, useUi } from '../app/stores';
+import type { NodeInfo } from '../core/contracts';
 
 /** Bridges the core's realtime channel into caches and UI state. Mounted once in the shell. */
 export function RealtimeBridge() {

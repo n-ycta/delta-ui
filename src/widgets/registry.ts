@@ -1,7 +1,7 @@
 import {BubblesWidget} from './charts/BubblesWidget';
-import { tr } from '@/i18n';
-import type { MetricDescriptor } from '@/core/contracts';
-import { WidgetRegistry } from '@/core/registry/WidgetRegistry';
+import { tr } from '../i18n';
+import type { MetricDescriptor } from '../core/contracts';
+import { WidgetRegistry } from '../core/registry/WidgetRegistry';
 import { TimeseriesWidget } from './charts/TimeseriesWidget';
 import { StatWidget } from './charts/StatWidget';
 import { GaugeWidget } from './charts/GaugeWidget';

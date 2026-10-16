@@ -1,4 +1,4 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import type { DashboardConfig, MetricDescriptor, PluginEntry, WidgetConfig } from '../contracts';
 import type { WidgetRegistry } from './WidgetRegistry';
 import { uid } from '../lib/random';

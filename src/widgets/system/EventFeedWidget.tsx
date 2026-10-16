@@ -1,11 +1,11 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import { Link } from 'react-router-dom';
 import type { WidgetProps } from '../types';
-import { useQuery } from '@/app/query';
-import { useUi } from '@/app/stores';
-import { fmtTime } from '@/core/lib/format';
-import { ErrorState, SkeletonRows, Empty } from '@/ui/states';
-import type { CoreEvent, Severity } from '@/core/contracts';
+import { useQuery } from '../../app/query';
+import { useUi } from '../../app/stores';
+import { fmtTime } from '../../core/lib/format';
+import { ErrorState, SkeletonRows, Empty } from '../../ui/states';
+import type { CoreEvent, Severity } from '../../core/contracts';
 
 const ORDER: Severity[] = ['debug', 'info', 'warn', 'error', 'critical'];
 

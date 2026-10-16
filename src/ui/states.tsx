@@ -1,7 +1,7 @@
-import { tr } from '@/i18n';
+import { tr } from '../i18n';
 import type { ReactNode } from 'react';
 import { AlertTriangle, Inbox, RotateCcw, WifiOff } from 'lucide-react';
-import type { CoreApiError } from '@/api';
+import type { CoreApiError } from '../api';
 import { Button } from './primitives';
 
 export function Empty({ icon, title, children, action, compact }: { icon?: ReactNode; title: string; children?: ReactNode; action?: ReactNode; compact?: boolean }) {

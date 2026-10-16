@@ -1,4 +1,4 @@
-import { tr } from '@/i18n';
+import { tr } from '../i18n';
 import { useEffect, useState } from 'react';
 import { usePrefs } from './stores';
 

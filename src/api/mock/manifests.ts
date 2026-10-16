@@ -1,5 +1,5 @@
-import { tr } from '@/i18n';
-import type { PluginManifestInput } from '@/core/contracts';
+import { tr } from '../../i18n';
+import type { PluginManifestInput } from '../../core/contracts';
 
 /**
  * Demo plugin manifests, as a real core would serve them.

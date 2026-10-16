@@ -1,6 +1,6 @@
 import { Updates } from './Updates';
-import { isCoreEndpoint } from '@/api/endpoints';
-import { tr } from '@/i18n';
+import { isCoreEndpoint } from '../api/endpoints';
+import { tr } from '../i18n';
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
@@ -12,11 +12,11 @@ import {
   RotateCcw,
   Upload,
 } from 'lucide-react';
-import { useApi } from '@/app/ApiContext';
-import { useDashboards, usePlugins } from '@/app/data';
-import { queryClient, useQuery } from '@/app/query';
-import { toast, usePrefs, type Density, type Theme } from '@/app/stores';
-import { PALETTES, useResolvedTheme } from '@/app/theme';
+import { useApi } from '../app/ApiContext';
+import { useDashboards, usePlugins } from '../app/data';
+import { queryClient, useQuery } from '../app/query';
+import { toast, usePrefs, type Density, type Theme } from '../app/stores';
+import { PALETTES, useResolvedTheme } from '../app/theme';
 import {
   createCoreApi,
   readConnectionSettings,
@@ -24,20 +24,20 @@ import {
   writeConnectionSettings,
   type ConnectionSettings,
   type CoreInfo,
-} from '@/api';
-import { MockCoreAdapter, resetMockDatabase, type MockControl } from '@/api/mock/MockCoreAdapter';
+} from '../api';
+import { MockCoreAdapter, resetMockDatabase, type MockControl } from '../api/mock/MockCoreAdapter';
 import {
   CONFIG_EXPORT_FORMAT,
   ConfigBundle,
   PANEL_CONTRACT_VERSION,
   type DashboardConfig,
-} from '@/core/contracts';
-import { fmtDateTime, fmtDuration, plural } from '@/core/lib/format';
-import { Badge, Button, Field, PageHead, Panel, Segmented, Switch, Tabs } from '@/ui/primitives';
-import { Confirm } from '@/ui/overlays';
-import { ErrorState, Skeleton } from '@/ui/states';
-import { downloadJson } from '@/dashboards/useDashboardActions';
-import { widgetRegistry } from '@/widgets/registry';
+} from '../core/contracts';
+import { fmtDateTime, fmtDuration, plural } from '../core/lib/format';
+import { Badge, Button, Field, PageHead, Panel, Segmented, Switch, Tabs } from '../ui/primitives';
+import { Confirm } from '../ui/overlays';
+import { ErrorState, Skeleton } from '../ui/states';
+import { downloadJson } from '../dashboards/useDashboardActions';
+import { widgetRegistry } from '../widgets/registry';
 
 type Tab = 'general' | 'connection' | 'backup' | 'developer' | 'updates';
 const PREF_KEYS = [

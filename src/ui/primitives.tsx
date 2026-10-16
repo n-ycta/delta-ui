@@ -1,9 +1,9 @@
-import { tr } from '@/i18n';
+import { tr } from '../i18n';
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { Loader2 } from 'lucide-react';
 import type { Tone } from './status';
-import { useCan } from '@/app/stores';
-import type { ConsolePermission } from '@/core/contracts';
+import { useCan } from '../app/stores';
+import type { ConsolePermission } from '../core/contracts';
 
 type BtnProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: 'default' | 'primary' | 'accent' | 'danger' | 'danger-solid' | 'ghost';

@@ -1,15 +1,15 @@
-import { tr, locale } from '@/i18n';
+import { tr, locale } from '../i18n';
 import { Link } from 'react-router-dom';
-import { useDashboards, useNodes, usePlugins } from '@/app/data';
-import { useQuery } from '@/app/query';
-import { usePrefs } from '@/app/stores';
-import { isInstalled, isLive } from '@/core/registry/plugins';
-import { DashboardView } from '@/dashboards/DashboardView';
-import { useDashboardActions } from '@/dashboards/useDashboardActions';
-import { useAlerts } from '@/widgets/system/AlertsWidget';
-import { PageHead } from '@/ui/primitives';
-import { ErrorState, Skeleton } from '@/ui/states';
-import { fmtDuration, fmtNumber } from '@/core/lib/format';
+import { useDashboards, useNodes, usePlugins } from '../app/data';
+import { useQuery } from '../app/query';
+import { usePrefs } from '../app/stores';
+import { isInstalled, isLive } from '../core/registry/plugins';
+import { DashboardView } from '../dashboards/DashboardView';
+import { useDashboardActions } from '../dashboards/useDashboardActions';
+import { useAlerts } from '../widgets/system/AlertsWidget';
+import { PageHead } from '../ui/primitives';
+import { ErrorState, Skeleton } from '../ui/states';
+import { fmtDuration, fmtNumber } from '../core/lib/format';
 
 function Strip() {
   const info = useQuery('info', (api) => api.info());

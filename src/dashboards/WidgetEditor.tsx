@@ -1,5 +1,5 @@
-import { tr } from '@/i18n';
-import { BUCKET_INTERVALS } from '@/widgets/intervals';
+import { tr } from '../i18n';
+import { BUCKET_INTERVALS } from '../widgets/intervals';
 import { useEffect, useMemo, useState } from 'react';
 import type {
   MetricDescriptor,
@@ -7,16 +7,16 @@ import type {
   TimeRangePreset,
   WidgetConfig,
   WidgetDisplay,
-} from '@/core/contracts';
-import { PRESET_LABEL } from '@/core/contracts';
-import { widgetRegistry, SYSTEM_FEEDS } from '@/widgets/registry';
-import { isInstalled } from '@/core/registry/plugins';
-import { widgetForMetric } from '@/core/registry/autodash';
-import { Drawer } from '@/ui/overlays';
-import { Button, Field, Segmented, Switch, Tabs } from '@/ui/primitives';
-import { Icon } from '@/ui/Icon';
-import { PALETTES, useChartColors } from '@/app/theme';
-import { uid } from '@/core/lib/random';
+} from '../core/contracts';
+import { PRESET_LABEL } from '../core/contracts';
+import { widgetRegistry, SYSTEM_FEEDS } from '../widgets/registry';
+import { isInstalled } from '../core/registry/plugins';
+import { widgetForMetric } from '../core/registry/autodash';
+import { Drawer } from '../ui/overlays';
+import { Button, Field, Segmented, Switch, Tabs } from '../ui/primitives';
+import { Icon } from '../ui/Icon';
+import { PALETTES, useChartColors } from '../app/theme';
+import { uid } from '../core/lib/random';
 import { WidgetFrame } from './WidgetFrame';
 
 const KIND_LABEL: Record<string, string> = {

@@ -1,5 +1,5 @@
-import { queryClient } from '@/app/query';
-import { tr } from '@/i18n';
+import { queryClient } from '../app/query';
+import { tr } from '../i18n';
 import { memo, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -13,18 +13,18 @@ import {
   Table2,
   Trash2,
 } from 'lucide-react';
-import type { PluginEntry, WidgetConfig, WidgetDisplay, TimeRangePreset } from '@/core/contracts';
-import { widgetRegistry } from '@/widgets/registry';
-import type { WidgetContext } from '@/widgets/types';
-import { Menu } from '@/ui/overlays';
-import { Button } from '@/ui/primitives';
-import { Empty } from '@/ui/states';
-import { Icon } from '@/ui/Icon';
+import type { PluginEntry, WidgetConfig, WidgetDisplay, TimeRangePreset } from '../core/contracts';
+import { widgetRegistry } from '../widgets/registry';
+import type { WidgetContext } from '../widgets/types';
+import { Menu } from '../ui/overlays';
+import { Button } from '../ui/primitives';
+import { Empty } from '../ui/states';
+import { Icon } from '../ui/Icon';
 import { ErrorBoundary } from './ErrorBoundary';
-import { useApi } from '@/app/ApiContext';
-import { resultToCsv } from '@/widgets/charts/TableWidget';
-import { buildQuery } from '@/widgets/shared';
-import { toast } from '@/app/stores';
+import { useApi } from '../app/ApiContext';
+import { resultToCsv } from '../widgets/charts/TableWidget';
+import { buildQuery } from '../widgets/shared';
+import { toast } from '../app/stores';
 
 export interface FrameProps {
   config: WidgetConfig;

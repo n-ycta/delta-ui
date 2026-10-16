@@ -1,9 +1,9 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import { useState } from 'react';
 import type { WidgetProps } from '../types';
 import { MetricData } from '../shared';
-import { useChartColors } from '@/app/theme';
-import { fmtValue } from '@/core/lib/format';
+import { useChartColors } from '../../app/theme';
+import { fmtValue } from '../../core/lib/format';
 
 const DAYS = [tr("widgets.charts.HeatmapWidget.s_3770c0ef8e"), tr("widgets.charts.HeatmapWidget.s_93480c9383"), tr("widgets.charts.HeatmapWidget.s_387e39223d"), tr("widgets.charts.HeatmapWidget.s_9c8acdf376"), tr("widgets.charts.HeatmapWidget.s_e18bb0844b"), tr("widgets.charts.HeatmapWidget.s_e8bd00ada8"), tr("widgets.charts.HeatmapWidget.s_c58ca969a8")];
 

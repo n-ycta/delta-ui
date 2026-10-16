@@ -1,4 +1,4 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import { useMemo, useState } from 'react';
 import { FileJson, Wand2 } from 'lucide-react';
 import {
@@ -6,11 +6,11 @@ import {
   PANEL_CONTRACT_VERSION,
   validateManifest,
   type MetricDescriptor,
-} from '@/core/contracts';
-import { widgetRegistry } from '@/widgets/registry';
-import * as M from '@/api/mock/manifests';
-import { Badge, PageHead, Panel, Segmented, Tabs } from '@/ui/primitives';
-import { Icon } from '@/ui/Icon';
+} from '../../core/contracts';
+import { widgetRegistry } from '../../widgets/registry';
+import * as M from '../../api/mock/manifests';
+import { Badge, PageHead, Panel, Segmented, Tabs } from '../../ui/primitives';
+import { Icon } from '../../ui/Icon';
 import { ValidationIssues } from './ValidationIssues';
 import { SettingsForm } from '../plugins/SettingsForm';
 

@@ -1,9 +1,9 @@
 import type { UpdateSettings, UpdateStatus } from './updates';
-import { tr } from '@/i18n';
+import { tr } from '../i18n';
 import type {
   AuditEntry, ConnectionConfig, CoreEvent, DashboardConfig, EventQuery, MetricQuery, MetricResult, NodeCommandId,
   NodeInfo, Notification, PluginInstance, Principal, RealtimeMessage, Role, Series, UptimeCell,
-} from '@/core/contracts';
+} from '../core/contracts';
 
 /**
  * CoreApi — the only boundary between UI and the Delta core.

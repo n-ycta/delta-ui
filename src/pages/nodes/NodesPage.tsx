@@ -1,15 +1,15 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { BatteryLow, Plus, Search } from 'lucide-react';
-import { useNodes } from '@/app/data';
-import { NODE_KIND_LABEL, type NodeInfo } from '@/core/contracts';
-import { ago, fmtBytes } from '@/core/lib/format';
-import { Badge, Button, Meter, PageHead, StatusBadge } from '@/ui/primitives';
-import { Empty, ErrorState, SkeletonRows } from '@/ui/states';
-import { Icon } from '@/ui/Icon';
-import { NODE_STATUS } from '@/ui/status';
-import { NODE_ICON } from '@/widgets/system/NodeGridWidget';
+import { useNodes } from '../../app/data';
+import { NODE_KIND_LABEL, type NodeInfo } from '../../core/contracts';
+import { ago, fmtBytes } from '../../core/lib/format';
+import { Badge, Button, Meter, PageHead, StatusBadge } from '../../ui/primitives';
+import { Empty, ErrorState, SkeletonRows } from '../../ui/states';
+import { Icon } from '../../ui/Icon';
+import { NODE_STATUS } from '../../ui/status';
+import { NODE_ICON } from '../../widgets/system/NodeGridWidget';
 import { PairDialog } from './PairDialog';
 
 const LATEST_AGENT = '1.8.2';

@@ -1,6 +1,6 @@
-import { compare, isValid } from '@/core/lib/semver';
+import { compare, isValid } from '../lib/semver';
 import { localizeManifest } from './localize';
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import type { PluginEntry, PluginInstance, PluginManifest, ValidationReport } from '../contracts';
 import { validateManifest } from '../contracts';
 

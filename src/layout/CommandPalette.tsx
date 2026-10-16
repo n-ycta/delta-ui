@@ -1,16 +1,16 @@
-import { tr } from '@/i18n';
+import { tr } from '../i18n';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, CornerDownLeft, Search } from 'lucide-react';
-import { useDashboards, useNodes, usePlugins } from '@/app/data';
-import { usePrefs, useUi, toast } from '@/app/stores';
-import { useApi } from '@/app/ApiContext';
-import { queryClient } from '@/app/query';
-import { Icon } from '@/ui/Icon';
-import { Highlight, Kbd } from '@/ui/primitives';
-import { NODE_KIND_LABEL } from '@/core/contracts';
-import { NODE_ICON } from '@/widgets/system/NodeGridWidget';
+import { useDashboards, useNodes, usePlugins } from '../app/data';
+import { usePrefs, useUi, toast } from '../app/stores';
+import { useApi } from '../app/ApiContext';
+import { queryClient } from '../app/query';
+import { Icon } from '../ui/Icon';
+import { Highlight, Kbd } from '../ui/primitives';
+import { NODE_KIND_LABEL } from '../core/contracts';
+import { NODE_ICON } from '../widgets/system/NodeGridWidget';
 
 interface Cmd { id: string; group: string; label: string; hint?: string; icon: ReactNode; keywords?: string; run: () => void }
 

@@ -1,11 +1,11 @@
 import {useEffect,useRef,useState} from 'react';
 import {hierarchy,pack} from 'd3-hierarchy';
-import {tr} from '@/i18n';
-import type {CategoryValue} from '@/core/contracts';
+import {tr} from '../../i18n';
+import type {CategoryValue} from '../../core/contracts';
 import type {WidgetProps} from '../types';
 import {MetricData} from '../shared';
-import {useChartColors} from '@/app/theme';
-import {fmtNumber} from '@/core/lib/format';
+import {useChartColors} from '../../app/theme';
+import {fmtNumber} from '../../core/lib/format';
 export function rankedCategories(categories:CategoryValue[],limit:number){return categories.filter(c=>Number.isFinite(c.value)&&c.value>0).sort((a,b)=>b.value-a.value||a.key.localeCompare(b.key)).slice(0,Math.min(50,Math.max(1,limit)));}
 function BubblePlot({items,colors,total}:{items:CategoryValue[];colors:string[];total:number}){
  const ref=useRef<HTMLDivElement>(null),[size,setSize]=useState({w:400,h:240});

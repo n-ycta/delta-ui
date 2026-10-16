@@ -1,5 +1,5 @@
-import { dashboardCount } from '@/core/registry/dashboardIndex';
-import { tr } from '@/i18n';
+import { dashboardCount } from '../core/registry/dashboardIndex';
+import { tr } from '../i18n';
 import { NavLink } from 'react-router-dom';
 import {
   FileCheck2,
@@ -14,11 +14,11 @@ import {
   Server,
   Settings,
 } from 'lucide-react';
-import { useDashboards, useNodes, usePlugins } from '@/app/data';
-import { usePrefs, useRole, useUi, useRuntimeAccess } from '@/app/stores';
-import { ROLE_LABEL } from '@/core/contracts';
-import { hasUpdate } from '@/core/registry/plugins';
-import { Icon } from '@/ui/Icon';
+import { useDashboards, useNodes, usePlugins } from '../app/data';
+import { usePrefs, useRole, useUi, useRuntimeAccess } from '../app/stores';
+import { ROLE_LABEL } from '../core/contracts';
+import { hasUpdate } from '../core/registry/plugins';
+import { Icon } from '../ui/Icon';
 
 function Item({
   to,

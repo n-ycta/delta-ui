@@ -1,4 +1,4 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import { z } from 'zod';
 import { NodeKind } from './plugin';
 

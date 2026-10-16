@@ -1,5 +1,5 @@
-import { tr } from '@/i18n';
-import type { NodeStatus, PluginStatus, Severity } from '@/core/contracts';
+import { tr } from '../i18n';
+import type { NodeStatus, PluginStatus, Severity } from '../core/contracts';
 
 export type Tone = 'ok' | 'warn' | 'err' | 'crit' | 'info' | 'off' | 'accent';
 

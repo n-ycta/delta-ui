@@ -1,4 +1,4 @@
-import {tr,language} from '@/i18n';
+import {tr,language} from '../i18n';
 import { readConnectionSettings } from './index';
 /** Owner/control-plane calls share the same original-user transport as the regular adapter. */
 export async function control(capability:string,args:unknown={},node?:string):Promise<any>{

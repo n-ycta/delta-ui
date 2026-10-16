@@ -1,10 +1,10 @@
 import { RefreshCw } from 'lucide-react';
 import { useState } from 'react';
-import { tr, locale } from '@/i18n';
-import type { PluginEntry, PluginDataView } from '@/core/contracts';
-import { useQuery } from '@/app/query';
-import { Button, Panel } from '@/ui/primitives';
-import { ErrorState, Empty } from '@/ui/states';
+import { tr, locale } from '../../i18n';
+import type { PluginEntry, PluginDataView } from '../../core/contracts';
+import { useQuery } from '../../app/query';
+import { Button, Panel } from '../../ui/primitives';
+import { ErrorState, Empty } from '../../ui/states';
 import { SettingsForm, defaultsOf } from './SettingsForm';
 export function safeDataLink(value: unknown) {
   try {

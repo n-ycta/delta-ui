@@ -1,18 +1,18 @@
-import { tr } from '@/i18n';
+import { tr } from '../i18n';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Pause, Play, Search, RefreshCw } from 'lucide-react';
-import { useQuery } from '@/app/query';
-import { useUi } from '@/app/stores';
-import { useApi } from '@/app/ApiContext';
-import { toApiError } from '@/api';
-import type { CoreEvent, Severity } from '@/core/contracts';
-import { fmtDateTime, fmtTime } from '@/core/lib/format';
-import { Badge, Button, PageHead } from '@/ui/primitives';
-import { Drawer } from '@/ui/overlays';
-import { Empty, ErrorState, SkeletonRows } from '@/ui/states';
-import { SEVERITY_LABEL, SEVERITY_TONE } from '@/ui/status';
-import { downloadJson } from '@/dashboards/useDashboardActions';
+import { useQuery } from '../app/query';
+import { useUi } from '../app/stores';
+import { useApi } from '../app/ApiContext';
+import { toApiError } from '../api';
+import type { CoreEvent, Severity } from '../core/contracts';
+import { fmtDateTime, fmtTime } from '../core/lib/format';
+import { Badge, Button, PageHead } from '../ui/primitives';
+import { Drawer } from '../ui/overlays';
+import { Empty, ErrorState, SkeletonRows } from '../ui/states';
+import { SEVERITY_LABEL, SEVERITY_TONE } from '../ui/status';
+import { downloadJson } from '../dashboards/useDashboardActions';
 
 const SEVS: Severity[] = ['critical', 'error', 'warn', 'info', 'debug'];
 const SOURCES = [

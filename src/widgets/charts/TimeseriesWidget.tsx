@@ -1,8 +1,8 @@
 import { Area, Bar, CartesianGrid, ComposedChart, Line, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { WidgetProps } from '../types';
 import { axisTick, ChartTooltip, Legend, MetricData, toRows, useSeriesColors, valueTick } from '../shared';
-import { useChartColors } from '@/app/theme';
-import type { MetricResult, MetricDescriptor, WidgetConfig } from '@/core/contracts';
+import { useChartColors } from '../../app/theme';
+import type { MetricResult, MetricDescriptor, WidgetConfig } from '../../core/contracts';
 import type { WidgetContext } from '../types';
 
 export function TimeseriesWidget({ config, ctx }: WidgetProps) {

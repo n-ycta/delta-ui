@@ -1,6 +1,6 @@
 import type { UpdateSettings, UpdateStatus } from '../updates';
-import { tr, language } from '@/i18n';
-import type { ConnectionConfig, CoreEvent, DashboardConfig, EventQuery, MetricQuery, NodeCommandId, RealtimeMessage, Role } from '@/core/contracts';
+import { tr, language } from '../../i18n';
+import type { ConnectionConfig, CoreEvent, DashboardConfig, EventQuery, MetricQuery, NodeCommandId, RealtimeMessage, Role } from '../../core/contracts';
 import type { CoreApi, SSHTarget, SSHPreflight, SSHProbe, SSHInstall, SSHJob } from '../types';
 import { CoreApiError } from '../types';
 

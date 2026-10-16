@@ -1,11 +1,11 @@
-import { tr, language, setLanguage } from '@/i18n';
+import { tr, language, setLanguage } from '../i18n';
 import { Link, useLocation } from 'react-router-dom';
 import { Bell, Menu as MenuIcon, Moon, Search, Sun } from 'lucide-react';
-import { useNotifications } from '@/app/data';
-import { usePrefs, useUi } from '@/app/stores';
-import { useResolvedTheme } from '@/app/theme';
-import { useApi } from '@/app/ApiContext';
-import { Button, Dot, Kbd } from '@/ui/primitives';
+import { useNotifications } from '../app/data';
+import { usePrefs, useUi } from '../app/stores';
+import { useResolvedTheme } from '../app/theme';
+import { useApi } from '../app/ApiContext';
+import { Button, Dot, Kbd } from '../ui/primitives';
 
 const LABELS: Record<string, string> = { dashboards: tr('runtime.crumb_dashboards'), plugins: tr('runtime.crumb_plugins'), nodes: tr('runtime.crumb_nodes'), events: tr('runtime.crumb_events'), contracts: tr('runtime.crumb_contracts'), access: tr('runtime.crumb_access'), settings: tr('runtime.crumb_settings') };
 

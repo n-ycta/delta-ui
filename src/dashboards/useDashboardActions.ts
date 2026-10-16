@@ -1,9 +1,9 @@
-import { tr } from '@/i18n';
-import { useApi } from '@/app/ApiContext';
-import { queryClient } from '@/app/query';
-import { toast } from '@/app/stores';
-import type { DashboardConfig } from '@/core/contracts';
-import { DashboardConfig as DashboardSchema } from '@/core/contracts';
+import { tr } from '../i18n';
+import { useApi } from '../app/ApiContext';
+import { queryClient } from '../app/query';
+import { toast } from '../app/stores';
+import type { DashboardConfig } from '../core/contracts';
+import { DashboardConfig as DashboardSchema } from '../core/contracts';
 
 export function useDashboardActions() {
   const api = useApi();

@@ -1,6 +1,6 @@
-import { tr } from '@/i18n';
+import { tr } from '../i18n';
 import { X } from 'lucide-react';
-import { useUi } from '@/app/stores';
+import { useUi } from '../app/stores';
 
 export function Toasts() {
   const toasts = useUi((s) => s.toasts);

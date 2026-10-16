@@ -1,5 +1,5 @@
-import { tr } from '@/i18n';
-import type { AuditEntry, CoreEvent, NodeInfo, Notification, PluginInstance, Principal } from '@/core/contracts';
+import { tr } from '../../i18n';
+import type { AuditEntry, CoreEvent, NodeInfo, Notification, PluginInstance, Principal } from '../../core/contracts';
 import * as M from './manifests';
 
 const now = () => Date.now();

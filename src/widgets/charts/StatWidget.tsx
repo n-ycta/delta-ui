@@ -1,9 +1,9 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import type { WidgetProps } from '../types';
 import { Delta, MetricData } from '../shared';
-import { fmtValue } from '@/core/lib/format';
-import { Sparkline } from '@/ui/Sparkline';
-import { useChartColors } from '@/app/theme';
+import { fmtValue } from '../../core/lib/format';
+import { Sparkline } from '../../ui/Sparkline';
+import { useChartColors } from '../../app/theme';
 
 export function StatWidget({ config, ctx }: WidgetProps) {
   const c = useChartColors(config.display.palette);

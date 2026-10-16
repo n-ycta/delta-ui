@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { tr } from '@/i18n';
-import { control } from '@/api/control';
-import { PageHead, Button, Panel } from '@/ui/primitives';
+import { tr } from '../i18n';
+import { control } from '../api/control';
+import { PageHead, Button, Panel } from '../ui/primitives';
 export function McpPage() {
   const [profiles, setProfiles] = useState<any[]>([]),
     [catalog, setCatalog] = useState<any[]>([]),

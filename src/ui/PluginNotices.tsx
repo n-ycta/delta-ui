@@ -1,12 +1,12 @@
-import { tr, language } from '@/i18n';
+import { tr, language } from '../i18n';
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import { useApi } from '@/app/ApiContext';
-import { usePrefs, useRuntimeAccess } from '@/app/stores';
+import { useApi } from '../app/ApiContext';
+import { usePrefs, useRuntimeAccess } from '../app/stores';
 import { noticeKey, noticeFingerprint, dismissNotice } from './pluginNoticeState';
-import type { PluginEntry } from '@/core/contracts';
-import { useMutation } from '@/app/query';
-import { toast } from '@/app/stores';
+import type { PluginEntry } from '../core/contracts';
+import { useMutation } from '../app/query';
+import { toast } from '../app/stores';
 import { Button } from './primitives';
 import { Confirm } from './overlays';
 

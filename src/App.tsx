@@ -1,25 +1,25 @@
-import { tr } from '@/i18n';
+import { tr } from './i18n';
 import type { ReactNode } from 'react';
 import { HashRouter, Route, Routes, useLocation } from 'react-router-dom';
-import { ErrorState } from '@/ui/states';
-import { Button } from '@/ui/primitives';
-import { Shell } from '@/layout/Shell';
-import { ErrorBoundary } from '@/dashboards/ErrorBoundary';
-import { HomePage } from '@/pages/Home';
-import { DashboardsPage } from '@/pages/Dashboards';
-import { DashboardPage } from '@/pages/DashboardPage';
-import { PluginsPage } from '@/pages/plugins/PluginsPage';
-import { PluginDetail } from '@/pages/plugins/PluginDetail';
-import { NodesPage } from '@/pages/nodes/NodesPage';
-import { NodeDetail } from '@/pages/nodes/NodeDetail';
-import { EventsPage } from '@/pages/EventsPage';
-import { ContractsPage } from '@/pages/contracts/ContractsPage';
-import { AccessPage } from '@/pages/AccessPage';
-import { SettingsPage } from '@/pages/SettingsPage';
-import { NotFound } from '@/pages/NotFound';
+import { ErrorState } from './ui/states';
+import { Button } from './ui/primitives';
+import { Shell } from './layout/Shell';
+import { ErrorBoundary } from './dashboards/ErrorBoundary';
+import { HomePage } from './pages/Home';
+import { DashboardsPage } from './pages/Dashboards';
+import { DashboardPage } from './pages/DashboardPage';
+import { PluginsPage } from './pages/plugins/PluginsPage';
+import { PluginDetail } from './pages/plugins/PluginDetail';
+import { NodesPage } from './pages/nodes/NodesPage';
+import { NodeDetail } from './pages/nodes/NodeDetail';
+import { EventsPage } from './pages/EventsPage';
+import { ContractsPage } from './pages/contracts/ContractsPage';
+import { AccessPage } from './pages/AccessPage';
+import { SettingsPage } from './pages/SettingsPage';
+import { NotFound } from './pages/NotFound';
 
-import {McpPage} from '@/pages/McpPage';
-import {IdentityPage} from '@/pages/IdentityPage';
+import {McpPage} from './pages/McpPage';
+import {IdentityPage} from './pages/IdentityPage';
 export function App() {
   return (
     <HashRouter>

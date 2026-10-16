@@ -1,15 +1,15 @@
-import { tr } from '@/i18n';
+import { tr } from '../i18n';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BellOff, CheckCheck } from 'lucide-react';
-import { useNotifications } from '@/app/data';
-import { useUi } from '@/app/stores';
-import { useMutation } from '@/app/query';
-import { Drawer } from '@/ui/overlays';
-import { Button, Dot, Segmented } from '@/ui/primitives';
-import { Empty, ErrorState, SkeletonRows } from '@/ui/states';
-import { SEVERITY_TONE } from '@/ui/status';
-import { ago } from '@/core/lib/format';
+import { useNotifications } from '../app/data';
+import { useUi } from '../app/stores';
+import { useMutation } from '../app/query';
+import { Drawer } from '../ui/overlays';
+import { Button, Dot, Segmented } from '../ui/primitives';
+import { Empty, ErrorState, SkeletonRows } from '../ui/states';
+import { SEVERITY_TONE } from '../ui/status';
+import { ago } from '../core/lib/format';
 
 export function NotificationsPanel() {
   const open = useUi((s) => s.notificationsOpen);

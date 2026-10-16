@@ -1,7 +1,7 @@
-import { tr } from '@/i18n';
-import type { Aggregation, CategoryValue, MetricDescriptor, MetricQuery, MetricResult, Series } from '@/core/contracts';
-import { autoStep, resolveRange } from '@/core/contracts';
-import { hashString, mulberry32 } from '@/core/lib/random';
+import { tr } from '../../i18n';
+import type { Aggregation, CategoryValue, MetricDescriptor, MetricQuery, MetricResult, Series } from '../../core/contracts';
+import { autoStep, resolveRange } from '../../core/contracts';
+import { hashString, mulberry32 } from '../../core/lib/random';
 
 type Activity = 'day' | 'work' | 'evening' | 'night' | 'flat' | 'sleep';
 interface Profile {

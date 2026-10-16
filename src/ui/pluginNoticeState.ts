@@ -1,4 +1,4 @@
-import type { PluginEntry } from '@/core/contracts';
+import type { PluginEntry } from '../core/contracts';
 type Notice = NonNullable<PluginEntry['instance']['notices']>[number];
 /** Local UI preference only: never acknowledges consent or changes plugin settings. */
 export function noticeKey(scope: string, entry: PluginEntry, notice: Notice): string {

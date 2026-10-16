@@ -1,4 +1,4 @@
-import { language, translateDemoText } from '@/i18n';
+import { language, translateDemoText } from '../../i18n';
 const displayFields = new Set(['name','description','label','help','reason','placeholder','group','notes','alt','title','body','acceptLabel','unit']);
 const ids = ['id','key','scope','value','version'];
 function merge(base: any, patch: any): any {

@@ -1,17 +1,17 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import { useEffect, useState } from 'react';
 import { ShieldAlert } from 'lucide-react';
-import type { PluginEntry } from '@/core/contracts';
-import { NODE_KIND_LABEL } from '@/core/contracts';
-import { useNodes } from '@/app/data';
-import { useMutation } from '@/app/query';
-import { toast } from '@/app/stores';
-import { Modal } from '@/ui/overlays';
-import { Badge, Button, Dot } from '@/ui/primitives';
-import { Icon } from '@/ui/Icon';
-import { NODE_STATUS } from '@/ui/status';
+import type { PluginEntry } from '../../core/contracts';
+import { NODE_KIND_LABEL } from '../../core/contracts';
+import { useNodes } from '../../app/data';
+import { useMutation } from '../../app/query';
+import { toast } from '../../app/stores';
+import { Modal } from '../../ui/overlays';
+import { Badge, Button, Dot } from '../../ui/primitives';
+import { Icon } from '../../ui/Icon';
+import { NODE_STATUS } from '../../ui/status';
 import { defaultsOf } from './SettingsForm';
-import { compare } from '@/core/lib/semver';
+import { compare } from '../../core/lib/semver';
 
 /** Three-step install: compatibility & nodes → permissions review → confirm. */
 export function InstallDialog({ entry, open, onClose }: { entry: PluginEntry; open: boolean; onClose: () => void }) {

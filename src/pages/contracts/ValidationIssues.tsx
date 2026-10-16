@@ -1,6 +1,6 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import { AlertCircle, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
-import type { ValidationReport } from '@/core/contracts';
+import type { ValidationReport } from '../../core/contracts';
 
 export function ValidationIssues({ report }: { report: ValidationReport }) {
   if (!report.issues.length) return <div className="row" style={{ padding: 14, color: 'var(--ok)' }}><CheckCircle2 size={15} />{tr("pages.contracts.ValidationIssues.s_0fdea00241")}</div>;

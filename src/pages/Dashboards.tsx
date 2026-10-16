@@ -1,22 +1,22 @@
-import { dashboardPlugins } from '@/core/registry/dashboardIndex';
-import { tr } from '@/i18n';
+import { dashboardPlugins } from '../core/registry/dashboardIndex';
+import { tr } from '../i18n';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Copy, Download, MoreHorizontal, Pin, Plus, Trash2, Upload } from 'lucide-react';
-import { useDashboards, usePlugins } from '@/app/data';
-import { useCan } from '@/app/stores';
-import { isInstalled } from '@/core/registry/plugins';
-import { generatePluginDashboard } from '@/core/registry/autodash';
-import { widgetRegistry } from '@/widgets/registry';
-import { DashboardConfig as DashboardSchema, type DashboardConfig } from '@/core/contracts';
-import { uid } from '@/core/lib/random';
-import { ago } from '@/core/lib/format';
-import { Button, Field, PageHead } from '@/ui/primitives';
-import { Menu, Modal, Confirm } from '@/ui/overlays';
-import { Empty, ErrorState, SkeletonRows } from '@/ui/states';
-import { Icon } from '@/ui/Icon';
-import { downloadJson, useDashboardActions } from '@/dashboards/useDashboardActions';
-import { toast } from '@/app/stores';
+import { useDashboards, usePlugins } from '../app/data';
+import { useCan } from '../app/stores';
+import { isInstalled } from '../core/registry/plugins';
+import { generatePluginDashboard } from '../core/registry/autodash';
+import { widgetRegistry } from '../widgets/registry';
+import { DashboardConfig as DashboardSchema, type DashboardConfig } from '../core/contracts';
+import { uid } from '../core/lib/random';
+import { ago } from '../core/lib/format';
+import { Button, Field, PageHead } from '../ui/primitives';
+import { Menu, Modal, Confirm } from '../ui/overlays';
+import { Empty, ErrorState, SkeletonRows } from '../ui/states';
+import { Icon } from '../ui/Icon';
+import { downloadJson, useDashboardActions } from '../dashboards/useDashboardActions';
+import { toast } from '../app/stores';
 
 const ICONS = [
   'layout-dashboard',

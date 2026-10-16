@@ -1,12 +1,12 @@
 import {SSHConnectDialog} from './SSHConnectDialog';
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import { useEffect, useState } from 'react';
 import { Copy } from 'lucide-react';
-import { useMutation } from '@/app/query';
-import { Modal } from '@/ui/overlays';
-import { Button, Field, Segmented } from '@/ui/primitives';
-import { NODE_KIND_LABEL } from '@/core/contracts';
-import type { PairingTicket } from '@/api';
+import { useMutation } from '../../app/query';
+import { Modal } from '../../ui/overlays';
+import { Button, Field, Segmented } from '../../ui/primitives';
+import { NODE_KIND_LABEL } from '../../core/contracts';
+import type { PairingTicket } from '../../api';
 
 export function PairDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [method,setMethod]=useState<'ssh'|'direct'>('ssh');

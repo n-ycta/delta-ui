@@ -1,5 +1,5 @@
-import { PluginNotices } from '@/ui/PluginNotices';
-import { tr } from '@/i18n';
+import { PluginNotices } from '../ui/PluginNotices';
+import { tr } from '../i18n';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Responsive, WidthProvider, type Layout } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
@@ -10,15 +10,15 @@ import type {
   TimeRangePreset,
   WidgetConfig,
   WidgetDisplay,
-} from '@/core/contracts';
-import { widgetRegistry } from '@/widgets/registry';
-import { usePlugins } from '@/app/data';
-import { queryClient } from '@/app/query';
-import { useCan } from '@/app/stores';
-import { Button, Segmented } from '@/ui/primitives';
-import { Empty } from '@/ui/states';
-import { uid } from '@/core/lib/random';
-import { nextFreeY } from '@/core/registry/autodash';
+} from '../core/contracts';
+import { widgetRegistry } from '../widgets/registry';
+import { usePlugins } from '../app/data';
+import { queryClient } from '../app/query';
+import { useCan } from '../app/stores';
+import { Button, Segmented } from '../ui/primitives';
+import { Empty } from '../ui/states';
+import { uid } from '../core/lib/random';
+import { nextFreeY } from '../core/registry/autodash';
 import { WidgetFrame } from './WidgetFrame';
 import { WidgetEditor } from './WidgetEditor';
 

@@ -1,4 +1,4 @@
-import type { SettingCondition, SettingField } from '@/core/contracts';
+import type { SettingCondition, SettingField } from '../../core/contracts';
 
 export function matchesCondition(
   condition: SettingCondition,

@@ -1,4 +1,4 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import { z } from 'zod';
 
 /** Version of the plugin ↔ panel contract implemented by this build of the console. */

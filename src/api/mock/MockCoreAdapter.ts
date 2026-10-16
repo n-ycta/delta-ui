@@ -1,10 +1,10 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import type {
   AuditEntry, ConnectionConfig, CoreEvent, DashboardConfig, EventQuery, MetricDescriptor, MetricQuery, MetricResult,
   NodeCommandId, NodeInfo, Notification, PluginInstance, Principal, RealtimeMessage, Role, UptimeCell,
-} from '@/core/contracts';
-import { NODE_COMMANDS } from '@/core/contracts';
-import { hashString, mulberry32, uid } from '@/core/lib/random';
+} from '../../core/contracts';
+import { NODE_COMMANDS } from '../../core/contracts';
+import { hashString, mulberry32, uid } from '../../core/lib/random';
 import type { CommandResult, CoreApi, CoreInfo, InstallRequest, LogLine, NodeHistory, PairingTicket, RawPluginRecord } from '../types';
 import { CoreApiError } from '../types';
 import { generateMetric, nodeSeries } from './generate';

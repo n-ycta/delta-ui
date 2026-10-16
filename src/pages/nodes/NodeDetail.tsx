@@ -1,4 +1,4 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import { useMemo, useRef, useState, useEffect } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
@@ -11,10 +11,10 @@ import {
   YAxis,
 } from 'recharts';
 import { AlertTriangle, ChevronLeft, Play, RotateCcw, Terminal, Trash2, Wifi } from 'lucide-react';
-import { useNodes, usePlugins } from '@/app/data';
-import { queryClient, useMutation, useQuery } from '@/app/query';
-import { toast, useCan } from '@/app/stores';
-import { useChartColors } from '@/app/theme';
+import { useNodes, usePlugins } from '../../app/data';
+import { queryClient, useMutation, useQuery } from '../../app/query';
+import { toast, useCan } from '../../app/stores';
+import { useChartColors } from '../../app/theme';
 import {
   ConnectionConfig,
   NODE_COMMANDS,
@@ -22,7 +22,7 @@ import {
   type NodeCommandId,
   type NodeInfo,
   type Series,
-} from '@/core/contracts';
+} from '../../core/contracts';
 import {
   ago,
   fmtBytes,
@@ -32,7 +32,7 @@ import {
   fmtAxisTime,
   DAY,
   HOUR,
-} from '@/core/lib/format';
+} from '../../core/lib/format';
 import {
   Badge,
   Button,
@@ -44,13 +44,13 @@ import {
   StatusBadge,
   Switch,
   Tabs,
-} from '@/ui/primitives';
-import { Confirm } from '@/ui/overlays';
-import { ChartSkeleton, Empty, ErrorState, Skeleton, SkeletonRows } from '@/ui/states';
-import { Icon } from '@/ui/Icon';
-import { NODE_STATUS, PLUGIN_STATUS, SEVERITY_LABEL } from '@/ui/status';
-import { NODE_ICON } from '@/widgets/system/NodeGridWidget';
-import { ChartTooltip } from '@/widgets/shared';
+} from '../../ui/primitives';
+import { Confirm } from '../../ui/overlays';
+import { ChartSkeleton, Empty, ErrorState, Skeleton, SkeletonRows } from '../../ui/states';
+import { Icon } from '../../ui/Icon';
+import { NODE_STATUS, PLUGIN_STATUS, SEVERITY_LABEL } from '../../ui/status';
+import { NODE_ICON } from '../../widgets/system/NodeGridWidget';
+import { ChartTooltip } from '../../widgets/shared';
 
 type Tab =
   | 'overview'

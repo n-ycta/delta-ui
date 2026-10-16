@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Download, RefreshCw } from 'lucide-react';
-import { tr, locale } from '@/i18n';
-import { useApi } from '@/app/ApiContext';
-import { useQuery, useMutation } from '@/app/query';
-import { useRuntimeAccess, toast } from '@/app/stores';
-import { Button, Panel, Switch, Field, Badge } from '@/ui/primitives';
-import { Confirm } from '@/ui/overlays';
-import type { UpdateSettings } from '@/api/updates';
+import { tr, locale } from '../i18n';
+import { useApi } from '../app/ApiContext';
+import { useQuery, useMutation } from '../app/query';
+import { useRuntimeAccess, toast } from '../app/stores';
+import { Button, Panel, Switch, Field, Badge } from '../ui/primitives';
+import { Confirm } from '../ui/overlays';
+import type { UpdateSettings } from '../api/updates';
 const text = (code?: string) => tr('updates.' + (code || 'operation_failed'));
 export function Updates() {
   const api = useApi(),

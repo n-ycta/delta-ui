@@ -1,9 +1,9 @@
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { WidgetProps } from '../types';
 import { axisTick, ChartTooltip, Legend, MetricData, toRows, useSeriesColors, valueTick } from '../shared';
-import { useChartColors } from '@/app/theme';
-import { fmtValue } from '@/core/lib/format';
-import type { MetricDescriptor, MetricResult, WidgetConfig } from '@/core/contracts';
+import { useChartColors } from '../../app/theme';
+import { fmtValue } from '../../core/lib/format';
+import type { MetricDescriptor, MetricResult, WidgetConfig } from '../../core/contracts';
 import type { WidgetContext } from '../types';
 
 /** Bars over time buckets (counter-like metrics) or over categories (categorical). */

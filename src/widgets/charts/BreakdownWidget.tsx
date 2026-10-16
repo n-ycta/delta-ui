@@ -1,10 +1,10 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import type { WidgetProps } from '../types';
 import { MetricData } from '../shared';
-import { useChartColors } from '@/app/theme';
-import { fmtValue } from '@/core/lib/format';
-import type { CategoryValue, MetricResult } from '@/core/contracts';
+import { useChartColors } from '../../app/theme';
+import { fmtValue } from '../../core/lib/format';
+import type { CategoryValue, MetricResult } from '../../core/contracts';
 
 function toCategories(r: MetricResult): CategoryValue[] {
   if (r.categories) return r.categories;

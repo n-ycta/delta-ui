@@ -1,15 +1,15 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowUpCircle, LayoutGrid, List, Search } from 'lucide-react';
-import { usePlugins } from '@/app/data';
-import { hasUpdate, isInstalled } from '@/core/registry/plugins';
-import type { PluginCategory, PluginEntry } from '@/core/contracts';
-import { ago } from '@/core/lib/format';
-import { Badge, Button, PageHead, Segmented, StatusBadge, Tabs } from '@/ui/primitives';
-import { Empty, ErrorState, SkeletonRows } from '@/ui/states';
-import { Icon } from '@/ui/Icon';
-import { PLUGIN_STATUS } from '@/ui/status';
+import { usePlugins } from '../../app/data';
+import { hasUpdate, isInstalled } from '../../core/registry/plugins';
+import type { PluginCategory, PluginEntry } from '../../core/contracts';
+import { ago } from '../../core/lib/format';
+import { Badge, Button, PageHead, Segmented, StatusBadge, Tabs } from '../../ui/primitives';
+import { Empty, ErrorState, SkeletonRows } from '../../ui/states';
+import { Icon } from '../../ui/Icon';
+import { PLUGIN_STATUS } from '../../ui/status';
 
 export const CATEGORY_LABEL: Record<PluginCategory, string> = { input: tr("pages.plugins.PluginsPage.s_c15522ef34"), health: tr("pages.plugins.PluginsPage.s_08930838eb"), finance: tr("pages.plugins.PluginsPage.s_61dcf3af42"), dev: tr("pages.plugins.PluginsPage.s_738724359f"), media: tr("pages.plugins.PluginsPage.s_198be2a9a8"), home: tr("pages.plugins.PluginsPage.s_92f3f459ec"), system: tr("pages.plugins.PluginsPage.s_3ac98f278c"), location: tr("pages.plugins.PluginsPage.s_eb6f9c21f2"), productivity: tr("pages.plugins.PluginsPage.s_7fadb95f60"), other: tr("pages.plugins.PluginsPage.s_8f96cac0d4") };
 

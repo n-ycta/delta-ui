@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef } from 'react';
-import type { DashboardConfig, MetricQuery, MetricResult, NodeInfo, Notification, PluginEntry } from '@/core/contracts';
-import { normalizePlugins } from '@/core/registry/plugins';
-import { defaultHomeDashboard } from '@/core/registry/autodash';
-import { widgetRegistry } from '@/widgets/registry';
+import type { DashboardConfig, MetricQuery, MetricResult, NodeInfo, Notification, PluginEntry } from '../core/contracts';
+import { normalizePlugins } from '../core/registry/plugins';
+import { defaultHomeDashboard } from '../core/registry/autodash';
+import { widgetRegistry } from '../widgets/registry';
 import { queryClient, useQuery } from './query';
 import { useApi } from './ApiContext';
 

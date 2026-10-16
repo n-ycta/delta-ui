@@ -1,13 +1,13 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import { Link } from 'react-router-dom';
 import type { WidgetProps } from '../types';
-import { usePlugins } from '@/app/data';
-import { isInstalled } from '@/core/registry/plugins';
-import { Icon } from '@/ui/Icon';
-import { Dot } from '@/ui/primitives';
-import { PLUGIN_STATUS } from '@/ui/status';
-import { ago, fmtNumber } from '@/core/lib/format';
-import { SkeletonRows, ErrorState } from '@/ui/states';
+import { usePlugins } from '../../app/data';
+import { isInstalled } from '../../core/registry/plugins';
+import { Icon } from '../../ui/Icon';
+import { Dot } from '../../ui/primitives';
+import { PLUGIN_STATUS } from '../../ui/status';
+import { ago, fmtNumber } from '../../core/lib/format';
+import { SkeletonRows, ErrorState } from '../../ui/states';
 
 export function PluginActivityWidget(_: WidgetProps) {
   const { data, loading, error, refetch } = usePlugins();

@@ -1,4 +1,4 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import { z } from 'zod';
 
 export const Role = z.enum(['owner', 'operator', 'analyst', 'viewer']);

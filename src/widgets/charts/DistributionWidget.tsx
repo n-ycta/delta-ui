@@ -1,9 +1,9 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import { Bar, BarChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { WidgetProps } from '../types';
 import { MetricData } from '../shared';
-import { useChartColors } from '@/app/theme';
-import { fmtNumber, fmtValue } from '@/core/lib/format';
+import { useChartColors } from '../../app/theme';
+import { fmtNumber, fmtValue } from '../../core/lib/format';
 
 export function DistributionWidget({ config, ctx }: WidgetProps) {
   const c = useChartColors(config.display.palette);

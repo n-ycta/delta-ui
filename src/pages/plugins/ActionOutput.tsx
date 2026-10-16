@@ -1,4 +1,4 @@
-import { Badge } from '@/ui/primitives';
+import { Badge } from '../../ui/primitives';
 function Value({ value, depth = 0 }: { value: unknown; depth?: number }) {
   if (typeof value === 'boolean')
     return <Badge tone={value ? 'ok' : 'warn'}>{String(value)}</Badge>;

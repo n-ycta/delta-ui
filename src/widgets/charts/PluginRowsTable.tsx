@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import type { WidgetProps } from '../types';
-import { useQuery } from '@/app/query';
-import { tr } from '@/i18n';
-import { Button } from '@/ui/primitives';
-import { Empty, ErrorState } from '@/ui/states';
-import { DataCell } from '@/pages/plugins/PluginDataViews';
-import { defaultsOf } from '@/pages/plugins/SettingsForm';
+import { useQuery } from '../../app/query';
+import { tr } from '../../i18n';
+import { Button } from '../../ui/primitives';
+import { Empty, ErrorState } from '../../ui/states';
+import { DataCell } from '../../pages/plugins/PluginDataViews';
+import { defaultsOf } from '../../pages/plugins/SettingsForm';
 
 /** Record-data mode of the existing table widget; all columns and endpoints come from the plugin. */
 export function PluginRowsTable({ config, ctx }: WidgetProps) {

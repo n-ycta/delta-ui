@@ -1,12 +1,12 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import { Link } from 'react-router-dom';
 import type { WidgetProps } from '../types';
-import { useNodes } from '@/app/data';
-import { Dot, Meter } from '@/ui/primitives';
-import { Icon } from '@/ui/Icon';
-import { NODE_STATUS } from '@/ui/status';
-import { ago } from '@/core/lib/format';
-import { ErrorState, SkeletonRows } from '@/ui/states';
+import { useNodes } from '../../app/data';
+import { Dot, Meter } from '../../ui/primitives';
+import { Icon } from '../../ui/Icon';
+import { NODE_STATUS } from '../../ui/status';
+import { ago } from '../../core/lib/format';
+import { ErrorState, SkeletonRows } from '../../ui/states';
 
 export const NODE_ICON: Record<string, string> = { vps: 'server', android: 'smartphone', desktop: 'monitor', sbc: 'cpu', container: 'container' };
 

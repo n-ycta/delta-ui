@@ -1,7 +1,7 @@
-import { tr } from '@/i18n';
+import { tr } from '../i18n';
 import { Link, useLocation } from 'react-router-dom';
-import { Empty } from '@/ui/states';
-import { Icon } from '@/ui/Icon';
+import { Empty } from '../ui/states';
+import { Icon } from '../ui/Icon';
 
 export function NotFound() {
   const loc = useLocation();

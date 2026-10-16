@@ -1,8 +1,8 @@
 import type { WidgetProps } from '../types';
 import { Delta, MetricData } from '../shared';
-import { fmtValue } from '@/core/lib/format';
-import { useChartColors } from '@/app/theme';
-import type { MetricDescriptor } from '@/core/contracts';
+import { fmtValue } from '../../core/lib/format';
+import { useChartColors } from '../../app/theme';
+import type { MetricDescriptor } from '../../core/contracts';
 
 function arc(cx: number, cy: number, r: number, a0: number, a1: number) {
   const p = (a: number) => [cx + r * Math.cos(a), cy + r * Math.sin(a)];

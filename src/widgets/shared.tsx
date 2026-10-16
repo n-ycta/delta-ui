@@ -1,12 +1,12 @@
-import { tr } from '@/i18n';
+import { tr } from '../i18n';
 import { queryStep } from './intervals';
 import { useMemo, type ReactNode } from 'react';
 import { ArrowDownRight, ArrowUpRight, Minus } from 'lucide-react';
-import type { MetricDescriptor, MetricQuery, MetricResult, Series, WidgetConfig } from '@/core/contracts';
-import { fmtAxisTime, fmtDateTime, fmtValue } from '@/core/lib/format';
-import { useMetric } from '@/app/data';
-import { useChartColors } from '@/app/theme';
-import { ChartSkeleton, Empty, ErrorState } from '@/ui/states';
+import type { MetricDescriptor, MetricQuery, MetricResult, Series, WidgetConfig } from '../core/contracts';
+import { fmtAxisTime, fmtDateTime, fmtValue } from '../core/lib/format';
+import { useMetric } from '../app/data';
+import { useChartColors } from '../app/theme';
+import { ChartSkeleton, Empty, ErrorState } from '../ui/states';
 import type { WidgetContext } from './types';
 
 export function buildQuery(cfg: WidgetConfig, ctx: WidgetContext, overrides: Partial<MetricQuery> = {}): MetricQuery | null {

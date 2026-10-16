@@ -1,4 +1,4 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import type { WidgetProps } from '../types';
 
 /** Free-form note — useful to annotate dashboards. Supports **bold**, `code` and line breaks. */

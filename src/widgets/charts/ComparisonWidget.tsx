@@ -1,9 +1,9 @@
-import { tr } from '@/i18n';
+import { tr } from '../../i18n';
 import type { WidgetProps } from '../types';
 import { Delta, MetricData } from '../shared';
-import { useChartColors } from '@/app/theme';
-import { fmtValue } from '@/core/lib/format';
-import { Sparkline } from '@/ui/Sparkline';
+import { useChartColors } from '../../app/theme';
+import { fmtValue } from '../../core/lib/format';
+import { Sparkline } from '../../ui/Sparkline';
 
 /** Side-by-side comparison of dimension values (e.g. typing speed RU vs EN) with gap and trend. */
 export function ComparisonWidget({ config, ctx }: WidgetProps) {

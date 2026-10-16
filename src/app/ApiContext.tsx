@@ -1,6 +1,6 @@
-import { tr } from '@/i18n';
+import { tr } from '../i18n';
 import { createContext, useContext, type ReactNode } from 'react';
-import type { CoreApi } from '@/api';
+import type { CoreApi } from '../api';
 
 const Ctx = createContext<CoreApi | null>(null);
 export function ApiProvider({ api, children }: { api: CoreApi; children: ReactNode }) { return <Ctx.Provider value={api}>{children}</Ctx.Provider>; }

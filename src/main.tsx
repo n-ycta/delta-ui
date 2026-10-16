@@ -1,4 +1,4 @@
-import { tr } from '@/i18n';
+import { tr } from './i18n';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import '@fontsource/ibm-plex-sans/400.css';
@@ -9,8 +9,8 @@ import '@fontsource/ibm-plex-mono/500.css';
 import './styles/tokens.css';
 import './styles/base.css';
 import './styles/components.css';
-import { createCoreApi } from '@/api';
-import { ApiProvider } from '@/app/ApiContext';
+import { createCoreApi } from './api';
+import { ApiProvider } from './app/ApiContext';
 import { App } from './App';
 import { discoverHost } from './host/browser';
 import { installHostBridge } from './host/contract';
