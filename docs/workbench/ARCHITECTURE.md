@@ -10,7 +10,7 @@ Reviewed Core platform/identity/peer/host contracts, UI SDK client/channel, host
 - MCP: real scoped gateways. Not an implemented AI agent harness.
 - Web: real administrative projection. Desktop/Android: thin hosts sharing delta-ui.
 - Updater/Provision/Observability: real headless services. Not OS-binary self-update, VPN or complete uptime reporting.
-- Media: real local/direct/RSS MVP, limited platform decoding/CORS. YouTube/Nostr/Blossom adapters and cross-device sync remain future work.
+- Media: real local/direct/RSS playback and cliamp public radio presets/catalog search, limited platform decoding/CORS. YouTube/Nostr/Blossom adapters and cross-device sync remain future work.
 - Send/Sync/Health/Connect/Flow/Scope/Grab: roadmap, no available implementation repositories. No pretend chat, Samsung Health, graph executor or downloader in the UI.
 
 ## Alternatives reviewed
@@ -25,6 +25,12 @@ Profile = identity/display profile. Application = saved interface. Workspace = c
 
 Built-in system pages reuse the authenticated API and existing capabilities. Each embedded page has its own React root/MemoryRouter, not a nested router in the same tree. Portable plugins retain isolated origins, source/origin/nonce checks and explicit grants in the existing Plugin UI SDK. The builder never executes arbitrary JS, accepts raw HTML/CSS or changes auth. Hidden views are visual only; security/recovery controls live outside editable trees.
 
-The first integration is an explicit `/workbench` route, not an automatic destructive replacement of the existing Console. Standalone HTML provides actual local notes, file playback, layout editing and persistence; system screens explicitly require Core. Production uses real system screens and installed apps. Existing auth remains outside the workbench. Layouts currently persist per browser/device with previous-version backup and portable export; node/profile storage and synchronization are NOT claimed. Local files/notes are separate and never exported with the layout.
+The first integration is an explicit `/workbench` route, not an automatic destructive replacement of the existing Console. Standalone HTML provides local notes, file playback, editing, persistence and the original Console screens using an explicitly labeled mock adapter. It does not connect to a real node or overwrite connection settings. Production uses the original authenticated system screens and installed apps. Existing auth remains outside the workbench. Layouts persist locally with previous-version backup and portable export. Connected hosts additionally support explicit owner-private node save/load with revision conflict checks and a 48 KB limit. This is manual persistence, not automatic cross-device synchronization. Local files/notes are separate and never exported with the layout.
 
 Four starters: Console / Media / Studio / Canvas. Four scoped themes: Paper and Daylight (light), Graphite and Midnight (dark). Plugin SDK v1 still receives light/dark; additional theme semantics are host-local. Full official Phosphor regular pool is bundled offline, MIT notice retained.
+
+## Reuse and controls
+
+The complete original Console remains available, including plugins, node details, events, dashboards, contracts, access, keys and settings. Existing individual dashboard widgets can be composed through the original WidgetFrame renderer and editor; edits affect the linked dashboard. Home heading/date/description and the summary strip have separate visibility/text settings and composable fragments.
+
+The tree renderer, outline, appearance inspector, shared controls, persistence, SDK contribution schema and plugin surfaces are separate modules. React and vanilla Media controls share the same visual contract: custom keyboard-accessible popup lists, styled checkbox states, bounded scrolling and responsive touch controls. See `../sdk/UI-SURFACES.md` for the shared-plugin-instance boundary.

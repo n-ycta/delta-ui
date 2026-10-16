@@ -2210,6 +2210,7 @@
     "media_playlists": "Playlists",
     "media_queue": "Queue",
     "media_stats": "Statistics",
-    "mediaDependency": "Requires Delta Media ≥ 0.1.0-alpha.3. The standalone HTML includes only the local file player."
+    "mediaDependency": "Requires Delta Media ≥ 0.1.0-alpha.3. The standalone HTML includes only the local file player.",
+    "requiresPlugin": "plugin required"
   }
 }

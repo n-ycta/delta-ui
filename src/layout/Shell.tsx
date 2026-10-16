@@ -16,7 +16,7 @@ import { CommandPalette } from './CommandPalette';
 import { NotificationsPanel } from './Notifications';
 import { RealtimeBridge } from './Realtime';
 
-export function Shell({ children }: { children: ReactNode }) {
+export function Shell({ children,embedded=false }: { children: ReactNode;embedded?:boolean }) {
   const route=useLocation().pathname;
   const appView=route.startsWith('/apps/')||route==='/workbench';
   const setupOwner=useRuntimeAccess(s=>s.name==='browser-owner');
@@ -30,15 +30,16 @@ export function Shell({ children }: { children: ReactNode }) {
     else useRuntimeAccess.getState().set(info.data?.principal ?? { role: 'viewer', name: '', scopes: [] });
   }, [api.mode, info.data]);
   useEffect(() => {
+    if(embedded)return;
     document.documentElement.dataset.theme = theme;
     document.documentElement.dataset.density = prefs.density;
-  }, [theme, prefs.density]);
+  }, [theme, prefs.density,embedded]);
   const authRequired = (info.error as {code?:string;status?:number}|undefined)?.code === 'unauthorized' || (info.error as {status?:number}|undefined)?.status === 401;
   const disconnected = ui.connection.state === 'closed' || ui.connection.state === 'reconnecting';
   if(appView)return <><RealtimeBridge />{children}<NotificationsPanel /><Toasts /></>;
   return (
     <div className="shell" data-collapsed={prefs.sidebarCollapsed} data-mobile-nav={ui.mobileNav}>
-      <RealtimeBridge />
+      {!embedded&&<RealtimeBridge />}
       <Sidebar />
       {ui.mobileNav && <div className="overlay mobile-only" style={{ zIndex: 54 }} onClick={() => ui.set({ mobileNav: false })} />}
       <div className="main">
@@ -65,8 +66,7 @@ export function Shell({ children }: { children: ReactNode }) {
         <main className="content">{children}</main>
       </div>
       <CommandPalette />
-      <NotificationsPanel />
-      <Toasts />
+      {!embedded&&<><NotificationsPanel /><Toasts /></>}
     </div>
   );
 }

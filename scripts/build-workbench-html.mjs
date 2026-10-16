@@ -1,4 +1,39 @@
-import {build} from 'esbuild';import {readFile,mkdir,writeFile} from 'node:fs/promises';
-const result=await build({entryPoints:['src/workbench/standalone.tsx'],bundle:true,write:false,outfile:'workbench.js',format:'iife',platform:'browser',target:['es2022'],jsx:'automatic',minify:true,define:{'process.env.NODE_ENV':'"production"','import.meta.env':'{"DEV":false,"VITE_ENABLE_DEMO":"true"}'},loader:{'.woff2':'dataurl','.woff':'dataurl','.svg':'dataurl','.png':'dataurl'},legalComments:'eof'});
-const logo='data:image/svg+xml;base64,'+(await readFile('public/delta-logo.svg')).toString('base64');const js=result.outputFiles.find(f=>f.path.endsWith('.js')).text.replaceAll('./delta-logo.svg',logo).replaceAll('</script','<\\/script');const css=result.outputFiles.find(f=>f.path.endsWith('.css')).text.replaceAll('</style','<\\/style');await mkdir('artifacts',{recursive:true});const license=await readFile('docs/workbench/PHOSPHOR-LICENSE','utf8');
-const html=`<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Delta — Рабочая среда</title><style>html,body,#root{margin:0;width:100%;height:100%}${css}</style></head><body><div id="root"></div><script>try{if(!localStorage.getItem('delta.language'))localStorage.setItem('delta.language','ru')}catch{};${js}</script><!-- Phosphor Icons\n${license}--></body></html>`;await writeFile('artifacts/delta-workbench.html',html);console.log('Self-contained HTML:',Buffer.byteLength(html),'bytes');
+import { build } from "esbuild";
+import { readFile, mkdir, writeFile } from "node:fs/promises";
+const result = await build({
+  entryPoints: ["src/workbench/standalone.tsx"],
+  bundle: true,
+  write: false,
+  outfile: "workbench.js",
+  format: "iife",
+  platform: "browser",
+  target: ["es2022"],
+  jsx: "automatic",
+  minify: true,
+  define: {
+    "process.env.NODE_ENV": '"production"',
+    "import.meta.env": '{"DEV":false,"VITE_ENABLE_DEMO":"true"}',
+  },
+  loader: {
+    ".woff2": "dataurl",
+    ".woff": "dataurl",
+    ".svg": "dataurl",
+    ".png": "dataurl",
+  },
+  legalComments: "eof",
+});
+const logo =
+  "data:image/svg+xml;base64," +
+  (await readFile("public/delta-logo.svg")).toString("base64");
+const js = result.outputFiles
+  .find((f) => f.path.endsWith(".js"))
+  .text.replaceAll("./delta-logo.svg", logo)
+  .replaceAll("</script", "<\\/script");
+const css = result.outputFiles
+  .find((f) => f.path.endsWith(".css"))
+  .text.replaceAll("</style", "<\\/style");
+await mkdir("artifacts", { recursive: true });
+const license = await readFile("docs/workbench/PHOSPHOR-LICENSE", "utf8");
+const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Delta — Рабочая среда</title><style>html,body,#root{margin:0;width:100%;height:100%}${css}</style></head><body><div id="root"></div><script>try{if(!localStorage.getItem('delta.language'))localStorage.setItem('delta.language','ru')}catch{};${js}</script><!-- Phosphor Icons\n${license}--></body></html>`;
+await writeFile("artifacts/delta-workbench.html", html);
+console.log("Self-contained HTML:", Buffer.byteLength(html), "bytes");

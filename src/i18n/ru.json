@@ -2210,6 +2210,7 @@
     "media_playlists": "Плейлисты",
     "media_queue": "Очередь",
     "media_stats": "Статистика",
-    "mediaDependency": "Требуется Delta Media ≥ 0.1.0-alpha.3. В автономном HTML доступен только локальный файловый плеер."
+    "mediaDependency": "Требуется Delta Media ≥ 0.1.0-alpha.3. В автономном HTML доступен только локальный файловый плеер.",
+    "requiresPlugin": "нужен плагин"
   }
 }

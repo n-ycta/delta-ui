@@ -1,16 +1,228 @@
-import {Children,isValidElement,useEffect,useLayoutEffect,useRef,useState,type SelectHTMLAttributes,type ReactElement} from 'react';
-import {createPortal} from 'react-dom';
-import {CaretDown,Check} from '@phosphor-icons/react';
-import './controls.css';
+import {
+  Children,
+  isValidElement,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type SelectHTMLAttributes,
+  type ReactElement,
+  type CSSProperties,
+} from "react";
+import { createPortal } from "react-dom";
+import { CaretDown, Check } from "@phosphor-icons/react";
+
 /** Native form semantics; custom accessible popup. No browser-owned option menu. */
-export function Select(props:SelectHTMLAttributes<HTMLSelectElement>){
- const native=useRef<HTMLSelectElement>(null),button=useRef<HTMLButtonElement>(null),list=useRef<HTMLDivElement>(null);const[open,setOpen]=useState(false),[tick,setTick]=useState(0),[rect,setRect]=useState({left:0,top:0,width:0}),[index,setIndex]=useState(0);
- const options=Children.toArray(props.children).filter(isValidElement).map(e=>{const p=(e as ReactElement<{value?:string;disabled?:boolean;children?:React.ReactNode}>).props;return {value:String(p.value??p.children??''),label:p.children,disabled:!!p.disabled}});
- const value=String(props.value??native.current?.value??props.defaultValue??options[0]?.value??'');const selected=options.find(o=>o.value===value);void tick;
- const close=()=>{setOpen(false);button.current?.focus()};
- const choose=(i:number)=>{const o=options[i];if(!o||o.disabled)return;const el=native.current!;el.value=o.value;el.dispatchEvent(new Event('change',{bubbles:true}));setTick(v=>v+1);close()};
- useLayoutEffect(()=>{if(!open)return;const position=()=>{const r=button.current!.getBoundingClientRect();setRect({left:Math.min(r.left,innerWidth-Math.max(r.width,160)-8),top:r.bottom+8+Math.min(280,options.length*40)>innerHeight?Math.max(8,r.top-Math.min(280,options.length*40)-8):r.bottom+8,width:Math.max(r.width,160)})};position();window.addEventListener('resize',position);window.addEventListener('scroll',position,true);return()=>{window.removeEventListener('resize',position);window.removeEventListener('scroll',position,true)}},[open,options.length]);
- useEffect(()=>{if(!open)return;list.current?.focus();const outside=(e:PointerEvent)=>{if(!list.current?.contains(e.target as Node)&&!button.current?.contains(e.target as Node))setOpen(false)};document.addEventListener('pointerdown',outside);return()=>document.removeEventListener('pointerdown',outside)},[open]);
- const toggle=()=>{setIndex(Math.max(0,options.findIndex(o=>o.value===value)));setOpen(v=>!v)};
- return <span className="delta-select"><select {...props} ref={native} tabIndex={-1} aria-hidden="true" className={'delta-select-native '+(props.className||'')} onChange={e=>{props.onChange?.(e);setTick(v=>v+1)}}/><button ref={button} type="button" role="combobox" aria-expanded={open} aria-haspopup="listbox" aria-label={props['aria-label']||native.current?.labels?.[0]?.textContent||props.title} disabled={props.disabled} className="delta-select-trigger" onClick={toggle} onKeyDown={e=>{if(['ArrowDown','ArrowUp'].includes(e.key)){e.preventDefault();toggle()}}}><span>{selected?.label}</span><CaretDown size={16}/></button>{open&&createPortal(<div ref={list} tabIndex={0} role="listbox" className="delta-select-popup" style={{left:Math.max(8,rect.left),top:rect.top,width:rect.width}} onKeyDown={e=>{if(e.key==='Escape'){e.stopPropagation();close()}else if(e.key==='Tab')setOpen(false);else if(e.key==='Enter'||e.key===' '){e.preventDefault();choose(index)}else if(['ArrowDown','ArrowUp','Home','End'].includes(e.key)){e.preventDefault();setIndex(i=>e.key==='Home'?0:e.key==='End'?options.length-1:(i+(e.key==='ArrowDown'?1:-1)+options.length)%options.length)}else if(e.key.length===1){const next=options.findIndex(o=>String(o.label).toLowerCase().startsWith(e.key.toLowerCase()));if(next>=0)setIndex(next)}}}>{options.map((o,i)=><button key={o.value} type="button" tabIndex={-1} role="option" aria-selected={o.value===value} disabled={o.disabled} className={i===index?'focused':''} onPointerMove={()=>setIndex(i)} onClick={()=>choose(i)}><span>{o.label}</span>{o.value===value&&<Check size={16}/>}</button>)}</div>,document.body)}</span>
+export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
+  const native = useRef<HTMLSelectElement>(null),
+    button = useRef<HTMLButtonElement>(null),
+    list = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false),
+    [tick, setTick] = useState(0),
+    [rect, setRect] = useState({ left: 0, top: 0, width: 0 }),
+    [index, setIndex] = useState(0);
+  const options = Children.toArray(props.children)
+    .filter(isValidElement)
+    .map((e) => {
+      const p = (
+        e as ReactElement<{
+          value?: string;
+          disabled?: boolean;
+          children?: React.ReactNode;
+        }>
+      ).props;
+      return {
+        value: String(p.value ?? p.children ?? ""),
+        label: p.children,
+        disabled: !!p.disabled,
+      };
+    });
+  const [popupTheme, setPopupTheme] = useState<CSSProperties>({});
+  const value = String(
+    props.value ??
+      native.current?.value ??
+      props.defaultValue ??
+      options[0]?.value ??
+      "",
+  );
+  const selected = options.find((o) => o.value === value);
+  void tick;
+  const close = () => {
+    setOpen(false);
+    button.current?.focus();
+  };
+  const choose = (i: number) => {
+    const o = options[i];
+    if (!o || o.disabled) return;
+    const el = native.current!;
+    el.value = o.value;
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+    setTick((v) => v + 1);
+    close();
+  };
+  useLayoutEffect(() => {
+    if (!open) return;
+    const position = () => {
+      const computed = getComputedStyle(button.current!);
+      const wb = !!button.current?.closest(".wb");
+      setPopupTheme(
+        Object.fromEntries(
+          ["surface", "ink", "hover", "rule", "accent"].map((k) => [
+            "--" + k,
+            computed.getPropertyValue(
+              wb
+                ? {
+                    surface: "--wb-surface",
+                    ink: "--wb-text",
+                    hover: "--wb-raised",
+                    rule: "--wb-line",
+                    accent: "--wb-accent",
+                  }[k] || "--" + k
+                : "--" + k,
+            ),
+          ]),
+        ) as CSSProperties,
+      );
+      const r = button.current!.getBoundingClientRect();
+      setRect({
+        left: Math.min(r.left, innerWidth - Math.max(r.width, 160) - 8),
+        top:
+          r.bottom + 8 + Math.min(280, options.length * 40) > innerHeight
+            ? Math.max(8, r.top - Math.min(280, options.length * 40) - 8)
+            : r.bottom + 8,
+        width: Math.max(r.width, 160),
+      });
+    };
+    position();
+    window.addEventListener("resize", position);
+    window.addEventListener("scroll", position, true);
+    return () => {
+      window.removeEventListener("resize", position);
+      window.removeEventListener("scroll", position, true);
+    };
+  }, [open, options.length]);
+  useEffect(() => {
+    if (!open) return;
+    list.current?.focus();
+    const outside = (e: PointerEvent) => {
+      if (
+        !list.current?.contains(e.target as Node) &&
+        !button.current?.contains(e.target as Node)
+      )
+        setOpen(false);
+    };
+    document.addEventListener("pointerdown", outside);
+    return () => document.removeEventListener("pointerdown", outside);
+  }, [open]);
+  const toggle = () => {
+    setIndex(
+      Math.max(
+        0,
+        options.findIndex((o) => o.value === value),
+      ),
+    );
+    setOpen((v) => !v);
+  };
+  return (
+    <span className="delta-select">
+      <select
+        {...props}
+        ref={native}
+        onFocus={() => button.current?.focus()}
+        tabIndex={-1}
+        aria-hidden="true"
+        className={"delta-select-native " + (props.className || "")}
+        onChange={(e) => {
+          props.onChange?.(e);
+          setTick((v) => v + 1);
+        }}
+      />
+      <button
+        ref={button}
+        type="button"
+        role="combobox"
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        aria-label={
+          props["aria-label"] ||
+          native.current?.labels?.[0]?.textContent ||
+          props.title
+        }
+        disabled={props.disabled}
+        className="delta-select-trigger"
+        onClick={toggle}
+        onKeyDown={(e) => {
+          if (["ArrowDown", "ArrowUp"].includes(e.key)) {
+            e.preventDefault();
+            toggle();
+          }
+        }}
+      >
+        <span>{selected?.label}</span>
+        <CaretDown size={16} />
+      </button>
+      {open &&
+        createPortal(
+          <div
+            ref={list}
+            tabIndex={0}
+            role="listbox"
+            className="delta-select-popup"
+            style={{
+              ...popupTheme,
+              left: Math.max(8, rect.left),
+              top: rect.top,
+              width: rect.width,
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") {
+                e.stopPropagation();
+                close();
+              } else if (e.key === "Tab") setOpen(false);
+              else if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                choose(index);
+              } else if (
+                ["ArrowDown", "ArrowUp", "Home", "End"].includes(e.key)
+              ) {
+                e.preventDefault();
+                setIndex((i) =>
+                  e.key === "Home"
+                    ? 0
+                    : e.key === "End"
+                      ? options.length - 1
+                      : (i +
+                          (e.key === "ArrowDown" ? 1 : -1) +
+                          options.length) %
+                        options.length,
+                );
+              } else if (e.key.length === 1) {
+                const next = options.findIndex((o) =>
+                  String(o.label).toLowerCase().startsWith(e.key.toLowerCase()),
+                );
+                if (next >= 0) setIndex(next);
+              }
+            }}
+          >
+            {options.map((o, i) => (
+              <button
+                key={o.value}
+                type="button"
+                tabIndex={-1}
+                role="option"
+                aria-selected={o.value === value}
+                disabled={o.disabled}
+                className={i === index ? "focused" : ""}
+                onPointerMove={() => setIndex(i)}
+                onClick={() => choose(i)}
+              >
+                <span>{o.label}</span>
+                {o.value === value && <Check size={16} />}
+              </button>
+            ))}
+          </div>,
+          document.body,
+        )}
+    </span>
+  );
 }

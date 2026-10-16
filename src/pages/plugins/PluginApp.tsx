@@ -5,12 +5,28 @@ import { appCall } from "../../sdk/apps";
 import { pluginChannel } from "../../sdk/channel";
 import { language, tr } from "../../i18n";
 import { useResolvedTheme } from "../../app/theme";
-export function PluginApp(){const {id}=useParams();return <PluginSurface id={id}/>}
-export function PluginSurface({id,surface,inline=false,themeOverride}:{id?:string;surface?:string;inline?:boolean;themeOverride?:'light'|'dark'}) {
+export function PluginApp() {
+  const { id } = useParams();
+  return <PluginSurface id={id} />;
+}
+export function PluginSurface({
+  id,
+  surface,
+  inline = false,
+  themeOverride,
+}: {
+  id?: string;
+  surface?: string;
+  inline?: boolean;
+  themeOverride?: "light" | "dark";
+}) {
   const resolvedTheme = useResolvedTheme();
-  const theme=themeOverride||resolvedTheme;
-  const brokerRef=useRef<ReturnType<typeof pluginChannel>|undefined>(undefined);
-  const presentation=useRef({appId:id,language,theme,surface});presentation.current={appId:id,language,theme,surface};
+  const theme = themeOverride || resolvedTheme;
+  const brokerRef = useRef<ReturnType<typeof pluginChannel> | undefined>(
+    undefined,
+  );
+  const presentation = useRef({ appId: id, language, theme, surface });
+  presentation.current = { appId: id, language, theme, surface };
   const frame = useRef<HTMLIFrameElement>(null);
   const [src, setSrc] = useState(""),
     [error, setError] = useState("");
@@ -22,8 +38,12 @@ export function PluginSurface({id,surface,inline=false,themeOverride}:{id?:strin
       .then((result: any) => {
         if (cancelled) return;
         const u = new URL(result.url);
-        const appOrigin=u.origin === "null" ? u.protocol + "//" + u.host : u.origin;
-        const rootOrigin=location.origin === "null" ? location.protocol + "//" + location.host : location.origin;
+        const appOrigin =
+          u.origin === "null" ? u.protocol + "//" + u.host : u.origin;
+        const rootOrigin =
+          location.origin === "null"
+            ? location.protocol + "//" + location.host
+            : location.origin;
         if (
           appOrigin === rootOrigin ||
           (!["http:", "https:"].includes(u.protocol) &&
@@ -38,7 +58,10 @@ export function PluginSurface({id,surface,inline=false,themeOverride}:{id?:strin
         u.searchParams.set("parentOrigin", parentOrigin);
         u.searchParams.set("language", language);
         u.searchParams.set("theme", theme);
-        if(surface){u.searchParams.set("surface",surface);u.searchParams.set("chrome","0")}
+        if (surface) {
+          u.searchParams.set("surface", surface);
+          u.searchParams.set("chrome", "0");
+        }
         setSrc(u.href);
       })
       .catch((e) => {
@@ -56,16 +79,16 @@ export function PluginSurface({id,surface,inline=false,themeOverride}:{id?:strin
     const initialize = () => {
       const source = frame.current?.contentWindow;
       if (!source) return;
-      broker?.revoke();
-      broker = pluginChannel({
-        source,
-        origin,
-        grants: new Set(),
-        call: async () => {
-          throw Error("forbidden");
-        },
-      });
-      brokerRef.current=broker;
+      if (!broker)
+        broker = pluginChannel({
+          source,
+          origin,
+          grants: new Set(),
+          call: async () => {
+            throw Error("forbidden");
+          },
+        });
+      brokerRef.current = broker;
       source.postMessage(
         {
           type: "delta:initialize",
@@ -87,12 +110,25 @@ export function PluginSurface({id,surface,inline=false,themeOverride}:{id?:strin
     const node = frame.current;
     node?.addEventListener("load", initialize);
     return () => {
-      broker?.revoke();brokerRef.current=undefined;
+      broker?.revoke();
+      brokerRef.current = undefined;
       window.removeEventListener("message", ready);
       node?.removeEventListener("load", initialize);
     };
   }, [src, id]);
-  useEffect(()=>{if(!src||!brokerRef.current)return;const u=new URL(src);const origin=u.origin==='null'?u.protocol+'//'+u.host:u.origin;frame.current?.contentWindow?.postMessage({type:'delta:presentation',channel:brokerRef.current.channel,context:presentation.current},origin)},[src,theme,surface]);
+  useEffect(() => {
+    if (!src || !brokerRef.current) return;
+    const u = new URL(src);
+    const origin = u.origin === "null" ? u.protocol + "//" + u.host : u.origin;
+    frame.current?.contentWindow?.postMessage(
+      {
+        type: "delta:presentation",
+        channel: brokerRef.current.channel,
+        context: presentation.current,
+      },
+      origin,
+    );
+  }, [src, theme, surface]);
   return error ? (
     <div className="page">
       <div role="alert" className="banner err">
@@ -101,12 +137,14 @@ export function PluginSurface({id,surface,inline=false,themeOverride}:{id?:strin
     </div>
   ) : src ? (
     <div className="plugin-app-host">
-      {!inline&&<div className="plugin-app-toolbar">
-        <Link className="btn ghost" to="/plugins">
-          <ArrowLeft size={16} />
-          {tr("apps.console")}
-        </Link>
-      </div>}
+      {!inline && (
+        <div className="plugin-app-toolbar">
+          <Link className="btn ghost" to="/plugins">
+            <ArrowLeft size={16} />
+            {tr("apps.console")}
+          </Link>
+        </div>
+      )}
       <iframe
         ref={frame}
         src={src}

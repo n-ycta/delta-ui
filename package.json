@@ -58,7 +58,8 @@
     "./host": "./src/host/contract.ts",
     "./sdk": "./src/sdk/channel.ts",
     "./package.json": "./package.json",
-    "./sdk/client": "./src/sdk/client.ts"
+    "./sdk/client": "./src/sdk/client.ts",
+    "./sdk/surfaces": "./src/sdk/surfaces.ts"
   },
   "files": [
     "src",

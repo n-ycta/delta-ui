@@ -1,3 +1,4 @@
+import {useApi} from './app/ApiContext';
 import type { ReactNode } from 'react';
 import { HashRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { ConsoleRoutes } from './ConsoleRoutes';
@@ -7,7 +8,7 @@ import { ErrorBoundary } from './dashboards/ErrorBoundary';
 import { ErrorState } from './ui/states';
 import { Button } from './ui/primitives';
 import { tr } from './i18n';
-export function App(){return <HashRouter><Shell><RouteBoundary><Routes><Route path="/workbench" element={<LiveWorkbench/>}/><Route path="*" element={<ConsoleRoutes/>}/></Routes></RouteBoundary></Shell></HashRouter>}
+export function App(){return <HashRouter><Shell><RouteBoundary><Routes><Route path="/workbench" element={<LiveWorkbench demo={useApi().mode==='mock'}/>}/><Route path="*" element={<ConsoleRoutes/>}/></Routes></RouteBoundary></Shell></HashRouter>}
 /** Page-level crash isolation: a broken page never takes down the shell; navigating away resets it. */
 function RouteBoundary({ children }: { children: ReactNode }) {
   const loc = useLocation();
