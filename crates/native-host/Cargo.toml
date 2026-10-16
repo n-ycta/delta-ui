@@ -1,14 +1,28 @@
 [package]
 name = "delta-native-host"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "Apache-2.0"
 
 [dependencies]
-delta-host-runtime = {git="https://github.com/n-ycta/delta",rev="fba9d27be9d48964a4cf213b59c7fbbe2f3e0645"}
+delta-host-runtime = {git="https://github.com/n-ycta/delta",rev="e841d9ad283b78cfc383f1fc8653e77e2c050216"}
 serde_json = "1"
 tauri = {version="2",features=[]}
 
 [target.'cfg(not(target_os = "android"))'.dependencies]
-delta-host-runtime = {git="https://github.com/n-ycta/delta",rev="fba9d27be9d48964a4cf213b59c7fbbe2f3e0645",features=["desktop"]}
+delta-host-runtime = {git="https://github.com/n-ycta/delta",rev="e841d9ad283b78cfc383f1fc8653e77e2c050216",features=["desktop"]}
 tauri = {version="2",features=["tray-icon"]}
+
+[target.'cfg(not(target_os = "android"))'.dependencies.tauri-plugin-single-instance]
+version="2"
+[target.'cfg(not(target_os = "android"))'.dependencies.tauri-plugin-autostart]
+version="2"
+[target.'cfg(not(target_os = "android"))'.dependencies.tauri-plugin-dialog]
+version="2"
+[target.'cfg(not(target_os = "android"))'.dependencies.tauri-plugin-opener]
+version="2"
+[target.'cfg(not(target_os = "android"))'.dependencies.tauri-plugin-notification]
+version="2"
+[target.'cfg(target_os = "android")'.dependencies]
+jni="0.21"
+tokio={version="1",features=["rt-multi-thread"]}

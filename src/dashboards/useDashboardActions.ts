@@ -1,3 +1,4 @@
+import {hostBridge} from '../host/contract';
 import { tr } from '../i18n';
 import { useApi } from '../app/ApiContext';
 import { queryClient } from '../app/query';
@@ -32,6 +33,7 @@ export function useDashboardActions() {
 }
 
 export function downloadJson(name: string, data: unknown) {
+  const host=hostBridge();if(host){void host.call({capability:'host.export',args:{data}}).catch(e=>toast({severity:'error',title:tr('host.unavailable'),body:String(e)}));return;}
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
   a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);

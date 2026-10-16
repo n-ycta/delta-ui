@@ -14,14 +14,15 @@ import { ApiProvider } from './app/ApiContext';
 import { App } from './App';
 import { discoverHost } from './host/browser';
 import { installHostBridge } from './host/contract';
-import { NativeHome } from './host/NativeHome';
+import {startNativeLifecycle} from './host/lifecycle';
+import {projectNative} from './host/projection';
 
 document.title = tr('runtime.appTitle');
 async function boot() {
  const host = await discoverHost();
- if(host) installHostBridge(host);
+ if(host){installHostBridge(projectNative(host));startNativeLifecycle();}
  const root=createRoot(document.getElementById('root')!);
- if(host) { root.render(<StrictMode><NativeHome bridge={host}/></StrictMode>);return; }
+
  const api=createCoreApi();
  root.render(<StrictMode><ApiProvider api={api}><App /></ApiProvider></StrictMode>);
 }

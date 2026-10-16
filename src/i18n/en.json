@@ -1941,5 +1941,32 @@
     "explanation": "Install or enable a compatible provider to use this feature. The rest of the plugin remains available.",
     "installHint": "Select optional providers. Unselected integrations remain unavailable; the main plugin can still be installed.",
     "executableWarning": "Installing this dependency executes trusted code on the selected node. Review its requested scopes."
+  },
+  "native": {
+    "title": "Native connection",
+    "privacy": "The local node runs inside this app. Administrative credentials remain in the native host, not in JavaScript.",
+    "background": "Background service",
+    "backgroundHint": "Android may delay networking in battery-saving mode. Force-stop stops the service. Desktop stays running in the tray.",
+    "autostart": "Start on login",
+    "notifications": "System notifications",
+    "refresh": "Refresh",
+    "pair": "Pair",
+    "invite": "Invite",
+    "join": "Join",
+    "url": "Remote Core URL",
+    "code": "Invitation code",
+    "trust": "Grant incoming administrative access to this peer",
+    "localUrl": "Reachable local URL (optional)",
+    "network": "Use a reachable Core address over HTTPS or a trusted private network/VPN. Pairing does not open firewall ports or provide NAT traversal. An invitation expires after ten minutes. Never share it publicly.",
+    "serviceNode": "Service node",
+    "servicesHint": "Select explicitly where MCP, updates, provisioning and observability run. Missing plugins stay unavailable; another node is not chosen silently.",
+    "local": "Local",
+    "save": "Save",
+    "share": "Share",
+    "linked": "Connected",
+    "permission": "Allow notifications in Android system settings if requested.",
+    "scan": "Scan",
+    "invalidQr": "No valid Delta invitation found",
+    "qr": "Invitation QR"
   }
 }

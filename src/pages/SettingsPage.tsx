@@ -1,3 +1,5 @@
+import {NativeConnection} from '../host/NativeConnection';
+import {hostBridge} from '../host/contract';
 import {CapabilityGate} from '../ui/Dependencies';
 import uiPackage from '../../package.json';
 import { Updates } from './Updates';
@@ -78,7 +80,7 @@ export function SettingsPage() {
       <div className="settings-content">
         {tab === 'updates' && <CapabilityGate capability="web.updates_status"><Updates /></CapabilityGate>}
         {tab === 'general' && <General />}
-        {tab === 'connection' && <Connection />}
+        {tab === 'connection' && (hostBridge()?<NativeConnection />:<Connection />)}
         {tab === 'backup' && <Backup />}
         {tab === 'developer' && api instanceof MockCoreAdapter && <Developer api={api} />}
       </div>

@@ -1,0 +1,8 @@
+import {hostBridge} from './contract';import {acceptInvitation} from './NativeConnection';
+/** OS actions remain private IPC; external content never navigates the privileged document. */
+export function startNativeLifecycle(){const host=hostBridge()!;document.addEventListener('click',event=>{const a=(event.target as Element)?.closest?.('a[href]') as HTMLAnchorElement|null;if(a&&/^https?:/.test(a.href)){event.preventDefault();event.stopPropagation();void host.call({capability:'host.open',args:{url:a.href}}).catch(()=>{})}},true);
+ let busy=false;const seen=new Set<string>();async function poll(){if(busy)return;busy=true;try{const s=await host.call({capability:'host.platform_status'}) as any;if(s.pendingPairing){acceptInvitation(s.pendingPairing);location.hash='#/settings?tab=connection'}if(typeof s.pendingRoute==='string'&&/^\/plugins\/[a-zA-Z0-9_.-]+$/.test(s.pendingRoute))location.hash='#'+s.pendingRoute;
+ if((await host.info()).kind==='desktop'){const prefs=await host.call({capability:'host.document_list',args:{namespace:'preferences'}}) as any[];if(prefs.some(p=>p.id==='notifications'&&p.enabled)){const notified=prefs.find(p=>p.id==='os-notified')?.keys||[];const rows=await host.call({capability:'web.notifications_list',args:{}}) as any[];for(const n of rows.slice(0,20)){if(seen.has(n.id)||notified.includes(n.id)||n.read)continue;await host.call({capability:'host.notify',args:{title:n.title,body:n.body||''}});seen.add(n.id);notified.push(n.id);await host.call({capability:'host.document_put',args:{namespace:'preferences',key:'os-notified',value:{id:'os-notified',keys:notified.slice(-500)}}})}}}
+ }catch{/* Offline host: retain UI and retry, never fall back to HTTP. */}finally{busy=false}}
+ void poll();setInterval(()=>void poll(),30000);
+}

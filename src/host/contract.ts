@@ -2,7 +2,7 @@
 export const HOST_BRIDGE_VERSION = '1.0.0';
 export const MAX_BRIDGE_BYTES = 64 * 1024;
 export type HostKind = 'web' | 'desktop' | 'android';
-export interface HostInfo { kind: HostKind; version: string; bridgeVersion: string; coreVersion?: string; uiVersion: string; features: string[]; nodeMode?: 'embedded' | 'attached'; lifecycle?: 'foreground' | 'tray' | 'external'; }
+export interface HostInfo { kind: HostKind; version: string; bridgeVersion: string; coreVersion?: string; uiVersion: string; features: string[]; nodeMode?: 'embedded' | 'attached'; lifecycle?: 'foreground' | 'foreground-service' | 'tray' | 'external'; }
 export interface CapabilityRequest { capability: string; args?: Record<string, unknown>; node?: string; }
 export interface HostBridge { info(): Promise<HostInfo>; call(request: CapabilityRequest): Promise<unknown>; }
 export function validateRequest(request: CapabilityRequest): void {

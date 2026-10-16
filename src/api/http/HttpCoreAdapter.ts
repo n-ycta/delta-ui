@@ -4,7 +4,7 @@ import type { ConnectionConfig, CoreEvent, DashboardConfig, EventQuery, MetricQu
 import type { CoreApi, SSHTarget, SSHPreflight, SSHProbe, SSHInstall, SSHJob } from '../types';
 import { CoreApiError } from '../types';
 
-export interface HttpAdapterOptions { baseUrl: string; token?: string; timeoutMs?: number }
+export interface HttpAdapterOptions { baseUrl: string; token?: string; timeoutMs?: number; transport?:(capability:string,args:Record<string,unknown>)=>Promise<any> }
 /** Delta v1 adapter. All UI operations call the independent web component. */
 export class HttpCoreAdapter implements CoreApi {
   readonly mode = 'http' as const;
@@ -15,6 +15,7 @@ export class HttpCoreAdapter implements CoreApi {
   private eventIds=new Set<string>();
   constructor(private opts: HttpAdapterOptions) { this.endpoint = opts.baseUrl.replace(/\/$/, '').replace(/\/v1$/, ''); }
   private async call<T = any>(action: string, args: unknown = {}): Promise<T> {
+    if(this.opts.transport)return this.opts.transport('web.'+action,{...(args as object),_locale:language});
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), this.opts.timeoutMs ?? 35000);
     try {

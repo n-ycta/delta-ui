@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "dev.delta.ui",
   "kind": "ui-package",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "entry": "index.html",
   "hostBridge": "^1.0.0",
   "coreProtocol": "v1",
