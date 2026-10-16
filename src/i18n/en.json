@@ -1921,5 +1921,25 @@
     "external": "The existing service owns node lifecycle; closing this interface does not stop it.",
     "tray": "Closing the window hides it to the tray; exiting the node is a separate action.",
     "shell": "Host"
+  },
+  "dependencies": {
+    "title": "Dependencies",
+    "required": "Required",
+    "optional": "Optional",
+    "ready": "Ready",
+    "missing": "Missing",
+    "disabled": "Disabled",
+    "offline": "Offline",
+    "incompatible": "Incompatible",
+    "unbound": "Unbound",
+    "unsupported": "Unsupported",
+    "open": "Open",
+    "refresh": "Refresh",
+    "loading": "Checking dependencies…",
+    "requiredBy": "Required by",
+    "unavailable": "Feature unavailable",
+    "explanation": "Install or enable a compatible provider to use this feature. The rest of the plugin remains available.",
+    "installHint": "Select optional providers. Unselected integrations remain unavailable; the main plugin can still be installed.",
+    "executableWarning": "Installing this dependency executes trusted code on the selected node. Review its requested scopes."
   }
 }

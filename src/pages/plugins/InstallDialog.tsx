@@ -1,3 +1,5 @@
+import {control} from '../../api/control';
+import {readConnectionSettings} from '../../api';
 import { tr } from '../../i18n';
 import { useEffect, useState } from 'react';
 import { ShieldAlert } from 'lucide-react';
@@ -19,16 +21,20 @@ export function InstallDialog({ entry, open, onClose }: { entry: PluginEntry; op
   const nodes = useNodes();
   const [step, setStep] = useState(0);
   const [nodeIds, setNodeIds] = useState<string[]>([]);
+  const [optional,setOptional]=useState<string[]>([]);
+  const [plans,setPlans]=useState<any[]>([]),[planError,setPlanError]=useState(''),[planning,setPlanning]=useState(false);
+  const live=readConnectionSettings().mode!=='mock';
+  useEffect(()=>{if(!open||!live)return;let active=true;setPlanning(true);setPlanError('');setPlans([]);Promise.all(nodeIds.map(node=>control('packages.plan',{id:m.id,optionalDependencies:optional},node))).then(p=>{if(active)setPlans(p)}).catch(e=>{if(active)setPlanError(e.message)}).finally(()=>{if(active)setPlanning(false)});return()=>{active=false}},[open,live,m.id,nodeIds.join(','),optional.join(',')]);
   const [perms, setPerms] = useState<string[]>([]);
   const eligible = (nodes.data ?? []).filter((n) => m.runtime.targets.includes(n.kind));
   useEffect(() => {
     if (!open) return;
-    setStep(0);
+    setStep(0);setOptional([]);
     setNodeIds(eligible.filter((n) => n.status !== 'offline').map((n) => n.id).slice(0, 2));
     setPerms(m.permissions.filter((p) => !p.optional).map((p) => p.scope));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
-  const install = useMutation((api) => api.installPlugin(m.id, { nodeIds, permissions: perms, settings: defaultsOf(m.settings) }), {
+  const install = useMutation((api) => api.installPlugin(m.id, { nodeIds, permissions: perms, settings: defaultsOf(m.settings), optionalDependencies:optional, approveDependencies:true }), {
     invalidate: ['plugins'],
     onSuccess: () => { toast({ severity: 'info', title: tr("pages.plugins.InstallDialog.s_0d1c65dc59", { p0: (m.name) }), body: tr("pages.plugins.InstallDialog.s_8f09862c6a") }); onClose(); },
   });
@@ -38,9 +44,13 @@ export function InstallDialog({ entry, open, onClose }: { entry: PluginEntry; op
       footer={<>
         <span className="row grow" style={{ gap: 14 }}>{steps.map((s, i) => <span key={s} className={i === step ? '' : 'muted'} style={{ fontSize: 12, fontWeight: i === step ? 600 : 400 }}>{i + 1}{tr("pages.plugins.InstallDialog.s_94c67da09e")}{s}</span>)}</span>
         {step > 0 && <Button variant="ghost" onClick={() => setStep(step - 1)}>{tr("pages.plugins.InstallDialog.s_f6dab074d7")}</Button>}
-        {step < 2 ? <Button variant="primary" disabled={step === 0 && !nodeIds.length} onClick={() => setStep(step + 1)}>{tr("pages.plugins.InstallDialog.s_9c714cf25e")}</Button>
-          : <Button variant="primary" loading={install.pending} onClick={() => install.run()}>{tr("pages.plugins.InstallDialog.s_ce88d35b18")}</Button>}
+        {step < 2 ? <Button variant="primary" disabled={!nodeIds.length || planning || !!planError || (live&&!plans.length)} onClick={() => setStep(step + 1)}>{tr("pages.plugins.InstallDialog.s_9c714cf25e")}</Button>
+          : <Button variant="primary" loading={install.pending} disabled={planning||!!planError||(live&&!plans.length)} onClick={() => install.run()}>{tr("pages.plugins.InstallDialog.s_ce88d35b18")}</Button>}
       </>}>
+      {planError&&<div className="banner err">{planError}</div>}
+      {planning&&<div className="muted">{tr('dependencies.loading')}</div>}
+      {!!m.dependencies.length&&step===0&&<div className="panel panel-body col gap-2"><strong>{tr('dependencies.title')}</strong><p className="muted">{tr('dependencies.installHint')}</p>{m.dependencies.map(d=><label className="dependency-row" key={d.id}>{!d.required&&d.kind==='plugin'&&<input type="checkbox" checked={optional.includes(d.id)} onChange={e=>setOptional(e.target.checked?[...optional,d.id]:optional.filter(x=>x!==d.id))}/>}<span className="grow"><strong>{d.id}</strong><div className="mono muted">{d.version}</div><div className="muted">{d.features.join(' · ')}</div></span><Badge>{tr(d.required?'dependencies.required':'dependencies.optional')}</Badge></label>)}</div>}
+      {step===1&&plans.flatMap((p,pi)=>p.items.filter((i:any)=>i.id!==m.id).map((i:any)=><div className="panel panel-body col gap-2" key={pi+':'+i.id}><strong>{i.manifest?.name||i.id}{' · '}{i.version}</strong><div className="muted">{tr('dependencies.executableWarning')}</div>{(i.scopes||[]).map((scope:string)=><code key={scope}>{scope}</code>)}</div>))}
       {install.error && <div className="banner err" style={{ borderRadius: 6, marginBottom: 12 }}>{install.error.message}</div>}
       {step === 0 && (
         <div className="col gap-3">

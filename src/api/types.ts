@@ -30,7 +30,7 @@ export interface RawPluginRecord {
 
 export interface LogLine { ts: number; level: 'debug' | 'info' | 'warn' | 'error'; message: string; nodeId?: string }
 
-export interface InstallRequest { nodeIds: string[]; permissions: string[]; settings?: Record<string, unknown> }
+export interface InstallRequest { optionalDependencies?: string[]; approveDependencies?: boolean; nodeIds: string[]; permissions: string[]; settings?: Record<string, unknown> }
 
 export interface CommandResult { ok: boolean; durationMs: number; output: string[]; exitCode?: number }
 

@@ -140,6 +140,7 @@ export const PermissionRequest = z.object({
 export type PermissionRequest = z.infer<typeof PermissionRequest>;
 
 export const PluginAction = z.object({
+  requires: z.array(z.string()).max(32).optional(),
   id: Id,
   label: z.string(),
   description: z.string().optional(),
@@ -192,7 +193,16 @@ export const PluginCategory = z.enum([
 ]);
 export type PluginCategory = z.infer<typeof PluginCategory>;
 
+export const PluginDependency = z.object({
+  id: z.string().min(1).max(128),
+  kind: z.enum(['core','plugin','provider','ui-package','prerequisite']).default('plugin'),
+  version: z.string().min(1).max(128),
+  required: z.boolean().default(false),
+  features: z.array(z.string().min(1).max(64)).max(32).default([]),
+  contract: z.string().optional(),
+});
 export const PluginManifest = z.object({
+  dependencies: z.array(PluginDependency).max(32).default([]),
   id: ReverseDnsId,
   name: z.string().min(1).max(64),
   version: SemverStr,

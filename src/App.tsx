@@ -1,3 +1,4 @@
+import {CapabilityGate} from './ui/Dependencies';
 import { tr } from './i18n';
 import type { ReactNode } from 'react';
 import { HashRouter, Route, Routes, useLocation } from 'react-router-dom';
@@ -33,9 +34,9 @@ export function App() {
             <Route path="/plugins/:id" element={<PluginDetail />} />
             <Route path="/nodes" element={<NodesPage />} />
             <Route path="/nodes/:id" element={<NodeDetail />} />
-            <Route path="/events" element={<EventsPage />} />
+            <Route path="/events" element={<CapabilityGate capability="web.events_list"><EventsPage /></CapabilityGate>} />
             <Route path="/contracts" element={<ContractsPage />} />
-            <Route path="/mcp" element={<McpPage />} />
+            <Route path="/mcp" element={<CapabilityGate capability="web.mcp_list"><McpPage /></CapabilityGate>} />
             <Route path="/identity" element={<IdentityPage />} />
             <Route path="/access" element={<AccessPage />} />
             <Route path="/settings" element={<SettingsPage />} />

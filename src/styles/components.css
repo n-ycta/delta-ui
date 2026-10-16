@@ -470,3 +470,5 @@ select option, select optgroup { color: var(--ink); background-color: var(--surf
   .row.wrap > .input-group { flex: 1 1 180px; }
   .page-head .row, .panel-head { flex-wrap: wrap; }
 }
+
+.dependency-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--rule);min-width:0}.dependency-row>.grow{min-width:0;overflow-wrap:anywhere}.dependency-row:last-child{border-bottom:0}

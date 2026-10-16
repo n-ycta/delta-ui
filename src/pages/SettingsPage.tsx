@@ -1,3 +1,4 @@
+import {CapabilityGate} from '../ui/Dependencies';
 import uiPackage from '../../package.json';
 import { Updates } from './Updates';
 import { isCoreEndpoint } from '../api/endpoints';
@@ -75,7 +76,7 @@ export function SettingsPage() {
         ]}
       />
       <div className="settings-content">
-        {tab === 'updates' && <Updates />}
+        {tab === 'updates' && <CapabilityGate capability="web.updates_status"><Updates /></CapabilityGate>}
         {tab === 'general' && <General />}
         {tab === 'connection' && <Connection />}
         {tab === 'backup' && <Backup />}

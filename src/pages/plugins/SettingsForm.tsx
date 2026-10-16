@@ -1,3 +1,4 @@
+import {useDependencyFeatures,featuresAvailable} from '../../ui/Dependencies';
 import { isSettingVisible, settingsPayload } from './visibility';
 import { mergeProfileValues, type SettingsProfiles } from './profiles';
 import { tr } from '../../i18n';
@@ -42,7 +43,9 @@ export function SettingsForm({
   profiles,
   actions = [],
   onAction,
+  featurePluginId,featureNode,
 }: {
+  featurePluginId?:string;featureNode?:string;
   fields: SettingField[];
   values: Record<string, unknown>;
   onSubmit: (v: Record<string, unknown>) => void;
@@ -51,9 +54,10 @@ export function SettingsForm({
   submitLabel?: string;
   allowPristine?: boolean;
   profiles?: SettingsProfiles;
-  actions?: { id: string; label: string; description?: string }[];
+  actions?: { id: string; label: string; description?: string; requires?:string[] }[];
   onAction?: (id: string, values: Record<string, unknown>) => void;
 }) {
+  const features=useDependencyFeatures(featurePluginId||'',featureNode,!!featurePluginId&&actions.some(a=>!!a.requires?.length));
   const initialKey = JSON.stringify([fields, values]);
   const initial = useMemo(() => ({ ...defaultsOf(fields), ...values }), [initialKey]);
   const [v, setV] = useState<Record<string, unknown>>(initial);
@@ -124,7 +128,7 @@ export function SettingsForm({
               type="button"
               size="sm"
               title={a.description}
-              disabled={disabled || saving || !!Object.keys(errors).length}
+              disabled={disabled || saving || !!Object.keys(errors).length || !featuresAvailable(a.requires,features)}
               onClick={() =>
                 onAction?.(a.id, {
                   ...settingsPayload(fields, v, secrets),

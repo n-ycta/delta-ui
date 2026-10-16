@@ -5,7 +5,7 @@ import {
   isSettingVisible,
   settingsPayload,
 } from '../src/pages/plugins/visibility';
-import { SettingField, SettingCondition } from '../src/core/contracts/plugin';
+import { PluginDependency, PluginManifest, SettingField, SettingCondition } from '../src/core/contracts/plugin';
 import { mergeGeneratedDashboard } from '../src/core/registry/autodash';
 import { safeDataLink, DataCell } from '../src/pages/plugins/PluginDataViews';
 import { createElement } from 'react';
@@ -55,6 +55,11 @@ const known = widgetRegistry.knownVisualizations();
 const v = (raw: unknown) =>
   validateManifest(raw, { knownVisualizations: known, panelContract: PANEL_CONTRACT_VERSION });
 
+test('dependency contract keeps legacy manifests and describes optional feature providers',()=>{
+ eq(PluginManifest.parse(M.typing).dependencies,[]);
+ const d=PluginDependency.parse({id:'dev.example.search',version:'^1.0.0',features:['search']});eq(d.required,false);eq(d.kind,'plugin');
+ ok(!PluginDependency.safeParse({id:'',version:'^1'}).success);
+});
 console.log('semver');
 test('valid / invalid', () => {
   ok(isValid('1.2.3'));

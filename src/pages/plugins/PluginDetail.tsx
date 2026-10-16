@@ -1,3 +1,4 @@
+import {DependencyPanel,useDependencyFeatures,featuresAvailable} from '../../ui/Dependencies';
 import { ActionOutput } from './ActionOutput';
 import { PluginDataViews } from './PluginDataViews';
 import { PluginNotices } from '../../ui/PluginNotices';
@@ -62,6 +63,7 @@ export function PluginDetail() {
   const [actionConfirm, setActionConfirm] = useState<string | null>(null);
   const nav = useNavigate();
   const canManage = useCan('plugins.manage');
+  const featureState=useDependencyFeatures(pid,actionNode||p.data?.instance.nodeIds[0],!!p.data?.manifest.dependencies.length);
 
   const toggle = useMutation((api, en: boolean) => api.setPluginEnabled(pid, en), {
     invalidate: ['plugins'],
@@ -260,8 +262,8 @@ export function PluginDetail() {
                     label: a.label,
                     icon: <Play size={14} />,
                     danger: a.dangerous,
-                    disabled: !canManage || inst.status === 'disabled',
-                    title: a.description,
+                    disabled: !canManage || inst.status === 'disabled' || !featuresAvailable(a.requires,featureState),
+                    title: featuresAvailable(a.requires,featureState)?a.description:tr('dependencies.unavailable'),
                     onSelect: () =>
                       a.inputs.length
                         ? setActionInput(a.id)
@@ -337,6 +339,7 @@ export function PluginDetail() {
       )}
 
       <PluginNotices entry={e} />
+      {!!m.dependencies.length && isInstalled(e) && <DependencyPanel id={m.id} node={inst.nodeIds[0]} />}
       <Tabs
         value={tab}
         onChange={(t) => setParams({ tab: t })}
@@ -712,6 +715,8 @@ function SettingsTab({ e }: { e: PluginEntry }) {
       </label>
       {current.error && <ErrorState error={current.error} onRetry={current.refetch} />}
       <SettingsForm
+        featurePluginId={e.manifest.id}
+        featureNode={nodeId}
         fields={e.manifest.settings}
         profiles={e.manifest.settingsProfiles}
         actions={e.manifest.actions.filter((a) => a.settingsAction && !a.dangerous)}
