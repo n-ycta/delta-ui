@@ -1,3 +1,4 @@
+import {Select} from '../../ui/Select';
 import {useDependencyFeatures,featuresAvailable} from '../../ui/Dependencies';
 import { isSettingVisible, settingsPayload } from './visibility';
 import { mergeProfileValues, type SettingsProfiles } from './profiles';
@@ -271,7 +272,7 @@ export function SettingsForm({
                       />
                     )}
                     {f.type === 'select' && (
-                      <select
+                      <Select
                         aria-labelledby={`setting-${f.key}-label`}
                         className="select"
                         disabled={disabled || saving}
@@ -284,7 +285,7 @@ export function SettingsForm({
                             {o.label}
                           </option>
                         ))}
-                      </select>
+                      </Select>
                     )}
                     {f.type === 'multiselect' && (
                       <div className="row wrap gap-1">

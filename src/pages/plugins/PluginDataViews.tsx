@@ -1,3 +1,4 @@
+import {Select} from '../../ui/Select';
 import { RefreshCw } from '../../ui/icons';
 import { useState } from 'react';
 import { tr, locale } from '../../i18n';
@@ -79,7 +80,7 @@ function DataView({ entry, view }: { entry: PluginEntry; view: PluginDataView })
       <div className="col" style={{ gap: 16, minWidth: 0 }}>
         <label className="field">
           {tr('polish.targetNode')}
-          <select
+          <Select
             className="select"
             value={nodeId}
             onChange={(e) => {
@@ -90,7 +91,7 @@ function DataView({ entry, view }: { entry: PluginEntry; view: PluginDataView })
             {entry.instance.nodeIds.map((id) => (
               <option key={id}>{id}</option>
             ))}
-          </select>
+          </Select>
         </label>
         {view.inputs.length > 0 && (
           <SettingsForm

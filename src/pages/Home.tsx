@@ -1,3 +1,5 @@
+import {useContext} from 'react';
+import {BrandOverride} from '../app/AppearanceContext';
 import { tr, locale } from '../i18n';
 import { Link } from 'react-router-dom';
 import { useDashboards, useNodes, usePlugins } from '../app/data';
@@ -11,7 +13,7 @@ import { PageHead } from '../ui/primitives';
 import { ErrorState, Skeleton } from '../ui/states';
 import { fmtDuration, fmtNumber } from '../core/lib/format';
 
-function Strip() {
+export function HomeSummary() {
   const info = useQuery('info', (api) => api.info());
   const nodes = useNodes();
   const plugins = usePlugins();
@@ -32,20 +34,11 @@ function Strip() {
   );
 }
 
-export function HomePage() {
-  const dashboards = useDashboards();
-  const { save } = useDashboardActions();
-  const showStrip = usePrefs((s) => s.homeStrip);
-  const home = dashboards.data?.find((d) => d.origin === 'home');
-  const hour = new Date().getHours();
-  const greet = hour < 6 ? tr("pages.Home.s_03f0b82037") : hour < 12 ? tr("pages.Home.s_d73c91bbc4") : hour < 18 ? tr("pages.Home.s_51d822d031") : tr("pages.Home.s_37f9f18bdc");
-  return (
-    <div className="page">
-      <PageHead eyebrow={new Date().toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' })} title={greet} sub={tr("pages.Home.s_0a2cf963b9")} />
-      {showStrip && <Strip />}
-      {dashboards.error && !dashboards.data && <ErrorState error={dashboards.error} onRetry={dashboards.refetch} />}
-      {!home && !dashboards.error && <div className="grid-3">{Array.from({ length: 6 }, (_, i) => <Skeleton key={i} h={180} />)}</div>}
-      {home && <DashboardView dashboard={home} onSave={(d) => save(d, { silent: true })} />}
-    </div>
-  );
+export function HomeHeading(){
+ const h=useContext(BrandOverride)?.home;
+ const hour=new Date().getHours();const greet=hour<6?tr('pages.Home.s_03f0b82037'):hour<12?tr('pages.Home.s_d73c91bbc4'):hour<18?tr('pages.Home.s_51d822d031'):tr('pages.Home.s_37f9f18bdc');
+ if(h&&!h.date&&!h.greeting&&!h.description)return null;
+ return <PageHead eyebrow={h?.date===false?undefined:new Date().toLocaleDateString(locale,{weekday:'long',day:'numeric',month:'long'})} title={h?.greeting===false?'':h?.title||greet} sub={h?.description===false?undefined:h?.subtitle||tr('pages.Home.s_0a2cf963b9')}/>;
 }
+export function HomeDashboard(){const dashboards=useDashboards(),{save}=useDashboardActions();const home=dashboards.data?.find(d=>d.origin==='home');return <>{dashboards.error&&!dashboards.data&&<ErrorState error={dashboards.error} onRetry={dashboards.refetch}/>} {!home&&!dashboards.error&&<div className="grid-3">{Array.from({length:6},(_,i)=><Skeleton key={i} h={180}/>)}</div>}{home&&<DashboardView dashboard={home} onSave={d=>save(d,{silent:true})}/>}</>}
+export function HomePage(){const strip=usePrefs(s=>s.homeStrip),appearance=useContext(BrandOverride);return <div className="page"><HomeHeading/>{(appearance?.home?.summary??strip)&&<HomeSummary/>}<HomeDashboard/></div>}

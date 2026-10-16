@@ -1,3 +1,4 @@
+import {Select} from '../../ui/Select';
 import { tr } from '../../i18n';
 import { useMemo, useRef, useState, useEffect } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -987,7 +988,7 @@ function Console({ n }: { n: NodeInfo }) {
               {spec.args?.map((a) => (
                 <Field key={a.key} label={a.label}>
                   {a.kind === 'component' ? (
-                    <select
+                    <Select
                       className="select"
                       style={{ width: 200, maxWidth: '100%' }}
                       value={args[a.key] ?? ''}
@@ -1001,7 +1002,7 @@ function Console({ n }: { n: NodeInfo }) {
                             {c.name}
                           </option>
                         ))}
-                    </select>
+                    </Select>
                   ) : (
                     <input
                       className="input mono"

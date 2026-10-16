@@ -9,6 +9,7 @@ export default defineConfig({
   build: {
     chunkSizeWarningLimit: 1200,
     rolldownOptions: {
+      input: {main:fileURLToPath(new URL('./index.html',import.meta.url)),workbench:fileURLToPath(new URL('./workbench.html',import.meta.url))},
       output: {
         manualChunks(id) {
           if (/\/node_modules\/(react|react-dom|react-router|react-router-dom|scheduler)\//.test(id)) return 'react';

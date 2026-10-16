@@ -1,3 +1,4 @@
+import {Select} from '../ui/Select';
 import { tr } from '../i18n';
 import { BUCKET_INTERVALS } from '../widgets/intervals';
 import { useEffect, useMemo, useState } from 'react';
@@ -269,7 +270,7 @@ export function WidgetEditor({
             <div className="panel">
               <div className="panel-body form-grid">
                 <Field label={tr('dashboards.WidgetEditor.s_8d426d8fd0')}>
-                  <select
+                  <Select
                     className="select"
                     value={src.aggregation ?? ''}
                     onChange={(e) => setSource({ aggregation: e.target.value })}
@@ -279,13 +280,13 @@ export function WidgetEditor({
                         {a}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </Field>
                 <Field
                   label={tr('dashboards.WidgetEditor.s_eddce20420')}
                   help={tr('dashboards.WidgetEditor.s_a4bf95f5ec')}
                 >
-                  <select
+                  <Select
                     className="select"
                     value={src.groupBy ?? ''}
                     onChange={(e) => setSource({ groupBy: e.target.value || undefined })}
@@ -296,7 +297,7 @@ export function WidgetEditor({
                         {d.label}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </Field>
                 {metric.dimensions
                   .filter((d) => !d.values?.length)
@@ -444,7 +445,7 @@ export function WidgetEditor({
           <div className="form-grid">
             {opts.has('chart') && (
               <Field label={tr('runtime.chartPresentation')}>
-                <select
+                <Select
                   className="select"
                   aria-label={tr('runtime.chartPresentation')}
                   value={cfg.display.chart ?? 'line'}
@@ -455,12 +456,12 @@ export function WidgetEditor({
                       {tr('runtime.chart_' + value)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </Field>
             )}
             {opts.has('interval') && (
               <Field label={tr('runtime.bucketInterval')} help={tr('runtime.bucketHelp')}>
-                <select
+                <Select
                   className="select"
                   aria-label={tr('runtime.bucketInterval')}
                   value={cfg.display.stepMs ?? ''}
@@ -474,7 +475,7 @@ export function WidgetEditor({
                       {tr('runtime.bucket_' + step)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </Field>
             )}
             {opts.has('range') && (
@@ -482,7 +483,7 @@ export function WidgetEditor({
                 label={tr('dashboards.WidgetEditor.s_b2822e2bb3')}
                 help={tr('dashboards.WidgetEditor.s_51b54d27dd')}
               >
-                <select
+                <Select
                   className="select"
                   value={cfg.display.rangeOverride ?? ''}
                   onChange={(e) =>
@@ -501,7 +502,7 @@ export function WidgetEditor({
                       {l}
                     </option>
                   ))}
-                </select>
+                </Select>
               </Field>
             )}
             {opts.has('decimals') && (

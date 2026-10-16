@@ -1,3 +1,4 @@
+import {Select} from '../../ui/Select';
 import {SSHConnectDialog} from './SSHConnectDialog';
 import { tr } from '../../i18n';
 import { useEffect, useState } from 'react';
@@ -29,7 +30,7 @@ export function PairDialog({ open, onClose }: { open: boolean; onClose: () => vo
           <Button variant="ghost" onClick={()=>setMethod('ssh')}>{tr('ssh.useSSH')}</Button><p className="muted">{tr('polish.remoteHint')}</p>
           <Field label={tr('polish.hubUrl')}><input className="input" value={hub} onChange={e=>setHub(e.target.value)} /></Field>
           <Field label={tr('polish.deviceUrl')}><input className="input" value={device} onChange={e=>setDevice(e.target.value)} /></Field>
-          <select className="select" value={os} onChange={e=>setOs(e.target.value)}><option value="linux">{'Linux'}</option><option value="windows">{'Windows'}</option></select>
+          <Select className="select" value={os} onChange={e=>setOs(e.target.value)}><option value="linux">{'Linux'}</option><option value="windows">{'Windows'}</option></Select>
           <label className="check"><input type="checkbox" checked={trust} onChange={e=>setTrust(e.target.checked)} />{tr('polish.trustHub')}</label>
           <Field label={tr("pages.nodes.PairDialog.s_56ef096f5e")}><Segmented sans value={kind} onChange={setKind} options={Object.entries(NODE_KIND_LABEL).map(([k, l]) => ({ value: k, label: l }))} /></Field>
           <Field label={tr("pages.nodes.PairDialog.s_7cb0561bcc")} help={tr("pages.nodes.PairDialog.s_42326c20c8")}><input className="input mono" value={name} onChange={(e) => setName(e.target.value.replace(/\s/g, '-'))} placeholder={`${kind}-new`} /></Field>

@@ -1,3 +1,6 @@
+import {useContext} from 'react';
+import {BrandOverride} from '../app/AppearanceContext';
+import {WIcon} from '../workbench/Icon';
 import {Link} from 'react-router-dom';
 import {useQuery} from '../app/query';
 import {loadProfile} from '../api/profile';
@@ -45,7 +48,7 @@ function Item({
       end={end}
       className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
       title={label}
-      onClick={() => close({ mobileNav: false })}
+      onClick={e => {close({ mobileNav: false });if(to==='/workbench'&&e.currentTarget.closest('.wb')){e.preventDefault();window.dispatchEvent(new Event('delta:workbench-choose'))}}}
     >
       {icon}
       <span className="nav-label truncate">{label}</span>
@@ -55,6 +58,7 @@ function Item({
 }
 
 export function Sidebar() {
+  const appearance=useContext(BrandOverride);
   const { sidebarCollapsed, set } = usePrefs();
   const plugins = usePlugins();
   const nodes = useNodes();
@@ -72,15 +76,8 @@ export function Sidebar() {
     <aside className="sidebar">
       <div className="sidebar-head">
         <div className="brand">
-          <img
-            className="delta-logo"
-            src="./delta-logo.svg"
-            alt={tr('layout.Sidebar.s_a4cbd21f4a')}
-          />
-          <span className="brand-text col" style={{ gap: 0 }}>
-            <span className="brand-name">{tr('layout.Sidebar.s_a4cbd21f4a')}</span>
-            <span className="brand-sub">{tr('layout.Sidebar.s_12062dd4e9')}</span>
-          </span>
+          {(!appearance||appearance.logo)&&(appearance&&appearance.brandSymbol!=='delta'?<WIcon name={appearance.brandSymbol} size={28}/>:<img className="delta-logo" src="./delta-logo.svg" alt="Delta"/>)}
+          {(!appearance||appearance.brand)&&<span className="brand-text col" style={{gap:0}}><span className="brand-name">{appearance?appearance.brandName:tr('layout.Sidebar.s_a4cbd21f4a')}</span>{!appearance&&<span className="brand-sub">{tr('layout.Sidebar.s_12062dd4e9')}</span>}</span>}
         </div>
         <button
           className="btn ghost icon sidebar-toggle desktop-only"
@@ -98,7 +95,8 @@ export function Sidebar() {
         </button>
       </div>
       <nav className="nav" id="sidebar-navigation">
-        <Item to="/" end icon={<Gauge size={16} />} label={tr('layout.Sidebar.s_39c6387206')} />
+        <Item to="/workbench" icon={<LayoutDashboard size={16}/>} label={tr('workbench.entry')}/>
+      <Item to="/" end icon={<Gauge size={16} />} label={tr('layout.Sidebar.s_39c6387206')} />
         <Item
           to="/dashboards"
           icon={<LayoutDashboard size={16} />}

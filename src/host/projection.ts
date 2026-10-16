@@ -2,6 +2,7 @@
 import type {HostBridge,CapabilityRequest} from './contract';
 import {DashboardConfig,PluginManifest} from '../core/contracts';
 import {tr} from '../i18n';
+import {validateWorkspace} from '../workbench/model';
 type Obj=Record<string,any>;
 const targets:Record<string,string>={'mcp_list':'mcp.list','mcp_catalog':'mcp.catalog','mcp_create':'mcp.create','mcp_revoke':'mcp.revoke','updates_status':'updater.status','updates_check':'updater.check','updates_settings':'updater.settings','updates_install':'updater.install','nodes_ssh_preflight':'provision.preflight','nodes_ssh_probe':'provision.probe','nodes_ssh_install':'provision.install','nodes_ssh_status':'provision.status','nodes_history':'observability.history','nodes_uptime':'observability.uptime','events_list':'observability.events'};
 const fail=(code:string,message:string):never=>{throw Object.assign(Error(message),{code})};
@@ -38,6 +39,8 @@ export function projectNative(raw:HostBridge):HostBridge{
  async function dispatch(action:string,a:Obj):Promise<any>{
   if(targets[action])return service(targets[action],a);
   switch(action){
+   case'workspace_get':{const doc=(await docs('preferences')).find((p:Obj)=>p.id==='visual-workspace');return doc?{workspace:doc.workspace,revision:doc.revision}:{workspace:null,revision:0};}
+   case'workspace_put':{if(!Number.isSafeInteger(a.revision)||a.revision<0)fail('bad_request','Invalid revision');const workspace=validateWorkspace(a.workspace);if(new TextEncoder().encode(JSON.stringify(workspace)).length>48000)fail('bad_request','Node layout limit: 48 KB');const old=(await docs('preferences')).find((p:Obj)=>p.id==='visual-workspace');if((old?.revision||0)!==a.revision)fail('conflict','Layout changed on this device. Load it before saving.');const result={workspace,revision:a.revision+1};if(old)await put('preferences','visual-workspace-backup',{...old,id:'visual-workspace-backup'});await put('preferences','visual-workspace',{id:'visual-workspace',...result});return result;}
    case'profile_get':return(await docs('preferences')).find((p:Obj)=>p.id==='owner-profile')?.profile||{name:'',nickname:'',avatar:'',updatedAt:0};
    case'profile_save':{const p=a.profile;if(!p||typeof p.name!=='string'||!p.name.trim()||p.name.length>80||typeof p.nickname!=='string'||p.nickname.length>32||p.nickname&&!/^[\p{L}\p{N}_.-]+$/u.test(p.nickname)||typeof p.avatar!=='string'||p.avatar.length>48000||p.avatar&&!/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(p.avatar))fail('bad_request',tr('profile.invalidProfile'));const profile={name:p.name.trim(),nickname:p.nickname,avatar:p.avatar,updatedAt:Date.now()};await put('preferences','owner-profile',{id:'owner-profile',profile});return profile;}
    case'info':{const[i,h]=await Promise.all([call('core.info'),raw.info()]);return{name:i.name,coreVersion:i.version,hostVersion:h.version,uiVersion:h.uiVersion,apiVersion:'1.0.0',startedAt:Date.now()-(i.uptime||0)*1000,features:h.features,principal:{name:'native-owner',role:'owner',scopes:['admin']}}}

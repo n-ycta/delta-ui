@@ -18,3 +18,5 @@ crates/*/target/
 .test-artifacts/
 
 __pycache__/
+
+artifacts/

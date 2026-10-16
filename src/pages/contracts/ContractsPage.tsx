@@ -1,3 +1,4 @@
+import {Select} from '../../ui/Select';
 import { tr } from '../../i18n';
 import { useMemo, useState } from 'react';
 import { FileJson, Wand2 } from '../../ui/icons';
@@ -129,7 +130,7 @@ export function ContractsPage() {
             }
             flush
             actions={
-              <select
+              <Select
                 className="select"
                 style={{ width: 260, maxWidth: '100%' }}
                 value={sample}
@@ -143,7 +144,7 @@ export function ContractsPage() {
                     {s.label}
                   </option>
                 ))}
-              </select>
+              </Select>
             }
           >
             <textarea

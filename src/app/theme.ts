@@ -1,8 +1,10 @@
+import {ThemeOverride} from './AppearanceContext';
 import { tr } from '../i18n';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { usePrefs } from './stores';
 
 export function useResolvedTheme(): 'light' | 'dark' {
+  const override=useContext(ThemeOverride);
   const theme = usePrefs((s) => s.theme);
   const [sys, setSys] = useState(() => (window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
   useEffect(() => {
@@ -11,7 +13,7 @@ export function useResolvedTheme(): 'light' | 'dark' {
     mq.addEventListener('change', h);
     return () => mq.removeEventListener('change', h);
   }, []);
-  return theme === 'system' ? (sys as 'light' | 'dark') : theme;
+  return override ?? (theme === 'system' ? (sys as 'light' | 'dark') : theme);
 }
 
 /** Data palettes. Chosen for distinguishability on both paper and graphite backgrounds, without neon. */

@@ -1,3 +1,4 @@
+import {Select} from '../ui/Select';
 import { useEffect, useState } from 'react';
 import { tr } from '../i18n';
 import { control } from '../api/control';
@@ -90,7 +91,7 @@ export function McpPage() {
             </label>
             <label>
               {tr('polish.mcpPreset')}
-              <select
+              <Select
                 className="select"
                 defaultValue="analytics"
                 onChange={(e) =>
@@ -106,7 +107,7 @@ export function McpPage() {
                 <option value="analytics">{tr('polish.mcpAnalytics')}</option>
                 <option value="ops">{tr('polish.mcpOps')}</option>
                 <option value="custom">{tr('polish.mcpCustom')}</option>
-              </select>
+              </Select>
             </label>
             <div className="row">
               <input

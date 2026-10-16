@@ -69,9 +69,9 @@ export function PluginsPage() {
 
   return (
     <div className="page">
-      <PortableApps />
       <PageHead title={tr("pages.plugins.PluginsPage.s_ff13ef845f")} sub={tr("pages.plugins.PluginsPage.s_13f5b9ea75")}
         actions={counts.updates > 0 && <Button icon={<ArrowUpCircle size={14} />} onClick={() => setParams({ tab: 'updates' })}>{tr("pages.plugins.PluginsPage.s_8dcaf51985")}{counts.updates}</Button>} />
+      <div style={{margin: "24px 0 32px"}}><PortableApps /></div>
       <Tabs value={tab} onChange={(t) => setParams({ tab: t })} tabs={[
         { id: 'installed', label: tr("pages.plugins.PluginsPage.s_92e4a3e2cb"), count: counts.installed },
         { id: 'available', label: tr("pages.plugins.PluginsPage.s_46e27e2f0a"), count: counts.available },

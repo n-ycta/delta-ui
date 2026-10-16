@@ -1,3 +1,4 @@
+import {Select} from '../ui/Select';
 import { dashboardPlugins } from '../core/registry/dashboardIndex';
 import { tr } from '../i18n';
 import { useEffect, useState } from 'react';
@@ -365,7 +366,7 @@ export function DashboardsPage() {
             label={tr('pages.Dashboards.s_adf905f367')}
             help={tr('pages.Dashboards.s_a0e2c7f5ff')}
           >
-            <select
+            <Select
               className="select"
               value={template}
               onChange={(e) => setTemplate(e.target.value)}
@@ -384,7 +385,7 @@ export function DashboardsPage() {
                     {p.manifest.name}
                   </option>
                 ))}
-            </select>
+            </Select>
           </Field>
         </div>
       </Modal>

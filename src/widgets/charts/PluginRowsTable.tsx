@@ -1,3 +1,4 @@
+import {Select} from '../../ui/Select';
 import { useState } from 'react';
 import type { WidgetProps } from '../types';
 import { useQuery } from '../../app/query';
@@ -38,7 +39,7 @@ function Rows({ config, ctx }: WidgetProps) {
     <div className="col" style={{ flex: 1, minHeight: 0, minWidth: 0, gap: 8 }}>
       {entry.instance.nodeIds.length > 1 && (
         <div className="row" style={{ gap: 8 }}>
-          <select
+          <Select
             className="select"
             aria-label={tr('polish.targetNode')}
             style={{ width: 'auto', minWidth: 0 }}
@@ -51,7 +52,7 @@ function Rows({ config, ctx }: WidgetProps) {
             {entry.instance.nodeIds.map((id) => (
               <option key={id}>{id}</option>
             ))}
-          </select>
+          </Select>
         </div>
       )}
       {q.error && <ErrorState error={q.error} onRetry={q.refetch} />}

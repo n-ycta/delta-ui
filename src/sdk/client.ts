@@ -1,6 +1,8 @@
 /** App-side half of the grant-limited Plugin UI channel. No host token or IPC access. */
 export interface AppContext {
   appId: string;
+  /** Optional host-selected presentation surface; never an authority or grant. */
+  surface?: string;
   language: "en" | "ru";
   theme: "light" | "dark";
 }

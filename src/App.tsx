@@ -1,55 +1,13 @@
-import {PluginApp} from './pages/plugins/PluginApp';
-import {CapabilityGate} from './ui/Dependencies';
-import { tr } from './i18n';
 import type { ReactNode } from 'react';
 import { HashRouter, Route, Routes, useLocation } from 'react-router-dom';
-import { ErrorState } from './ui/states';
-import { Button } from './ui/primitives';
+import { ConsoleRoutes } from './ConsoleRoutes';
+import { LiveWorkbench } from './workbench/LiveWorkbench';
 import { Shell } from './layout/Shell';
 import { ErrorBoundary } from './dashboards/ErrorBoundary';
-import { HomePage } from './pages/Home';
-import { DashboardsPage } from './pages/Dashboards';
-import { DashboardPage } from './pages/DashboardPage';
-import { PluginsPage } from './pages/plugins/PluginsPage';
-import { PluginDetail } from './pages/plugins/PluginDetail';
-import { NodesPage } from './pages/nodes/NodesPage';
-import { NodeDetail } from './pages/nodes/NodeDetail';
-import { EventsPage } from './pages/EventsPage';
-import { ContractsPage } from './pages/contracts/ContractsPage';
-import { AccessPage } from './pages/AccessPage';
-import { SettingsPage } from './pages/SettingsPage';
-import { NotFound } from './pages/NotFound';
-
-import {McpPage} from './pages/McpPage';
-import {IdentityPage} from './pages/IdentityPage';
-export function App() {
-  return (
-    <HashRouter>
-      <Shell>
-        <RouteBoundary>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/dashboards" element={<DashboardsPage />} />
-            <Route path="/dashboards/:id" element={<DashboardPage />} />
-            <Route path="/plugins" element={<PluginsPage />} />
-            <Route path="/apps/:id" element={<PluginApp />} />
-            <Route path="/plugins/:id" element={<PluginDetail />} />
-            <Route path="/nodes" element={<NodesPage />} />
-            <Route path="/nodes/:id" element={<NodeDetail />} />
-            <Route path="/events" element={<CapabilityGate capability="web.events_list"><EventsPage /></CapabilityGate>} />
-            <Route path="/contracts" element={<ContractsPage />} />
-            <Route path="/mcp" element={<CapabilityGate capability="web.mcp_list"><McpPage /></CapabilityGate>} />
-            <Route path="/identity" element={<IdentityPage />} />
-            <Route path="/access" element={<AccessPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </RouteBoundary>
-      </Shell>
-    </HashRouter>
-  );
-}
-
+import { ErrorState } from './ui/states';
+import { Button } from './ui/primitives';
+import { tr } from './i18n';
+export function App(){return <HashRouter><Shell><RouteBoundary><Routes><Route path="/workbench" element={<LiveWorkbench/>}/><Route path="*" element={<ConsoleRoutes/>}/></Routes></RouteBoundary></Shell></HashRouter>}
 /** Page-level crash isolation: a broken page never takes down the shell; navigating away resets it. */
 function RouteBoundary({ children }: { children: ReactNode }) {
   const loc = useLocation();

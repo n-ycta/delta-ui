@@ -5,9 +5,12 @@ import { appCall } from "../../sdk/apps";
 import { pluginChannel } from "../../sdk/channel";
 import { language, tr } from "../../i18n";
 import { useResolvedTheme } from "../../app/theme";
-export function PluginApp() {
-  const { id } = useParams();
-  const theme = useResolvedTheme();
+export function PluginApp(){const {id}=useParams();return <PluginSurface id={id}/>}
+export function PluginSurface({id,surface,inline=false,themeOverride}:{id?:string;surface?:string;inline?:boolean;themeOverride?:'light'|'dark'}) {
+  const resolvedTheme = useResolvedTheme();
+  const theme=themeOverride||resolvedTheme;
+  const brokerRef=useRef<ReturnType<typeof pluginChannel>|undefined>(undefined);
+  const presentation=useRef({appId:id,language,theme,surface});presentation.current={appId:id,language,theme,surface};
   const frame = useRef<HTMLIFrameElement>(null);
   const [src, setSrc] = useState(""),
     [error, setError] = useState("");
@@ -35,6 +38,7 @@ export function PluginApp() {
         u.searchParams.set("parentOrigin", parentOrigin);
         u.searchParams.set("language", language);
         u.searchParams.set("theme", theme);
+        if(surface){u.searchParams.set("surface",surface);u.searchParams.set("chrome","0")}
         setSrc(u.href);
       })
       .catch((e) => {
@@ -43,7 +47,7 @@ export function PluginApp() {
     return () => {
       cancelled = true;
     };
-  }, [id, theme]);
+  }, [id]);
   useEffect(() => {
     if (!src) return;
     let broker: ReturnType<typeof pluginChannel> | undefined;
@@ -61,11 +65,12 @@ export function PluginApp() {
           throw Error("forbidden");
         },
       });
+      brokerRef.current=broker;
       source.postMessage(
         {
           type: "delta:initialize",
           channel: broker.channel,
-          context: { appId: id, language, theme },
+          context: presentation.current,
         },
         origin,
       );
@@ -82,11 +87,12 @@ export function PluginApp() {
     const node = frame.current;
     node?.addEventListener("load", initialize);
     return () => {
-      broker?.revoke();
+      broker?.revoke();brokerRef.current=undefined;
       window.removeEventListener("message", ready);
       node?.removeEventListener("load", initialize);
     };
-  }, [src, id, theme]);
+  }, [src, id]);
+  useEffect(()=>{if(!src||!brokerRef.current)return;const u=new URL(src);const origin=u.origin==='null'?u.protocol+'//'+u.host:u.origin;frame.current?.contentWindow?.postMessage({type:'delta:presentation',channel:brokerRef.current.channel,context:presentation.current},origin)},[src,theme,surface]);
   return error ? (
     <div className="page">
       <div role="alert" className="banner err">
@@ -95,12 +101,12 @@ export function PluginApp() {
     </div>
   ) : src ? (
     <div className="plugin-app-host">
-      <div className="plugin-app-toolbar">
+      {!inline&&<div className="plugin-app-toolbar">
         <Link className="btn ghost" to="/plugins">
           <ArrowLeft size={16} />
           {tr("apps.console")}
         </Link>
-      </div>
+      </div>}
       <iframe
         ref={frame}
         src={src}

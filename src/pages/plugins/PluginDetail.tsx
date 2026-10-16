@@ -1,3 +1,4 @@
+import {Select} from '../../ui/Select';
 import {DependencyPanel,useDependencyFeatures,featuresAvailable} from '../../ui/Dependencies';
 import { ActionOutput } from './ActionOutput';
 import { PluginDataViews } from './PluginDataViews';
@@ -415,7 +416,7 @@ export function PluginDetail() {
       >
         <label className="field">
           {tr('polish.targetNode')}
-          <select
+          <Select
             className="select"
             value={actionNode || inst.nodeIds[0]}
             onChange={(e) => setActionNode(e.target.value)}
@@ -423,7 +424,7 @@ export function PluginDetail() {
             {inst.nodeIds.map((id) => (
               <option key={id}>{id}</option>
             ))}
-          </select>
+          </Select>
         </label>
         {actionInput && (
           <SettingsForm
@@ -705,13 +706,13 @@ function SettingsTab({ e }: { e: PluginEntry }) {
     <div style={{ width: '100%', minWidth: 0 }}>
       <label className="field plugin-target">
         {tr('polish.targetNode')}
-        <select className="select" value={nodeId} onChange={(e) => setNodeId(e.target.value)}>
+        <Select className="select" value={nodeId} onChange={(e) => setNodeId(e.target.value)}>
           {e.instance.nodeIds.map((id) => (
             <option key={id} value={id}>
               {nodes.data?.find((n) => n.id === id)?.name || id}
             </option>
           ))}
-        </select>
+        </Select>
       </label>
       {current.error && <ErrorState error={current.error} onRetry={current.refetch} />}
       <SettingsForm

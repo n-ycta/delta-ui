@@ -1,3 +1,4 @@
+import {Select} from '../ui/Select';
 import { tr } from '../i18n';
 import { useState } from 'react';
 import { Copy, Eye, KeyRound, Plus, ShieldCheck, Trash2 } from '../ui/icons';
@@ -61,7 +62,7 @@ export function AccessPage() {
                 <tr key={p.id}>
                   <td><span className="row"><Icon name={KIND_ICON[p.kind]} size={15} className="muted" /><span className="col" style={{ gap: 0 }}><span style={{ fontWeight: 500 }}>{p.name}</span><span className="mono faint" style={{ fontSize: 11 }}>{p.email ?? p.tokenPreview ?? p.id}</span></span>{p.mfa && <span title={tr("pages.AccessPage.s_dba50a9524")}><ShieldCheck size={13} color="var(--ok)" /></span>}</span></td>
                   <td className="muted">{p.kind === 'user' ? tr("pages.AccessPage.s_51aff18539") : p.kind === 'token' ? tr("pages.AccessPage.s_78f3cc4d4c") : tr("pages.AccessPage.s_564eba1527")}</td>
-                  <td><select className="select" style={{ height: 26 }} value={p.role} disabled={!canManage || lastOwner || changeRole.pending} title={lastOwner ? tr("pages.AccessPage.s_db09f46f56") : undefined} onChange={(e) => changeRole.run(p.id, e.target.value as Role)}>{ROLES.map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}</select></td>
+                  <td><Select className="select" style={{ height: 26 }} value={p.role} disabled={!canManage || lastOwner || changeRole.pending} title={lastOwner ? tr("pages.AccessPage.s_db09f46f56") : undefined} onChange={(e) => changeRole.run(p.id, e.target.value as Role)}>{ROLES.map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}</Select></td>
                   <td>{p.scopes?.length ? <span className="row wrap gap-1">{p.scopes.slice(0, 3).map((s) => <Badge key={s} mono outline>{s}</Badge>)}{p.scopes.length > 3 && <span className="faint">{tr("pages.AccessPage.s_a979ef10cc")}{p.scopes.length - 3}</span>}</span> : <span className="faint">{tr("pages.AccessPage.s_9df9c8cc1a")}</span>}</td>
                   <td className="muted">{p.lastActive ? ago(p.lastActive) : tr("pages.AccessPage.s_8ceadba8d8")}</td>
                   <td>{p.expiresAt ? <span style={{ color: p.expiresAt < Date.now() + 7 * 86400000 ? 'var(--warn)' : undefined }}>{fmtDate(p.expiresAt)}</span> : <span className="faint">{tr("pages.AccessPage.s_1b93795b97")}</span>}</td>

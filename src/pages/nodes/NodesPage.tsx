@@ -1,3 +1,4 @@
+import {Select} from '../../ui/Select';
 import { tr } from '../../i18n';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -159,7 +160,7 @@ export function NodesPage() {
             ))}
         </div>
         <span className="spacer" />
-        <select
+        <Select
           className="select"
           style={{ width: 170 }}
           value={sort}
@@ -169,7 +170,7 @@ export function NodesPage() {
           <option value="name">{tr('pages.nodes.NodesPage.s_48b527cb15')}</option>
           <option value="cpu">{tr('pages.nodes.NodesPage.s_348919da95')}</option>
           <option value="seen">{tr('pages.nodes.NodesPage.s_2575377324')}</option>
-        </select>
+        </Select>
       </div>
       {nodes.loading && <SkeletonRows rows={7} h={26} />}
       {nodes.error && !nodes.data && <ErrorState error={nodes.error} onRetry={nodes.refetch} />}

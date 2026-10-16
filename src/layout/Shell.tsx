@@ -17,7 +17,8 @@ import { NotificationsPanel } from './Notifications';
 import { RealtimeBridge } from './Realtime';
 
 export function Shell({ children }: { children: ReactNode }) {
-  const appView=useLocation().pathname.startsWith('/apps/');
+  const route=useLocation().pathname;
+  const appView=route.startsWith('/apps/')||route==='/workbench';
   const setupOwner=useRuntimeAccess(s=>s.name==='browser-owner');
   const prefs = usePrefs();
   const theme = useResolvedTheme();
@@ -34,7 +35,7 @@ export function Shell({ children }: { children: ReactNode }) {
   }, [theme, prefs.density]);
   const authRequired = (info.error as {code?:string;status?:number}|undefined)?.code === 'unauthorized' || (info.error as {status?:number}|undefined)?.status === 401;
   const disconnected = ui.connection.state === 'closed' || ui.connection.state === 'reconnecting';
-  if(appView)return <>{children}<Toasts /></>;
+  if(appView)return <><RealtimeBridge />{children}<NotificationsPanel /><Toasts /></>;
   return (
     <div className="shell" data-collapsed={prefs.sidebarCollapsed} data-mobile-nav={ui.mobileNav}>
       <RealtimeBridge />

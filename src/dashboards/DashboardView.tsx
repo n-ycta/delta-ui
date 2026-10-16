@@ -1,3 +1,4 @@
+import {Select} from '../ui/Select';
 import { PluginNotices } from '../ui/PluginNotices';
 import { tr } from '../i18n';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
@@ -146,7 +147,7 @@ export function DashboardView({
           onChange={(r) => update((d) => ({ ...d, range: r }))}
           options={RANGES.map((r) => ({ value: r, label: r }))}
         />
-        <select
+        <Select
           className="select"
           style={{ width: 120 }}
           value={draft.refreshSec}
@@ -158,7 +159,7 @@ export function DashboardView({
           <option value={30}>{tr('dashboards.DashboardView.s_566a88d6b7')}</option>
           <option value={60}>{tr('dashboards.DashboardView.s_d677974a70')}</option>
           <option value={300}>{tr('dashboards.DashboardView.s_6c85158f53')}</option>
-        </select>
+        </Select>
         <Button
           iconOnly
           variant="ghost"

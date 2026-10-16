@@ -1,3 +1,4 @@
+import {Select} from '../../ui/Select';
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { tr } from "../../i18n";
@@ -334,7 +335,7 @@ export function SSHConnectDialog({
                   {tr("ssh.confirmHost")}
                 </label>
                 <Field label={tr("ssh.auth")}>
-                  <select
+                  <Select
                     className="select"
                     value={auth}
                     onChange={(e) => {
@@ -344,7 +345,7 @@ export function SSHConnectDialog({
                   >
                     <option value="password">{tr("ssh.password")}</option>
                     <option value="key">{tr("ssh.key")}</option>
-                  </select>
+                  </Select>
                 </Field>
                 {auth === "password" ? (
                   <Field label={tr("ssh.password")}>
@@ -391,7 +392,7 @@ export function SSHConnectDialog({
                   label={tr("ssh.trust")}
                   help={tr("ssh.trustHelp_" + trust)}
                 >
-                  <select
+                  <Select
                     className="select"
                     value={trust}
                     onChange={(e) => {
@@ -402,7 +403,7 @@ export function SSHConnectDialog({
                     <option value="calls">{tr("ssh.calls")}</option>
                     <option value="manage">{tr("ssh.manage")}</option>
                     <option value="mutual">{tr("ssh.mutual")}</option>
-                  </select>
+                  </Select>
                 </Field>
                 {trust !== "calls" && (
                   <label className="check">

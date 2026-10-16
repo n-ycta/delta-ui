@@ -9,8 +9,12 @@ export interface ConnectionSettings { mode: 'mock' | 'http'; baseUrl: string; to
 
 export const demoAvailable=import.meta.env?.DEV||import.meta.env?.VITE_ENABLE_DEMO==='true';
 const KEY = 'delta.console.connection';
+let standaloneDemo=false;
+/** Explicit in-memory demo only; never changes the user's saved node connection. */
+export function enableStandaloneDemo(){standaloneDemo=true;}
 
 export function readConnectionSettings(): ConnectionSettings {
+  if(standaloneDemo)return {mode:'mock',baseUrl:'demo://local'};
   if(hostBridge())return{mode:'http',baseUrl:'host://local'};
   const env = { mode: (import.meta.env.VITE_CORE_MODE as 'mock' | 'http') ?? 'http', baseUrl: (import.meta.env.VITE_CORE_URL as string) ?? '/api' };
   try { const settings={ ...env, ...JSON.parse(localStorage.getItem(KEY) ?? '{}'), token: sessionStorage.getItem(KEY + '.token') ?? undefined };if(!demoAvailable)settings.mode='http';return settings; } catch { return env; }

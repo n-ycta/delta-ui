@@ -1,3 +1,4 @@
+import {Select} from '../ui/Select';
 import {ProfileSettings} from './ProfileSettings';
 import {NativeConnection} from '../host/NativeConnection';
 import {hostBridge} from '../host/contract';
@@ -118,9 +119,9 @@ function General() {
   return (
     <Panel>
       <Row label={tr('polish.language')}>
-        <select className="select" aria-label={tr('polish.language')} value={language} onChange={e=>setLanguage(e.target.value as 'en'|'ru')}>
+        <Select className="select" aria-label={tr('polish.language')} value={language} onChange={e=>setLanguage(e.target.value as 'en'|'ru')}>
           <option value="en">{tr('polish.en')}</option><option value="ru">{tr('polish.ru')}</option>
-        </select>
+        </Select>
       </Row>
       <Row
         label={tr('pages.SettingsPage.s_553c45f1b8')}
