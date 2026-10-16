@@ -5,10 +5,10 @@ edition = "2021"
 license = "Apache-2.0"
 
 [dependencies]
-delta-host-runtime = {git="https://github.com/n-ycta/delta",rev="1789669b867985de99b9b08b803d351eec9f6e4b"}
+delta-host-runtime = {git="https://github.com/n-ycta/delta",rev="08b94a2ffe5a6bac6209bfaeb2778647b275a14f"}
 serde_json = "1"
 tauri = {version="2",features=[]}
 
 [target.'cfg(not(target_os = "android"))'.dependencies]
-delta-host-runtime = {git="https://github.com/n-ycta/delta",rev="1789669b867985de99b9b08b803d351eec9f6e4b",features=["desktop"]}
+delta-host-runtime = {git="https://github.com/n-ycta/delta",rev="08b94a2ffe5a6bac6209bfaeb2778647b275a14f",features=["desktop"]}
 tauri = {version="2",features=["tray-icon"]}
