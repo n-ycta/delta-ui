@@ -2013,6 +2013,7 @@
     "remove": "Remove",
     "removeConfirm": "Remove the application? Local media stays in its storage.",
     "unavailable": "This host does not support isolated applications.",
-    "loading": "Loading"
+    "loading": "Loading",
+    "console": "Console"
   }
 }

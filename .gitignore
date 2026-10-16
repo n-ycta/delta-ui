@@ -13,3 +13,8 @@ server/launch.mjs
 crates/*/target/
 
 /crates/native-host/Cargo.lock
+
+.test-apps/
+.test-artifacts/
+
+__pycache__/

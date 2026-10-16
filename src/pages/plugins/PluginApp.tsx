@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
-import { hostBridge } from "../../host/contract";
+import { useParams, Link } from "react-router-dom";
+import { ArrowLeft } from "@phosphor-icons/react";
+import { appCall } from "../../sdk/apps";
 import { pluginChannel } from "../../sdk/channel";
 import { language, tr } from "../../i18n";
 import { useResolvedTheme } from "../../app/theme";
@@ -14,19 +15,22 @@ export function PluginApp() {
     let cancelled = false;
     setSrc("");
     setError("");
-    const host = hostBridge();
-    if (!host) {
-      setError(tr("apps.unavailable"));
-      return;
-    }
-    void host
-      .call({ capability: "host.apps_launch", args: { id } })
+    void appCall("host.apps_launch", { id })
       .then((result: any) => {
         if (cancelled) return;
         const u = new URL(result.url);
-        if (!u.hostname.endsWith(".localhost") && u.hostname !== "localhost")
+        if (
+          u.origin === location.origin ||
+          (!["http:", "https:"].includes(u.protocol) &&
+            !/^deltaapp-[a-z0-9-]+:$/.test(u.protocol))
+        )
           throw Error("invalid_app_origin");
         u.searchParams.set("embedded", "1");
+        const parentOrigin =
+          location.origin === "null"
+            ? location.protocol + "//" + location.host
+            : location.origin;
+        u.searchParams.set("parentOrigin", parentOrigin);
         u.searchParams.set("language", language);
         u.searchParams.set("theme", theme);
         setSrc(u.href);
@@ -88,14 +92,22 @@ export function PluginApp() {
       </div>
     </div>
   ) : src ? (
-    <iframe
-      ref={frame}
-      src={src}
-      title="Delta Media"
-      className="plugin-app-frame"
-      sandbox="allow-scripts allow-same-origin allow-downloads allow-forms"
-      allow="autoplay; fullscreen; picture-in-picture"
-    />
+    <div className="plugin-app-host">
+      <div className="plugin-app-toolbar">
+        <Link className="btn ghost" to="/plugins">
+          <ArrowLeft size={16} />
+          {tr("apps.console")}
+        </Link>
+      </div>
+      <iframe
+        ref={frame}
+        src={src}
+        title={id || "Delta"}
+        className="plugin-app-frame"
+        sandbox="allow-scripts allow-same-origin allow-downloads allow-forms"
+        allow="autoplay; fullscreen; picture-in-picture"
+      />
+    </div>
   ) : (
     <div className="page" role="status">
       {tr("apps.loading")}

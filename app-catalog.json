@@ -1,1 +1,29 @@
-[]
+[
+  {
+    "id": "dev.delta.media",
+    "name": "Delta Media",
+    "version": "0.1.0-alpha.1",
+    "asset": "https://github.com/n-ycta/delta-media/releases/download/v0.1.0-alpha.1/delta-media.delta-app",
+    "sha256": "3b770c60e192bb777eadea7358652c1dd6892b700dc917d523a54afdc48f9e59",
+    "runtime": {
+      "execution": "web",
+      "platforms": [
+        "android",
+        "windows",
+        "linux",
+        "macos",
+        "ios",
+        "web"
+      ],
+      "architectures": [
+        "any"
+      ]
+    },
+    "permissions": [
+      "storage.local",
+      "media.playback",
+      "network.https"
+    ],
+    "grants": []
+  }
+]

@@ -1,20 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { hostBridge } from "../../host/contract";
+import { appCall } from "../../sdk/apps";
 import { tr } from "../../i18n";
 import { Button, Panel } from "../../ui/primitives";
 import { Download, Play, Trash2 } from "../../ui/icons";
 export function PortableApps() {
-  const host = hostBridge();
   const [catalog, setCatalog] = useState<any[]>([]),
     [installed, setInstalled] = useState<any[]>([]),
     [busy, setBusy] = useState(""),
     [error, setError] = useState("");
   async function refresh() {
-    if (!host) return;
     const [c, i] = await Promise.all([
-      host.call({ capability: "host.apps_catalog" }),
-      host.call({ capability: "host.apps_list" }),
+      appCall("host.apps_catalog"),
+      appCall("host.apps_list"),
     ]);
     setCatalog(c as any[]);
     setInstalled(i as any[]);
@@ -22,15 +20,12 @@ export function PortableApps() {
   useEffect(() => {
     void refresh().catch((e) => setError(e.message));
   }, []);
-  if (!host || !catalog.length) return null;
+  if (!catalog.length) return null;
   async function action(id: string, remove = false) {
     setBusy(id);
     setError("");
     try {
-      await host!.call({
-        capability: remove ? "host.apps_remove" : "host.apps_install",
-        args: { id },
-      });
+      await appCall(remove ? "host.apps_remove" : "host.apps_install", { id });
       await refresh();
     } catch (e) {
       setError((e as Error).message);

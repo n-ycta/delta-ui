@@ -1,6 +1,6 @@
 import { tr } from '../i18n';
 import { useEffect, type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { WifiOff, X } from '../ui/icons';
 import { usePrefs, useUi, useRuntimeAccess } from '../app/stores';
 import { useResolvedTheme } from '../app/theme';
@@ -17,6 +17,7 @@ import { NotificationsPanel } from './Notifications';
 import { RealtimeBridge } from './Realtime';
 
 export function Shell({ children }: { children: ReactNode }) {
+  const appView=useLocation().pathname.startsWith('/apps/');
   const prefs = usePrefs();
   const theme = useResolvedTheme();
   const ui = useUi();
@@ -32,6 +33,7 @@ export function Shell({ children }: { children: ReactNode }) {
   }, [theme, prefs.density]);
   const authRequired = (info.error as {code?:string;status?:number}|undefined)?.code === 'unauthorized' || (info.error as {status?:number}|undefined)?.status === 401;
   const disconnected = ui.connection.state === 'closed' || ui.connection.state === 'reconnecting';
+  if(appView)return <>{children}<Toasts /></>;
   return (
     <div className="shell" data-collapsed={prefs.sidebarCollapsed} data-mobile-nav={ui.mobileNav}>
       <RealtimeBridge />

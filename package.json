@@ -15,7 +15,8 @@
     "test:navigation": "node tests/native-navigation.browser.mjs",
     "test:onboarding": "node tests/native-onboarding.browser.mjs",
     "test:language": "node tests/language-settings.browser.mjs",
-    "test:apps": "node --test tests/app-runtime.test.mjs"
+    "test:apps": "node --test tests/app-runtime.test.mjs",
+    "test:embedding": "node scripts/prepare-test-app.mjs && node tests/app-embedding.browser.mjs"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.0.14",

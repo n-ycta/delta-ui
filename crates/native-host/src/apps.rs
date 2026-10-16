@@ -14,9 +14,13 @@ pub async fn call(app:&tauri::AppHandle,method:&str,a:&Value)->Result<Value,Stri
   if delta_app_runtime::list(&root).iter().any(|v|v["id"]==id){return Err("already_installed".into())}
   let url=item["asset"].as_str().ok_or("invalid_catalog")?;
   if !url.starts_with("https://github.com/n-ycta/")||!url.contains("/releases/download/"){return Err("untrusted_release".into())}
+  #[cfg(target_os="android")]let bundled=app.path().app_data_dir().map_err(|_|"app_storage_unavailable")?.join("bundled-apps").join(format!("{id}.delta-app"));
+  #[cfg(not(target_os="android"))]let bundled=app.path().resource_dir().map_err(|_|"app_storage_unavailable")?.join("app-packages").join(format!("{id}.delta-app"));
+  let bytes=if bundled.is_file(){let size=std::fs::metadata(&bundled).map_err(|_|"package_read_failed")?.len();if size>delta_app_runtime::MAX_PACKAGE as u64{return Err("package_limit".into())}std::fs::read(bundled).map_err(|_|"package_read_failed")?}else{
   let client=reqwest::Client::builder().https_only(true).timeout(std::time::Duration::from_secs(120)).user_agent("Delta-App/1").build().map_err(|_|"download_failed")?;
   let mut response=client.get(url).send().await.map_err(|_|"download_failed")?.error_for_status().map_err(|_|"download_failed")?;
   let mut bytes=vec![];while let Some(b)=response.chunk().await.map_err(|_|"download_failed")?{if bytes.len()+b.len()>delta_app_runtime::MAX_PACKAGE{return Err("package_limit".into())}bytes.extend_from_slice(&b)}
+  bytes};
   let state=app.state::<AppStore>();let _guard=state.0.lock().map_err(|_|"app_store_busy")?;
   delta_app_runtime::install(&root,&bytes,&item).map_err(|e|e.to_string())
  },
@@ -25,7 +29,7 @@ pub async fn call(app:&tauri::AppHandle,method:&str,a:&Value)->Result<Value,Stri
  let protocol=delta_app_runtime::protocol(id);
  #[cfg(any(target_os="windows",target_os="android"))]let url=format!("http://{protocol}.localhost/index.html");
  #[cfg(not(any(target_os="windows",target_os="android")))]let url=format!("{protocol}://localhost/index.html");
- Ok(json!({"url":url,"id":id,"grants":[]}))},_=>Err("unsupported_app_operation".into())}
+ Ok(json!({"url":url,"id":id,"name":item["name"],"grants":[]}))},_=>Err("unsupported_app_operation".into())}
 }
 pub fn register(mut builder:tauri::Builder<tauri::Wry>)->tauri::Builder<tauri::Wry>{
  for item in catalog(){let id=item["id"].as_str().unwrap().to_owned();let protocol=delta_app_runtime::protocol(&id);
