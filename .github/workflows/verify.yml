@@ -1,0 +1,18 @@
+name: Verify shared UI
+on: [push, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci --ignore-scripts
+      - run: npm test && npm run test:i18n && npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: delta-ui-bundled-preview
+          path: dist

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+target/
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+config.json
+*.log
+data/
+server/launch.mjs
