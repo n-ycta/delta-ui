@@ -19,8 +19,10 @@ export function PluginApp() {
       .then((result: any) => {
         if (cancelled) return;
         const u = new URL(result.url);
+        const appOrigin=u.origin === "null" ? u.protocol + "//" + u.host : u.origin;
+        const rootOrigin=location.origin === "null" ? location.protocol + "//" + location.host : location.origin;
         if (
-          u.origin === location.origin ||
+          appOrigin === rootOrigin ||
           (!["http:", "https:"].includes(u.protocol) &&
             !/^deltaapp-[a-z0-9-]+:$/.test(u.protocol))
         )

@@ -22,12 +22,12 @@ export function NotificationsPanel() {
   const unread = q.data?.filter((n) => !n.read).length ?? 0;
   return (
     <Drawer open={open} onClose={() => set({ notificationsOpen: false })} title={tr("layout.Notifications.s_ee3c35f311")} sub={tr("layout.Notifications.s_3ad97ce395", { p0: (unread) })}>
-      <div className="row" style={{ marginBottom: 12 }}>
+      <div className="row notifications-toolbar">
         <Segmented sans value={filter} onChange={setFilter} options={[{ value: 'unread', label: tr("layout.Notifications.s_cf3ac2d46f") }, { value: 'all', label: tr("layout.Notifications.s_fd08da7a63") }]} />
         <span className="spacer" />
         <Button size="sm" variant="ghost" icon={<CheckCheck size={13} />} disabled={!unread} loading={mark.pending} onClick={() => mark.run('all', true)}>{tr("layout.Notifications.s_d9aa2d74e0")}</Button>
       </div>
-      <div style={{ margin: '0 -18px' }}>
+      <div className="notification-list">
         {q.loading && <SkeletonRows rows={5} />}
         {q.error && !q.data && <ErrorState error={q.error} onRetry={q.refetch} />}
         {q.data && list.length === 0 && <Empty icon={<BellOff size={18} />} title={filter === 'unread' ? tr("layout.Notifications.s_bd6a159296") : tr("layout.Notifications.s_84dcc23a34")}>{tr("layout.Notifications.s_3c12a2a2b9")}</Empty>}

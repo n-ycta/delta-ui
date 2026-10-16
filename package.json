@@ -1,7 +1,7 @@
 {
   "name": "@delta/ui",
   "private": false,
-  "version": "0.1.3",
+  "version": "0.1.4",
   "type": "module",
   "description": "Shared Delta UI and host/Plugin UI contracts",
   "scripts": {
@@ -11,7 +11,7 @@
     "typecheck": "tsc -b --noEmit",
     "test": "tsx tests/run.ts && npm run test:host",
     "test:i18n": "node scripts/check-i18n.cjs && node scripts/check-locales.cjs",
-    "test:host": "tsx --test tests/host-channel.test.ts tests/native-projection.test.ts tests/native-navigation.test.ts tests/compatibility.test.ts",
+    "test:host": "tsx --test tests/host-channel.test.ts tests/native-projection.test.ts tests/native-navigation.test.ts tests/compatibility.test.ts tests/auth-errors.test.ts",
     "test:navigation": "node tests/native-navigation.browser.mjs",
     "test:onboarding": "node tests/native-onboarding.browser.mjs",
     "test:language": "node tests/language-settings.browser.mjs",

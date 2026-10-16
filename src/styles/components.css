@@ -42,7 +42,13 @@
 .page-title { font-size: var(--fs-2xl); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
 .page-sub { color: var(--muted); margin-top: 4px; max-width: 760px; }
 .page-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.banner { display: flex; align-items: center; gap: 12px; padding: 8px 20px; border-bottom: 1px solid var(--rule); font-size: 12.5px; }
+.banner { display:flex; align-items:flex-start; gap:12px; padding:12px 16px; border:1px solid var(--rule); border-radius:var(--r-md); font-size:12.5px; line-height:1.55; min-width:0; overflow-wrap:anywhere; }
+.banner > span { min-width:0; }
+.banner > .btn, .banner > svg { flex-shrink:0; }
+.main > .banner { margin:12px 24px 0; }
+.page > .banner { margin-bottom:20px; }
+.panel-body .banner { width:100%; }
+@media(max-width:760px){.main > .banner{margin:12px 16px 0}.banner{flex-wrap:wrap;gap:12px}.banner > .grow{flex-basis:calc(100% - 44px)}}
 .banner.err { background: var(--err-weak); color: var(--err); }
 .banner.warn { background: var(--warn-weak); color: var(--warn); }
 .banner.info { background: var(--info-weak); color: var(--info); }
@@ -485,3 +491,5 @@ select option, select optgroup { color: var(--ink); background-color: var(--surf
 .plugin-app-host { height:100dvh; display:flex; flex-direction:column; }
 .plugin-app-toolbar { height:40px; flex-shrink:0; padding:4px 8px; border-bottom:1px solid var(--rule); background:var(--surface); }
 .plugin-app-host .plugin-app-frame { flex:1; height:0; min-height:0; }
+
+.recovery-help p,.recovery-help ol{margin:0}.recovery-help ol{padding-left:20px;display:grid;gap:12px}.auth-advanced{background:none;border:0;padding:8px 0;color:var(--muted);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:3px}.recovery-phrase{display:block;padding:16px;border:1px solid var(--rule);border-radius:var(--r-md);background:var(--surface-2);overflow-wrap:anywhere;line-height:1.8}.identity-page label .input{display:block;width:100%;margin-top:6px;min-height:44px}.toasts{bottom:max(16px,env(safe-area-inset-bottom));right:max(16px,env(safe-area-inset-right))}.toast{padding:16px;line-height:1.5}.toast .grow{min-width:0;overflow-wrap:anywhere}.toast > button{min-width:28px;min-height:28px;display:grid;place-items:center}.notif{gap:12px;padding:16px;align-items:flex-start}.notif .grow{overflow-wrap:anywhere}.notifications-toolbar{flex-wrap:wrap;gap:12px;margin-bottom:16px}.notification-list{display:grid;gap:8px}.notification-list .notif{border:1px solid var(--rule);border-radius:var(--r-md)}

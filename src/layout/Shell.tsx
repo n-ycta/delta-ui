@@ -18,6 +18,7 @@ import { RealtimeBridge } from './Realtime';
 
 export function Shell({ children }: { children: ReactNode }) {
   const appView=useLocation().pathname.startsWith('/apps/');
+  const setupOwner=useRuntimeAccess(s=>s.name==='browser-owner');
   const prefs = usePrefs();
   const theme = useResolvedTheme();
   const ui = useUi();
@@ -59,6 +60,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <Button size="sm" onClick={() => prefs.set({ viewAs: null })}>{tr("layout.Shell.s_4bb0c16e83")}</Button>
           </div>
         )}
+        {setupOwner&&<div className="banner warn" role="status"><span className="grow">{tr('auth.setupSession')}</span><Link className="btn sm" to="/identity">{tr('auth.setupAction')}</Link></div>}
         <main className="content">{children}</main>
       </div>
       <CommandPalette />

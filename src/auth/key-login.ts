@@ -1,4 +1,63 @@
-import {schnorr} from '@noble/curves/secp256k1';import {sha256} from '@noble/hashes/sha256';import {hexToBytes,bytesToHex,utf8ToBytes} from '@noble/hashes/utils';import {mnemonicToSeedSync,validateMnemonic} from '@scure/bip39';import {wordlist} from '@scure/bip39/wordlists/english';import {bech32} from '@scure/base';import {tr} from '../i18n';
-export function keyFromInput(input:string):Uint8Array{const s=input.trim().toLowerCase();if(s.startsWith('nsec1')){const d=bech32.decode(s as `${string}1${string}`,1000);if(d.prefix!=='nsec')throw Error(tr('polish.invalidKey'));return new Uint8Array(bech32.fromWords(d.words))}if(/^[a-f0-9]{64}$/.test(s))return hexToBytes(s);if(!validateMnemonic(s,wordlist))throw Error(tr('polish.invalidPhrase'));const seed=mnemonicToSeedSync(s);try{return sha256(new Uint8Array([...utf8ToBytes('delta-identity-v1:'),...seed]))}finally{seed.fill(0)}}
-export async function sessionRequest(path:string,args:unknown){const r=await fetch('/session/'+path,{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify(args)});const data=await r.json();if(!r.ok)throw Error(data.message||data.error);return data}
-export async function signInWithKey(input:string,remember:boolean){const key=keyFromInput(input);try{const pk=bytesToHex(schnorr.getPublicKey(key)),c=await sessionRequest('challenge',{public_key:pk,remember});const canonical=`delta-login-v1\n${c.node_id}\n${pk}\n${c.nonce}\n${c.expires_at}\n${location.origin}${c.remember?'\nremember:2592000':''}`;if(c.audience!==location.origin||c.message!==canonical||c.expires_at*1000<Date.now()||c.remember!==remember)throw Error(tr('polish.invalidChallenge'));await sessionRequest('key-login',{nonce:c.nonce,signature:bytesToHex(schnorr.sign(sha256(utf8ToBytes(c.message)),key))})}finally{key.fill(0)}}
+import { schnorr } from "@noble/curves/secp256k1";
+import { sha256 } from "@noble/hashes/sha256";
+import { hexToBytes, bytesToHex, utf8ToBytes } from "@noble/hashes/utils";
+import { mnemonicToSeedSync, validateMnemonic } from "@scure/bip39";
+import { wordlist } from "@scure/bip39/wordlists/english";
+import { bech32 } from "@scure/base";
+import { tr } from "../i18n";
+export function keyFromInput(input: string): Uint8Array {
+  const s = input.trim().toLowerCase();
+  if (s.startsWith("nsec1")) {
+    const d = bech32.decode(s as `${string}1${string}`, 1000);
+    if (d.prefix !== "nsec") throw Error(tr("polish.invalidKey"));
+    return new Uint8Array(bech32.fromWords(d.words));
+  }
+  if (/^[a-f0-9]{64}$/.test(s)) return hexToBytes(s);
+  if (!validateMnemonic(s, wordlist)) throw Error(tr("polish.invalidPhrase"));
+  const seed = mnemonicToSeedSync(s);
+  try {
+    return sha256(
+      new Uint8Array([...utf8ToBytes("delta-identity-v1:"), ...seed]),
+    );
+  } finally {
+    seed.fill(0);
+  }
+}
+export async function sessionRequest(path: string, args: unknown) {
+  const r = await fetch("/session/" + path, {
+    method: "POST",
+    credentials: "same-origin",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(args),
+  });
+  const data = await r.json();
+  if (!r.ok) {
+    const error = Object.assign(Error(data.message || data.error), {
+      code: data.error,
+      status: r.status,
+    });
+    throw error;
+  }
+  return data;
+}
+export async function signInWithKey(input: string, remember: boolean) {
+  const key = keyFromInput(input);
+  try {
+    const pk = bytesToHex(schnorr.getPublicKey(key)),
+      c = await sessionRequest("challenge", { public_key: pk, remember });
+    const canonical = `delta-login-v1\n${c.node_id}\n${pk}\n${c.nonce}\n${c.expires_at}\n${location.origin}${c.remember ? "\nremember:2592000" : ""}`;
+    if (
+      c.audience !== location.origin ||
+      c.message !== canonical ||
+      c.expires_at * 1000 < Date.now() ||
+      c.remember !== remember
+    )
+      throw Error(tr("polish.invalidChallenge"));
+    await sessionRequest("key-login", {
+      nonce: c.nonce,
+      signature: bytesToHex(schnorr.sign(sha256(utf8ToBytes(c.message)), key)),
+    });
+  } finally {
+    key.fill(0);
+  }
+}
