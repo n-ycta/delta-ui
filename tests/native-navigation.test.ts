@@ -23,3 +23,5 @@ for (const root of [
     assert.equal(isExternalHttpLink("javascript:alert(1)", root), false);
   });
 }
+
+test('malformed href never crashes the root click handler',()=>{assert.equal(isExternalHttpLink('http://','https://tauri.localhost/'),false)});

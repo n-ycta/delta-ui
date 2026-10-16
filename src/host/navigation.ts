@@ -1,10 +1,12 @@
 /** The root document owns routing; only genuinely external HTTP(S) links use the OS. */
 export function isExternalHttpLink(href: string, documentUrl: string): boolean {
+  try {
   const root = new URL(documentUrl);
   const target = new URL(href, root);
   if (!["http:", "https:"].includes(target.protocol)) return false;
   // Compare the actual bundled origin, never a hard-coded tauri.localhost name.
   return target.origin !== root.origin;
+  } catch { return false; }
 }
 export function installNativeLinkHandler(
   doc: Document,

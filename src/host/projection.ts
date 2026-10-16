@@ -7,7 +7,7 @@ const targets:Record<string,string>={'mcp_list':'mcp.list','mcp_catalog':'mcp.ca
 const fail=(code:string,message:string):never=>{throw Object.assign(Error(message),{code})};
 export function projectNative(raw:HostBridge):HostBridge{
  let serviceNode:string|undefined,prefsLoaded=false,cache:Promise<Obj[]>|undefined,cacheAt=0;
- const call=async(capability:string,args:Obj={},node?:string):Promise<any>=>{try{return await raw.call({capability,args,...(node?{node}:{})})}catch(e){const x=e as Obj;throw Object.assign(Error(x.message||x.code||String(e)),{code:x.code||'unavailable'})}};
+ const call=async(capability:string,args:Obj={},node?:string):Promise<any>=>{if(['packages.plan','packages.install'].includes(capability)&&(await raw.info()).kind==='android'){const local=await raw.call({capability:'core.info'}) as Obj;if(!node||node===local.node_id)fail('unsupported',tr('compatibility.installer'))}try{return await raw.call({capability,args,...(node?{node}:{})})}catch(e){const x=e as Obj;throw Object.assign(Error(x.message||x.code||String(e)),{code:x.code||'unavailable'})}};
  const docs=(namespace:string)=>call('host.document_list',{namespace});
  const put=(namespace:string,key:string,value:Obj)=>call('host.document_put',{namespace,key,value});
  const preferences=async()=>{if(!prefsLoaded){const p=(await docs('preferences')).find((p:Obj)=>p.id==='services');serviceNode=p?.node||undefined;prefsLoaded=true}return serviceNode};
@@ -65,7 +65,6 @@ export function projectNative(raw:HostBridge):HostBridge{
   if(r.capability==='host.services'){if(r.args?.node!==undefined){const n=String(r.args.node);const peers=await call('peers.list');if(n&&!peers.some((p:Obj)=>p.node_id===n))fail('bad_request','Unknown service node');serviceNode=n||undefined;prefsLoaded=true;await put('preferences','services',{id:'services',node:serviceNode||''})}return{node:await preferences()||''}}
   if(r.capability==='dependencies.check'&&typeof r.args?.capability==='string'&&r.args.capability.startsWith('web.')){const t=targets[r.args.capability.slice(4)];if(t)return service('dependencies.check',{capability:t});return{available:true}}
   if(r.capability.startsWith('web.'))return dispatch(r.capability.slice(4),r.args||{});
-  if(['packages.plan','packages.install'].includes(r.capability)&&(await raw.info()).kind==='android'){const local=await call('core.info');if(!r.node||r.node===local.node_id)fail('unsupported',tr('compatibility.installer'))}
   return call(r.capability,r.args||{},r.node);
  }};
 }

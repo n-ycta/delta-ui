@@ -1,4 +1,3 @@
-import React from "react";
 import { createRoot } from "react-dom/client";
 import { installHostBridge } from "../src/host/contract";
 import { NativeOnboarding } from "../src/host/NativeOnboarding";
