@@ -1,3 +1,4 @@
+import uiPackage from '../../package.json';
 import { Updates } from './Updates';
 import { isCoreEndpoint } from '../api/endpoints';
 import { tr } from '../i18n';
@@ -273,6 +274,10 @@ function Connection() {
                 {info.data.coreVersion} {tr('pages.SettingsPage.s_0d0c4ddd7c')}
                 {info.data.apiVersion}
               </dd>
+              <dt>{tr('host.ui')}</dt>
+              <dd className="mono">{uiPackage.version}</dd>
+              <dt>{tr('host.shell')}</dt>
+              <dd className="mono">{info.data.hostVersion ?? '—'}</dd>
               <dt>{tr('pages.SettingsPage.s_7117989d8a')}</dt>
               <dd className="mono">{PANEL_CONTRACT_VERSION}</dd>
               <dt>{tr('pages.SettingsPage.s_8db46ea789')}</dt>

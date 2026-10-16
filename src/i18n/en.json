@@ -1917,6 +1917,9 @@
     "foreground": "The core runs while the application is active.",
     "connected": "Connected",
     "features": "Host features",
-    "ui": "UI"
+    "ui": "UI",
+    "external": "The existing service owns node lifecycle; closing this interface does not stop it.",
+    "tray": "Closing the window hides it to the tray; exiting the node is a separate action.",
+    "shell": "Host"
   }
 }

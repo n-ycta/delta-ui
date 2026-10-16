@@ -13,6 +13,8 @@ import type {
 export interface CoreInfo {
   name: string;
   coreVersion: string;
+  hostVersion?: string;
+  uiVersion?: string;
   apiVersion: string;
   startedAt: number;
   region?: string;
