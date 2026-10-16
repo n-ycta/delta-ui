@@ -6,9 +6,9 @@ export interface HostInfo { kind: HostKind; version: string; bridgeVersion: stri
 export interface CapabilityRequest { capability: string; args?: Record<string, unknown>; node?: string; }
 export interface HostBridge { info(): Promise<HostInfo>; call(request: CapabilityRequest): Promise<unknown>; }
 export function validateRequest(request: CapabilityRequest): void {
- if (!request || !/^[a-z][a-z0-9_-]*\.[a-zA-Z0-9_.-]+$/.test(request.capability) ||
+ if (!request || typeof request.capability !== 'string' || !/^[a-z][a-z0-9_-]{0,47}(?:\.[a-z][a-z0-9_-]{0,47})+$/.test(request.capability) ||
    request.capability.length > 128 || (request.args !== undefined && (!request.args || Array.isArray(request.args) || typeof request.args !== 'object')) ||
-   (request.node !== undefined && (typeof request.node !== 'string' || request.node.length > 128)) ||
+   (request.node !== undefined && (typeof request.node !== 'string' || !request.node.length || request.node.length > 128)) ||
    new TextEncoder().encode(JSON.stringify(request)).length > MAX_BRIDGE_BYTES) throw new Error('invalid_request');
 }
 export function compatibleBridge(version: string): boolean { return /^1\.\d+\.\d+$/.test(version); }

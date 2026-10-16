@@ -1,0 +1,26 @@
+name: Release shared UI package
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci --ignore-scripts
+      - run: npm test && npm run test:i18n && npm run build
+      - run: |
+          cp ui-package.json LICENSE NOTICE dist/
+          tar -czf delta-ui.tar.gz -C dist .
+          sha256sum delta-ui.tar.gz > SHA256SUMS
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --title "Delta UI $GITHUB_REF_NAME" --notes "Shared interface source and bundled assets. Host Bridge 1.0; credential-private native adapter and scoped SDK broker. Bundled delivery only: independent signed UI activation/rollback is not enabled. Native hosts remain experimental."
+          gh release upload "$GITHUB_REF_NAME" delta-ui.tar.gz SHA256SUMS
