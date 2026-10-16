@@ -40,3 +40,10 @@ The tree renderer, outline, appearance inspector, shared controls, persistence, 
 The host launcher is collapsed to one compact button by default. Full Console embeds it in the normal top bar; frameless apps receive a small corner affordance. It opens only on demand and closes on Escape or outside pointer input. The button can be hidden in settings. Ctrl/Cmd+Shift+Space always recalls it; Ctrl/Cmd+Shift+E toggles editing and Ctrl/Cmd+Shift+R opens settings. The hidden-button preference is local host UI state, not part of the exported application tree. Recovery controls never become removable tree nodes.
 
 Dock is an additional desktop/mobile navigation choice, with icon-only app launchers and an active indicator. Its floating appearance reserves a layout row, rather than covering media playback or charts. Side/top/bottom/hidden options remain supported. A mixed integration test composes a real isolated Media radio surface and an original dashboard time-series widget, exercises audio playback, then verifies dock layout and phone overflow. It uses explicit mock statistics and a test host adapter, not a live user node.
+
+## Embedded responsive layout
+
+System surfaces expose named CSS inline-size containers. Legacy forms, side
+grids, event rows and Console navigation respond to their own pane rather than
+the outer screen. Workbench base controls use zero-specificity exclusions so
+component navigation and outline styling are not overridden by generic controls.

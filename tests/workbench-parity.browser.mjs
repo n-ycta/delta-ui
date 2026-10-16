@@ -20,6 +20,14 @@ try {
     assert(await label.evaluate(e => e.scrollWidth <= e.clientWidth), 'refresh interval must fit without ellipsis');
   }
   await p.screenshot({ path: `${output}/workbench-parity-home.png` });
+  const system = p.locator('.wb-system-surface').first();
+  await system.evaluate(e => e.style.width = '650px');
+  const menu = system.locator('.topbar .mobile-only');
+  await menu.waitFor({state:'visible'});
+  await menu.click();
+  assert(await system.locator('.sidebar').evaluate(e => getComputedStyle(e).position === 'absolute'), 'narrow embedded Console must use its own mobile navigation');
+  await system.locator('.overlay').click({position:{x:600,y:120}});
+  await system.evaluate(e => e.style.width = '');
   for (const [path, name] of [
     ["/plugins", "plugins"],
     ["/nodes", "nodes"],

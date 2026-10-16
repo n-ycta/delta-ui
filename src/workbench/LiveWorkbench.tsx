@@ -1,3 +1,4 @@
+import "./embedded-layout.css";
 import { appCall } from "../sdk/apps";
 import { queryClient, useQuery } from "../app/query";
 import { readInstalledSurfaceApps } from "../sdk/surfaces";

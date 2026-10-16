@@ -146,6 +146,21 @@ try {
     s.apps.find((a) => a.template === "studio").root.children[0].type,
     "split",
   );
+  await page.locator(".wb-system-surface .grid-aside .panel").first().waitFor();
+  assert(
+    await page
+      .locator(".wb-system-surface .grid-aside .panel")
+      .first()
+      .evaluate((e) => e.getBoundingClientRect().width > 300),
+    "embedded MCP form must stack at pane width",
+  );
+  assert(
+    await page
+      .locator(".wb-system-surface .grid-aside .panel-head")
+      .first()
+      .evaluate((e) => e.getBoundingClientRect().height < 100),
+    "panel heading must not collapse into vertical text",
+  );
   await page.screenshot({ path: `${output}/workbench-builder-desktop.png` });
   await top("Готово").click();
   // Every starter theme renders; settings actually persist theme.

@@ -1,0 +1,115 @@
+/* Legacy Console pages must respond to their application pane, not the viewport. */
+.wb-system-surface {
+  container: delta-system delta-page / inline-size;
+  position: relative;
+}
+.wb-system-surface .content {
+  container: delta-page / inline-size;
+}
+@container delta-page (max-width: 1100px) {
+  .wb-system-surface .grid-aside {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .wb-system-surface .grid-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container delta-page (max-width: 760px) {
+  .wb-system-surface .page {
+    padding: 16px 14px 40px;
+    --ctl: 44px;
+  }
+  .wb-system-surface :is(.grid-2, .grid-3, .profile-diff, .form-row) {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .wb-system-surface .form-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  }
+  .wb-system-surface .catalog {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  }
+  .wb-system-surface :is(.page-head, .page-actions, .panel-head, .row) {
+    flex-wrap: wrap;
+  }
+  .wb-system-surface .row > .input {
+    flex: 1 1 160px;
+    min-width: 0;
+  }
+  .wb-system-surface .row > .btn {
+    flex-shrink: 0;
+  }
+  .wb-system-surface .event-log-head {
+    display: none;
+  }
+  .wb-system-surface .event-log-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px 10px;
+    padding: 12px;
+  }
+  .wb-system-surface .event-log-message {
+    grid-column: 1 / -1;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+@container delta-page (max-width: 640px) {
+  .wb-system-surface .strip {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .wb-system-surface .dependency-row > .grow {
+    flex-basis: 100%;
+  }
+}
+@container delta-system (max-width: 900px) {
+  .wb-system-surface .shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .wb-system-surface .sidebar {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: min(260px, 100%);
+    z-index: 55;
+    transform: translateX(-100%);
+    background: var(--bg);
+  }
+  .wb-system-surface .shell[data-mobile-nav="true"] .sidebar {
+    transform: none;
+  }
+  .wb-system-surface .mobile-only {
+    display: inline-flex !important;
+  }
+  .wb-system-surface .desktop-only {
+    display: none !important;
+  }
+  .wb-system-surface .search-trigger {
+    width: auto;
+  }
+  .wb-system-surface :is(.search-trigger .st-text, .crumbs) {
+    display: none;
+  }
+  .wb-system-surface .topbar {
+    padding: 0 10px;
+    gap: 6px;
+  }
+  .wb-system-surface
+    .shell[data-collapsed="true"]
+    :is(
+      .nav-label,
+      .nav-section,
+      .brand-text,
+      .nav-sub,
+      .sidebar-foot-text,
+      .nav-item .count
+    ) {
+    display: initial;
+  }
+  .wb-system-surface
+    .shell[data-collapsed="true"]
+    :is(.brand-text, .sidebar-foot-text) {
+    display: flex;
+  }
+  .wb-system-surface .shell[data-collapsed="true"] :is(.nav-sub, .nav-section) {
+    display: block;
+  }
+}
