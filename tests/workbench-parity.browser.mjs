@@ -16,18 +16,39 @@ try {
   await p.waitForSelector(".wb .sidebar");
   await p.waitForTimeout(1400);
   assert((await p.locator(".widget").count()) > 0);
-  for (const label of await p.locator('.delta-select-trigger > span').all()) {
-    assert(await label.evaluate(e => e.scrollWidth <= e.clientWidth), 'refresh interval must fit without ellipsis');
+  for (const label of await p.locator(".delta-select-trigger > span").all()) {
+    assert(
+      await label.evaluate((e) => e.scrollWidth <= e.clientWidth),
+      "refresh interval must fit without ellipsis",
+    );
   }
   await p.screenshot({ path: `${output}/workbench-parity-home.png` });
-  const system = p.locator('.wb-system-surface').first();
-  await system.evaluate(e => e.style.width = '650px');
-  const menu = system.locator('.topbar .mobile-only');
-  await menu.waitFor({state:'visible'});
+  const system = p.locator(".wb-system-surface").first();
+  await system.evaluate((e) => (e.style.width = "650px"));
+  const menu = system.locator(".topbar .mobile-only");
+  await menu.waitFor({ state: "visible" });
   await menu.click();
-  assert(await system.locator('.sidebar').evaluate(e => getComputedStyle(e).position === 'absolute'), 'narrow embedded Console must use its own mobile navigation');
-  await system.locator('.overlay').click({position:{x:600,y:120}});
-  await system.evaluate(e => e.style.width = '');
+  assert(
+    await system
+      .locator(".sidebar")
+      .evaluate((e) => getComputedStyle(e).position === "absolute"),
+    "narrow embedded Console must use its own mobile navigation",
+  );
+  await system
+    .locator(".shell")
+    .evaluate((e) => (e.dataset.collapsed = "true"));
+  assert(
+    await system
+      .locator(".sidebar .nav-item")
+      .first()
+      .evaluate((e) => e.getBoundingClientRect().width > 180),
+    "narrow sidebar must not retain collapsed desktop rail sizing",
+  );
+  await system
+    .locator(".shell")
+    .evaluate((e) => (e.dataset.collapsed = "false"));
+  await system.locator(".overlay").click({ position: { x: 600, y: 120 } });
+  await system.evaluate((e) => (e.style.width = ""));
   for (const [path, name] of [
     ["/plugins", "plugins"],
     ["/nodes", "nodes"],
