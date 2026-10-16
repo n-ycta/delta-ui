@@ -13,7 +13,8 @@
     "test:i18n": "node scripts/check-i18n.cjs && node scripts/check-locales.cjs",
     "test:host": "tsx --test tests/host-channel.test.ts tests/native-projection.test.ts tests/native-navigation.test.ts tests/compatibility.test.ts",
     "test:navigation": "node tests/native-navigation.browser.mjs",
-    "test:onboarding": "node tests/native-onboarding.browser.mjs"
+    "test:onboarding": "node tests/native-onboarding.browser.mjs",
+    "test:language": "node tests/language-settings.browser.mjs"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.0.14",

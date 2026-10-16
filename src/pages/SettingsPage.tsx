@@ -4,7 +4,7 @@ import {CapabilityGate} from '../ui/Dependencies';
 import uiPackage from '../../package.json';
 import { Updates } from './Updates';
 import { isCoreEndpoint } from '../api/endpoints';
-import { tr } from '../i18n';
+import { tr, language, setLanguage } from '../i18n';
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
@@ -114,6 +114,11 @@ function General() {
   const resolved = useResolvedTheme();
   return (
     <Panel>
+      <Row label={tr('polish.language')}>
+        <select className="select" aria-label={tr('polish.language')} value={language} onChange={e=>setLanguage(e.target.value as 'en'|'ru')}>
+          <option value="en">{tr('polish.en')}</option><option value="ru">{tr('polish.ru')}</option>
+        </select>
+      </Row>
       <Row
         label={tr('pages.SettingsPage.s_553c45f1b8')}
         help={
