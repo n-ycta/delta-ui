@@ -14,7 +14,8 @@
     "test:host": "tsx --test tests/host-channel.test.ts tests/native-projection.test.ts tests/native-navigation.test.ts tests/compatibility.test.ts",
     "test:navigation": "node tests/native-navigation.browser.mjs",
     "test:onboarding": "node tests/native-onboarding.browser.mjs",
-    "test:language": "node tests/language-settings.browser.mjs"
+    "test:language": "node tests/language-settings.browser.mjs",
+    "test:apps": "node --test tests/app-runtime.test.mjs"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.0.14",
@@ -54,7 +55,8 @@
     "./bootstrap": "./src/main.tsx",
     "./host": "./src/host/contract.ts",
     "./sdk": "./src/sdk/channel.ts",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./sdk/client": "./src/sdk/client.ts"
   },
   "files": [
     "src",
@@ -67,7 +69,8 @@
     "index.html",
     "LICENSE",
     "NOTICE",
-    "ui-package.json"
+    "ui-package.json",
+    "app-catalog.json"
   ],
   "repository": {
     "type": "git",

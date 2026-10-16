@@ -479,3 +479,5 @@ select option, select optgroup { color: var(--ink); background-color: var(--surf
 .auth-page{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:var(--bg)}
 .auth-card{width:100%;max-width:460px;min-width:0}.auth-card .input{width:100%;min-width:0}.auth-card .banner{overflow-wrap:anywhere}.auth-card header .select{width:auto}
 @media(max-height:650px){.auth-page{align-items:flex-start}}
+
+.plugin-app-frame { display:block; width:100%; height:calc(100dvh - var(--topbar) - 52px); min-height:480px; border:0; background:var(--bg); }

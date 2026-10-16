@@ -1,0 +1,9 @@
+# Portable app packages (experimental)
+
+`delta-app-v1` installs static browser applications without a Node.js runtime. It is separate from the Core process supervisor: a static app must never be launched as an executable component. APK and desktop hosts use the same package verifier, isolated per-app custom-protocol origins and grant-limited Plugin UI SDK. Web hosts must serve app assets on a different origin, not under the credential-privileged Console origin.
+
+A package is bounded JSON containing `format`, `manifest` and `files` (`path`, SHA-256, base64 content). It contains code/font assets, never the user's media library. A trusted release catalog pins package identity, version and complete SHA-256. The verifier rejects traversal, duplicate paths, unsupported execution, non-empty host grants, incorrect hashes and oversized assets/packages before any destination is committed. Installation is explicit, atomic, and refuses overwrite; updates require uninstall/reinstall in this first experimental contract. Uninstall removes application assets, not browser media storage.
+
+Each catalog ID has a unique protocol (`deltaapp-dev-delta-media`); app origins do not share localStorage/IndexedDB or Console cookies. Frames are sandboxed and cannot navigate the root. Native IPC initialization is main-frame-only, with Tauri's invoke key and origin ACL; plugin frames receive no owner token or direct transport. The parent pins Window + origin + fresh channel nonce via `pluginChannel`. `connectPlugin` is the app-side SDK and checks source/origin before accepting context. This first app release has zero capability grants; theme and language are non-secret launch context only.
+
+No security claim is made for arbitrary side-loaded packages. Only reviewed catalog releases are accepted. HTTP media, DRM extraction, native background playback and multi-device binary synchronization are not granted by this package format.

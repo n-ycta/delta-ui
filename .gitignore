@@ -9,3 +9,7 @@ config.json
 *.log
 data/
 server/launch.mjs
+
+crates/*/target/
+
+/crates/native-host/Cargo.lock

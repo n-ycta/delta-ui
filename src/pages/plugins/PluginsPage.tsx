@@ -1,3 +1,4 @@
+import {PortableApps} from './PortableApps';
 import { tr } from '../../i18n';
 import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -68,6 +69,7 @@ export function PluginsPage() {
 
   return (
     <div className="page">
+      <PortableApps />
       <PageHead title={tr("pages.plugins.PluginsPage.s_ff13ef845f")} sub={tr("pages.plugins.PluginsPage.s_13f5b9ea75")}
         actions={counts.updates > 0 && <Button icon={<ArrowUpCircle size={14} />} onClick={() => setParams({ tab: 'updates' })}>{tr("pages.plugins.PluginsPage.s_8dcaf51985")}{counts.updates}</Button>} />
       <Tabs value={tab} onChange={(t) => setParams({ tab: t })} tabs={[

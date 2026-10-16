@@ -1,3 +1,4 @@
+import {PluginApp} from './pages/plugins/PluginApp';
 import {CapabilityGate} from './ui/Dependencies';
 import { tr } from './i18n';
 import type { ReactNode } from 'react';
@@ -31,6 +32,7 @@ export function App() {
             <Route path="/dashboards" element={<DashboardsPage />} />
             <Route path="/dashboards/:id" element={<DashboardPage />} />
             <Route path="/plugins" element={<PluginsPage />} />
+            <Route path="/apps/:id" element={<PluginApp />} />
             <Route path="/plugins/:id" element={<PluginDetail />} />
             <Route path="/nodes" element={<NodesPage />} />
             <Route path="/nodes/:id" element={<NodeDetail />} />

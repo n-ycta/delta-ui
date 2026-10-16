@@ -2004,5 +2004,15 @@
     "platform": "OS not supported",
     "architecture": "CPU architecture unsupported or unknown",
     "installer": "No compatible local plugin installer is available. Select a supported paired node."
+  },
+  "apps": {
+    "title": "Applications",
+    "install": "Install",
+    "installing": "Installing",
+    "open": "Open",
+    "remove": "Remove",
+    "removeConfirm": "Remove the application? Local media stays in its storage.",
+    "unavailable": "This host does not support isolated applications.",
+    "loading": "Loading"
   }
 }

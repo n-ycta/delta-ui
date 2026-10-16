@@ -1,4 +1,5 @@
 //! Credential-private root-document adapter shared by Desktop and Android.
+mod apps;
 use std::sync::{Arc,Mutex};use delta_host_runtime::HostRuntime;use serde_json::{json,Value};use tauri::{Manager,State,WebviewWindow};
 #[cfg(target_os="android")]pub mod android;
 struct HostState{#[cfg(not(target_os="android"))]runtime:Arc<HostRuntime>,pending:Mutex<Option<String>>}
@@ -6,6 +7,7 @@ fn trusted(window:&WebviewWindow)->Result<(),Value>{let url=window.url().map_err
 fn runtime(state:&HostState)->Result<Arc<HostRuntime>,Value>{#[cfg(target_os="android")] {let _=state;android::active().map_err(|code|json!({"code":code}))}#[cfg(not(target_os="android"))]{Ok(state.runtime.clone())}}
 #[tauri::command]async fn host_info(window:WebviewWindow,state:State<'_,HostState>)->Result<Value,Value>{trusted(&window)?;let mut v=runtime(&state)?.info(env!("CARGO_PKG_VERSION"),"0.1.3");let f=v["features"].as_array_mut().unwrap();f.extend([json!("native-export"),json!("native-share"),json!("external-links")]);#[cfg(target_os="android")]{f.push(json!("android-keystore"));f.push(json!("background-service"));if android::platform("info",&json!({})).ok().is_some_and(|s|s["backgroundRunning"]==true){v["lifecycle"]=json!("foreground-service")}}#[cfg(not(target_os="android"))]{f.push(json!("autostart"));}Ok(v)}
 #[tauri::command]async fn host_call(app:tauri::AppHandle,window:WebviewWindow,state:State<'_,HostState>,request:Value)->Result<Value,Value>{trusted(&window)?;let r=delta_host_runtime::Request::parse(request.clone()).map_err(|e|e.to_value())?;
+ if r.capability.starts_with("host.apps_"){if r.node.is_some(){return Err(json!({"code":"forbidden"}))}return apps::call(&app,&r.capability,&r.args).await.map_err(|code|json!({"code":code}));}
  if r.capability=="host.platform_status"||r.capability=="host.background"||r.capability=="host.export"||r.capability=="host.share"||r.capability=="host.open"||r.capability=="host.autostart"||r.capability=="host.notify" {
   let method=r.capability.trim_start_matches("host.");
   #[cfg(target_os="android")] {let _=&app;return android::platform(if method=="platform_status"{"status"}else{method},&r.args).map_err(|code|json!({"code":code}))}
@@ -32,7 +34,7 @@ fn prepare_runtime(app:&tauri::AppHandle,home:&std::path::Path)->std::io::Result
  std::fs::create_dir_all(home)?;let stage=home.join(".native-runtime-stage");if stage.exists(){std::fs::remove_dir_all(&stage)?}copy(&source,&stage)?;if target.exists(){return Err(std::io::Error::other("Existing incomplete runtime requires repair"))}std::fs::rename(stage,target)
 }
 pub fn run(context:tauri::Context<tauri::Wry>){
- let builder=tauri::Builder::default();
+ let builder=apps::register(tauri::Builder::default()).manage(apps::AppStore(Mutex::new(())));
  #[cfg(not(target_os="android"))]let builder=builder.plugin(tauri_plugin_single_instance::init(|app,args,_cwd|{if let Some(s)=app.try_state::<HostState>(){if let Some(uri)=args.into_iter().find(|v|v.len()<=2048&&v.starts_with("delta://pair?")){*s.pending.lock().unwrap()=Some(uri)}}if let Some(w)=app.get_webview_window("main"){let _=w.show();let _=w.set_focus();}})).plugin(tauri_plugin_autostart::Builder::new().args(["--background"]).build()).plugin(tauri_plugin_dialog::init()).plugin(tauri_plugin_opener::init()).plugin(tauri_plugin_notification::init());
  builder.setup(|app|{
   #[cfg(target_os="android")]let _=android::active().map_err(std::io::Error::other)?;
