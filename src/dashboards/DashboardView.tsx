@@ -149,7 +149,7 @@ export function DashboardView({
         />
         <Select
           className="select"
-          style={{ width: 120 }}
+          style={{ width: 160, maxWidth: "100%" }}
           value={draft.refreshSec}
           onChange={(e) => update((d) => ({ ...d, refreshSec: Number(e.target.value) }))}
           title={tr('dashboards.DashboardView.s_6fcdbbe8f7')}

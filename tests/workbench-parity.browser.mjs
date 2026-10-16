@@ -16,6 +16,9 @@ try {
   await p.waitForSelector(".wb .sidebar");
   await p.waitForTimeout(1400);
   assert((await p.locator(".widget").count()) > 0);
+  for (const label of await p.locator('.delta-select-trigger > span').all()) {
+    assert(await label.evaluate(e => e.scrollWidth <= e.clientWidth), 'refresh interval must fit without ellipsis');
+  }
   await p.screenshot({ path: `${output}/workbench-parity-home.png` });
   for (const [path, name] of [
     ["/plugins", "plugins"],
