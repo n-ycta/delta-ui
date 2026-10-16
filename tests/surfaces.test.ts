@@ -1,6 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readUiContributions } from "../src/sdk/surfaces";
+import {
+  readInstalledSurfaceApps,
+  readUiContributions,
+} from "../src/sdk/surfaces";
 const surface = {
   id: "radio",
   name: { en: "Radio", ru: "Радио" },
@@ -39,4 +42,18 @@ test("duplicate surfaces and missing metadata rejected", () => {
   );
   assert.equal(readUiContributions({}), null);
   assert.equal(readUiContributions(null), null);
+});
+
+test("host metadata decoding isolates malformed entries and duplicate app IDs", () => {
+  const app = {
+    id: "dev.delta.media",
+    name: "Media",
+    ui: { version: 1, surfaces: [surface] },
+  };
+  assert.equal(readInstalledSurfaceApps({ apps: [app] }).length, 0);
+  assert.equal(
+    readInstalledSurfaceApps([null, app, app, { ...app, id: "../admin" }])
+      .length,
+    1,
+  );
 });

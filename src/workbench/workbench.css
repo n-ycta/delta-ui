@@ -1316,7 +1316,7 @@
     gap: 12px;
   }
   .wb-split.wb-axis-row > .wb-tree {
-    min-height: 320px;
+    min-height: 400px;
     flex-shrink: 0;
     flex-basis: 50%;
   }

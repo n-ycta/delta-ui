@@ -37,3 +37,24 @@ export function readUiContributions(manifest: unknown): UiContributions | null {
   const r = uiContributionsSchema.safeParse((manifest as { ui?: unknown })?.ui);
   return r.success ? r.data : null;
 }
+const installedSurfaceAppSchema = z.object({
+  id: z
+    .string()
+    .regex(/^[a-z][a-z0-9]*(?:\.[a-z0-9]+)+$/)
+    .max(120),
+  name: z.string().min(1).max(120),
+  ui: uiContributionsSchema,
+});
+/** A host response is still input: isolate malformed metadata instead of breaking the workspace. */
+export function readInstalledSurfaceApps(
+  value: unknown,
+): z.infer<typeof installedSurfaceAppSchema>[] {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set<string>();
+  return value.slice(0, 128).flatMap((item) => {
+    const r = installedSurfaceAppSchema.safeParse(item);
+    if (!r.success || seen.has(r.data.id)) return [];
+    seen.add(r.data.id);
+    return [r.data];
+  });
+}

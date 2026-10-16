@@ -1,6 +1,6 @@
 import { appCall } from "../sdk/apps";
 import { useQuery } from "../app/query";
-import { readUiContributions } from "../sdk/surfaces";
+import { readInstalledSurfaceApps } from "../sdk/surfaces";
 import { language } from "../i18n";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -141,19 +141,16 @@ export function LiveWorkbench({ demo = false }: { demo?: boolean }) {
   const installedApps = useQuery("workbench-app-surfaces", () =>
     demo ? Promise.resolve([]) : appCall("host.apps_list"),
   );
-  const surfaces: PaletteItem[] = (installedApps.data || []).flatMap(
-    (app: any) => {
-      const ui = readUiContributions(app);
-      return ui
-        ? ui.surfaces.map((s) => ({
-            key: app.id + "-" + s.id,
-            title: app.name + " / " + (s.name[language] || s.name.en),
-            icon: s.icon,
-            kind: "plugin" as const,
-            target: app.id + "#" + s.id,
-          }))
-        : [];
-    },
+  const surfaces: PaletteItem[] = readInstalledSurfaceApps(
+    installedApps.data,
+  ).flatMap((app) =>
+    app.ui.surfaces.map((s) => ({
+      key: app.id + "-" + s.id,
+      title: app.name + " / " + (s.name[language] || s.name.en),
+      icon: s.icon,
+      kind: "plugin" as const,
+      target: app.id + "#" + s.id,
+    })),
   );
   const palette: PaletteItem[] = [
     ...surfaces,
