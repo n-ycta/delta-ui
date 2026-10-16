@@ -1602,7 +1602,7 @@
   "runtime": {
     "demoUser": "Demo owner",
     "noUser": "Not signed in",
-    "realNotice": "Node samples are stored every 15 seconds. Missing observations are not counted as downtime.",
+    "realNotice": "History is provided by the Observability plugin when installed. Missing observations are not counted as downtime.",
     "appTitle": "Delta · Control Panel",
     "cpuLabel": "CPU",
     "crumb_dashboards": "Dashboards",

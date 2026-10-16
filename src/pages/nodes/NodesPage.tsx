@@ -12,7 +12,7 @@ import { NODE_STATUS } from '../../ui/status';
 import { NODE_ICON } from '../../widgets/system/NodeGridWidget';
 import { PairDialog } from './PairDialog';
 
-const LATEST_AGENT = '1.8.2';
+const behind=(current:string,latest:string)=>{const a=current.split('.').map(Number),b=latest.split('.').map(Number);if(a.length!==3||b.length!==3||[...a,...b].some(x=>!Number.isInteger(x)))return false;for(let i=0;i<3;i++){if(a[i]!==b[i])return a[i]<b[i]}return false};
 
 export function NodesPage() {
   const nodes = useNodes();
@@ -31,6 +31,7 @@ export function NodesPage() {
     }
   }, [params, setParams]);
   const all = nodes.data ?? [];
+  const knownLatest=all.flatMap(n=>n.components).filter(c=>['core','delta-agent'].includes(c.id)).map(c=>c.latest).filter((v):v is string=>!!v).sort((a,b)=>behind(a,b)?1:behind(b,a)?-1:0)[0];
   const order = { offline: 0, degraded: 1, connecting: 2, online: 3 } as const;
   const list = useMemo(
     () =>
@@ -104,10 +105,10 @@ export function NodesPage() {
         <div>
           <div className="label">{tr('pages.nodes.NodesPage.s_cde0440b2d')}</div>
           <div className="v">
-            {all.filter((n) => n.agentVersion !== LATEST_AGENT).length}
+            {all.filter((n) => knownLatest && behind(n.agentVersion,knownLatest)).length}
             <small>
               {tr('pages.nodes.NodesPage.s_2d17e7fa9d')}
-              {LATEST_AGENT}
+              {knownLatest || '—'}
             </small>
           </div>
         </div>
@@ -280,7 +281,7 @@ export function NodesPage() {
                     </td>
                     <td className="mono">
                       {n.agentVersion}
-                      {n.agentVersion !== LATEST_AGENT && (
+                      {knownLatest && behind(n.agentVersion,knownLatest) && (
                         <>
                           {' '}
                           <Badge tone="warn">{tr('pages.nodes.NodesPage.s_9555ffd723')}</Badge>
