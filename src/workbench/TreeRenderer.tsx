@@ -171,7 +171,7 @@ export function TreeRenderer(p: TreeProps) {
   else if (n.type === "split")
     content = (
       <div
-        className={"wb-split " + n.axis}
+        className={"wb-split wb-axis-" + n.axis}
         style={{ "--wb-ratio": n.ratio } as CSSProperties}
       >
         {child(n.children[0])}

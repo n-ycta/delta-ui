@@ -5,6 +5,7 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  useId,
   type SelectHTMLAttributes,
   type ReactElement,
   type CSSProperties,
@@ -14,6 +15,7 @@ import { CaretDown, Check } from "@phosphor-icons/react";
 
 /** Native form semantics; custom accessible popup. No browser-owned option menu. */
 export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
+  const popupId = useId();
   const native = useRef<HTMLSelectElement>(null),
     button = useRef<HTMLButtonElement>(null),
     list = useRef<HTMLDivElement>(null);
@@ -114,6 +116,12 @@ export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
     document.addEventListener("pointerdown", outside);
     return () => document.removeEventListener("pointerdown", outside);
   }, [open]);
+  useEffect(() => {
+    if (open)
+      list.current
+        ?.querySelectorAll<HTMLElement>('[role="option"]')
+        [index]?.scrollIntoView({ block: "nearest" });
+  }, [open, index]);
   const toggle = () => {
     setIndex(
       Math.max(
@@ -124,7 +132,7 @@ export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
     setOpen((v) => !v);
   };
   return (
-    <span className="delta-select">
+    <span className="delta-select" style={props.style}>
       <select
         {...props}
         ref={native}
@@ -143,6 +151,7 @@ export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
         role="combobox"
         aria-expanded={open}
         aria-haspopup="listbox"
+        aria-controls={open ? popupId : undefined}
         aria-label={
           props["aria-label"] ||
           native.current?.labels?.[0]?.textContent ||
@@ -167,10 +176,15 @@ export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
             ref={list}
             tabIndex={0}
             role="listbox"
+            id={popupId}
+            aria-activedescendant={`${popupId}-${index}`}
             className="delta-select-popup"
             style={{
               ...popupTheme,
-              left: Math.max(8, rect.left),
+              left: Math.max(
+                8,
+                Math.min(rect.left, innerWidth - rect.width - 8),
+              ),
               top: rect.top,
               width: rect.width,
             }}
@@ -207,6 +221,7 @@ export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
             {options.map((o, i) => (
               <button
                 key={o.value}
+                id={`${popupId}-${i}`}
                 type="button"
                 tabIndex={-1}
                 role="option"

@@ -34,3 +34,9 @@ Four starters: Console / Media / Studio / Canvas. Four scoped themes: Paper and 
 The complete original Console remains available, including plugins, node details, events, dashboards, contracts, access, keys and settings. Existing individual dashboard widgets can be composed through the original WidgetFrame renderer and editor; edits affect the linked dashboard. Home heading/date/description and the summary strip have separate visibility/text settings and composable fragments.
 
 The tree renderer, outline, appearance inspector, shared controls, persistence, SDK contribution schema and plugin surfaces are separate modules. React and vanilla Media controls share the same visual contract: custom keyboard-accessible popup lists, styled checkbox states, bounded scrolling and responsive touch controls. See `../sdk/UI-SURFACES.md` for the shared-plugin-instance boundary.
+
+## Transient host controls and dock
+
+The host launcher is collapsed to one compact button by default. Full Console embeds it in the normal top bar; frameless apps receive a small corner affordance. It opens only on demand and closes on Escape or outside pointer input. The button can be hidden in settings. Ctrl/Cmd+Shift+Space always recalls it; Ctrl/Cmd+Shift+E toggles editing and Ctrl/Cmd+Shift+R opens settings. The hidden-button preference is local host UI state, not part of the exported application tree. Recovery controls never become removable tree nodes.
+
+Dock is an additional desktop/mobile navigation choice, with icon-only app launchers and an active indicator. Its floating appearance reserves a layout row, rather than covering media playback or charts. Side/top/bottom/hidden options remain supported. A mixed integration test composes a real isolated Media radio surface and an original dashboard time-series widget, exercises audio playback, then verifies dock layout and phone overflow. It uses explicit mock statistics and a test host adapter, not a live user node.

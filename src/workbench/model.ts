@@ -1,6 +1,6 @@
 import { z } from "zod";
 export type Theme = "paper" | "daylight" | "graphite" | "midnight";
-export type Nav = "side" | "top" | "bottom" | "hidden";
+export type Nav = "side" | "top" | "bottom" | "dock" | "hidden";
 export type ViewKind =
   "welcome" | "notes" | "files" | "web" | "system" | "plugin" | "app";
 export type Tree = {
@@ -169,8 +169,8 @@ export function validateWorkspace(value: unknown): Workspace {
       icon: z.string().regex(/^[a-z0-9-]{1,70}$/),
       template: text,
       theme: z.enum(["paper", "daylight", "graphite", "midnight"]),
-      nav: z.enum(["side", "top", "bottom", "hidden"]),
-      mobileNav: z.enum(["side", "top", "bottom", "hidden"]),
+      nav: z.enum(["side", "top", "bottom", "dock", "hidden"]),
+      mobileNav: z.enum(["side", "top", "bottom", "dock", "hidden"]),
       chrome: z.boolean().default(true),
       brand: z.boolean(),
       logo: z.boolean(),

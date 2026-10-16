@@ -1,3 +1,6 @@
+import { mkdir } from "node:fs/promises";
+const output = process.env.DELTA_TEST_OUTPUT || "/data";
+await mkdir(output, { recursive: true });
 import { chromium } from "playwright";
 import assert from "node:assert/strict";
 import { writeFile, readFile } from "node:fs/promises";
@@ -24,6 +27,7 @@ try {
   await page.waitForSelector(".wb");
   await page.waitForTimeout(500);
   assert.equal(await page.locator(".wb-nav>button").count(), 5);
+  await page.locator("[data-launcher-toggle]").click();
   await page
     .locator(".wb-recovery-dock")
     .getByRole("button", { name: "Приложения", exact: true })
@@ -89,7 +93,7 @@ try {
   await nav("Канвас").click();
   assert((await video.evaluate((v) => v.currentTime)) > 1.5);
   await video.evaluate((v) => v.pause());
-  await page.screenshot({ path: "/data/workbench-canvas-desktop.png" });
+  await page.screenshot({ path: `${output}/workbench-canvas-desktop.png` });
   // Full pool picker, safe export/import, duplicate and settings.
   await settings();
   await dialog().getByRole("button", { name: "Иконка", exact: true }).click();
@@ -106,8 +110,11 @@ try {
   const download = page.waitForEvent("download");
   await dialog().getByRole("button", { name: "Экспорт", exact: true }).click();
   const d = await download;
-  await d.saveAs("/data/delta-workspace-tested.json");
-  const exported = await readFile("/data/delta-workspace-tested.json", "utf8");
+  await d.saveAs(`${output}/delta-workspace-tested.json`);
+  const exported = await readFile(
+    `${output}/delta-workspace-tested.json`,
+    "utf8",
+  );
   assert(!exported.includes("Persistent note"));
   assert(!exported.includes("base64"));
   await dialog()
@@ -139,7 +146,7 @@ try {
     s.apps.find((a) => a.template === "studio").root.children[0].type,
     "split",
   );
-  await page.screenshot({ path: "/data/workbench-builder-desktop.png" });
+  await page.screenshot({ path: `${output}/workbench-builder-desktop.png` });
   await top("Готово").click();
   // Every starter theme renders; settings actually persist theme.
   for (const [name, path] of [
@@ -148,42 +155,38 @@ try {
     ["Канвас", "daylight"],
   ]) {
     await nav(name).click();
-    await page.screenshot({ path: `/data/workbench-${path}-desktop.png` });
+    await page.screenshot({ path: `${output}/workbench-${path}-desktop.png` });
   }
   await page.setViewportSize({ width: 390, height: 844 });
   await nav("Медиа").click();
-  await page.screenshot({ path: "/data/workbench-media-mobile.png" });
+  await page.screenshot({ path: `${output}/workbench-media-mobile.png` });
   assert.equal(
     await page.evaluate(() => document.documentElement.scrollWidth),
     390,
   );
   await nav("Канвас").click();
-  await page.screenshot({ path: "/data/workbench-canvas-mobile.png" });
+  await page.screenshot({ path: `${output}/workbench-canvas-mobile.png` });
   await top("Конструктор").click();
-  await page.screenshot({ path: "/data/workbench-builder-mobile.png" });
+  await page.screenshot({ path: `${output}/workbench-builder-mobile.png` });
   await top("Готово").click();
   await settings();
-  await page.screenshot({ path: "/data/workbench-settings-mobile.png" });
+  await page.screenshot({ path: `${output}/workbench-settings-mobile.png` });
   await page.keyboard.press("Escape");
   assert.equal(await dialog().count(), 0);
   // Import a previously exported configuration, without copying notes/media or credentials.
-  await page
-    .locator(".wb>input[type=file]")
-    .setInputFiles({
-      name: "layout.json",
-      mimeType: "application/json",
-      buffer: Buffer.from(exported),
-    });
+  await page.locator(".wb>input[type=file]").setInputFiles({
+    name: "layout.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(exported),
+  });
   await page.waitForTimeout(500);
   assert.equal((await state()).apps.length, 4);
   // Corrupt import must leave current valid layout untouched.
-  await page
-    .locator(".wb>input[type=file]")
-    .setInputFiles({
-      name: "bad.json",
-      mimeType: "application/json",
-      buffer: Buffer.from('{"version":99,"script":"alert(1)"}'),
-    });
+  await page.locator(".wb>input[type=file]").setInputFiles({
+    name: "bad.json",
+    mimeType: "application/json",
+    buffer: Buffer.from('{"version":99,"script":"alert(1)"}'),
+  });
   await page.waitForTimeout(400);
   assert.equal((await state()).apps.length, 4);
   assert(await page.getByRole("alert").count());

@@ -1,3 +1,4 @@
+import {ThemeOverride} from "../app/AppearanceContext";
 import {Select} from '../ui/Select';
 import {ProfileSettings} from './ProfileSettings';
 import {NativeConnection} from '../host/NativeConnection';
@@ -7,7 +8,7 @@ import uiPackage from '../../package.json';
 import { Updates } from './Updates';
 import { isCoreEndpoint } from '../api/endpoints';
 import { tr, language, setLanguage } from '../i18n';
-import { useMemo, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   AlertTriangle,
@@ -22,7 +23,7 @@ import { useApi } from '../app/ApiContext';
 import { useDashboards, usePlugins } from '../app/data';
 import { queryClient, useQuery } from '../app/query';
 import { toast, usePrefs, type Density, type Theme } from '../app/stores';
-import { PALETTES, useResolvedTheme } from '../app/theme';
+import { PALETTES, useThemeSetter, useResolvedTheme } from '../app/theme';
 import {
   demoAvailable,
   createCoreApi,
@@ -114,6 +115,8 @@ function Row({
 }
 
 function General() {
+  const embeddedTheme=useContext(ThemeOverride);
+  const setTheme=useThemeSetter();
   const p = usePrefs();
   const resolved = useResolvedTheme();
   return (
@@ -138,12 +141,12 @@ function General() {
       >
         <Segmented
           sans
-          value={p.theme}
-          onChange={(v: Theme) => p.set({ theme: v })}
+          value={embeddedTheme ?? p.theme}
+          onChange={(v: Theme) => setTheme(v)}
           options={[
             { value: 'light', label: tr('pages.SettingsPage.s_8080010c5e') },
             { value: 'dark', label: tr('pages.SettingsPage.s_bd16b23470') },
-            { value: 'system', label: tr('pages.SettingsPage.s_f0a22d9d1a') },
+            ...(!embeddedTheme ? [{ value: 'system' as const, label: tr('pages.SettingsPage.s_f0a22d9d1a') }] : []),
           ]}
         />
       </Row>

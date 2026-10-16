@@ -3,7 +3,7 @@ import { Select } from "../ui/Select";
 import { WIcon } from "./Icon";
 import { t } from "./strings";
 const themes: Theme[] = ["paper", "daylight", "graphite", "midnight"];
-const navs: Nav[] = ["side", "top", "bottom", "hidden"];
+const navs: Nav[] = ["side", "top", "bottom", "dock", "hidden"];
 export function Appearance({
   app,
   patch,

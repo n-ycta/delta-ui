@@ -45,7 +45,8 @@ export function template(which: (typeof templateNames)[number]): Application {
     base.root = view("system", t("console"), "squares-four", "/console");
   }
   if (which === "media") {
-    base.nav = "bottom";
+    base.nav = "dock";
+    base.mobileNav = "dock";
     base.accent = "#7155da";
     base.root = view("plugin", t("media"), "music-notes", "dev.delta.media");
   }
@@ -72,7 +73,8 @@ export function template(which: (typeof templateNames)[number]): Application {
     };
   }
   if (which === "canvas") {
-    base.nav = "bottom";
+    base.nav = "dock";
+    base.mobileNav = "dock";
     const n = view("notes", t("notes"), "note-pencil"),
       f = view("files", t("files"), "play-circle");
     base.root = {

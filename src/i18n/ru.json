@@ -2211,6 +2211,12 @@
     "media_queue": "Очередь",
     "media_stats": "Статистика",
     "mediaDependency": "Требуется Delta Media ≥ 0.1.0-alpha.3. В автономном HTML доступен только локальный файловый плеер.",
-    "requiresPlugin": "нужен плагин"
+    "requiresPlugin": "нужен плагин",
+    "controls": "Управление",
+    "collapseControls": "Свернуть",
+    "controlsShortcut": "Управление · Ctrl/⌘ Shift Space",
+    "launcherHidden": "Скрыть кнопку управления",
+    "launcherHint": "Вызов: Ctrl/⌘ Shift Space. Редактор: Ctrl/⌘ Shift E. Настройки: Ctrl/⌘ Shift R.",
+    "dock": "Док"
   }
 }

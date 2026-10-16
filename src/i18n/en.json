@@ -2211,6 +2211,12 @@
     "media_queue": "Queue",
     "media_stats": "Statistics",
     "mediaDependency": "Requires Delta Media ≥ 0.1.0-alpha.3. The standalone HTML includes only the local file player.",
-    "requiresPlugin": "plugin required"
+    "requiresPlugin": "plugin required",
+    "controls": "Controls",
+    "collapseControls": "Collapse",
+    "controlsShortcut": "Controls · Ctrl/⌘ Shift Space",
+    "launcherHidden": "Hide controls button",
+    "launcherHint": "Controls: Ctrl/⌘ Shift Space. Editor: Ctrl/⌘ Shift E. Settings: Ctrl/⌘ Shift R.",
+    "dock": "Dock"
   }
 }

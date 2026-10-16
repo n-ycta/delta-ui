@@ -1,3 +1,4 @@
+import { ControlLauncher, useLauncherHidden } from "./ControlLauncher";
 import { Button, Modal } from "./WorkbenchControls";
 import { Appearance } from "./Appearance";
 import { Outline } from "./Outline";
@@ -62,6 +63,7 @@ export function Workbench({
   demo = false,
   palette = [],
 }: WorkbenchProps) {
+  const [launcherHidden, setLauncherHidden] = useLauncherHidden();
   const initial = useRef(loadWorkspace());
   const [state, setState] = useState<Workspace>(initial.current.state),
     [error, setError] = useState(
@@ -139,6 +141,47 @@ export function Workbench({
     setMounted((s) => new Set([...s, state.active]));
   }, [state.active]);
   useEffect(() => {
+    const previous = document.documentElement.dataset.theme;
+    return () => {
+      if (previous) document.documentElement.dataset.theme = previous;
+      else delete document.documentElement.dataset.theme;
+    };
+  }, []);
+  useEffect(() => {
+    document.documentElement.dataset.theme = ["paper", "daylight"].includes(
+      active.theme,
+    )
+      ? "light"
+      : "dark";
+  }, [active.theme]);
+  useEffect(() => {
+    const change = (e: Event) => {
+      const wanted = (e as CustomEvent).detail;
+      if (!["light", "dark"].includes(wanted)) return;
+      const current = stateRef.current;
+      commit({
+        ...current,
+        apps: current.apps.map((a) =>
+          a.id === current.active
+            ? {
+                ...a,
+                theme:
+                  wanted === "light"
+                    ? a.theme === "midnight" || a.theme === "daylight"
+                      ? "daylight"
+                      : "paper"
+                    : a.theme === "midnight" || a.theme === "daylight"
+                      ? "midnight"
+                      : "graphite",
+              }
+            : a,
+        ),
+      });
+    };
+    window.addEventListener("delta:workbench-theme", change);
+    return () => window.removeEventListener("delta:workbench-theme", change);
+  }, [commit]);
+  useEffect(() => {
     const key = (e: KeyboardEvent) => {
       if (
         (e.ctrlKey || e.metaKey) &&
@@ -159,10 +202,12 @@ export function Workbench({
     };
     const choose = () => setModal("settings");
     window.addEventListener("delta:workbench-choose", choose);
+    window.addEventListener("delta:workbench-edit", toggleEditor);
     window.addEventListener("keydown", key);
     return () => {
       window.removeEventListener("keydown", key);
       window.removeEventListener("delta:workbench-choose", choose);
+      window.removeEventListener("delta:workbench-edit", toggleEditor);
     };
   }, [toggleEditor]);
   let selection: Tree | undefined;
@@ -361,26 +406,19 @@ export function Workbench({
           />
         </div>
       </header>
-      {!active.chrome && (
-        <div className="wb-recovery-dock">
-          {demo && <span>{t("demo")}</span>}
-          <Button
-            icon="squares-four"
-            label={t("apps")}
-            onClick={() => setModal("settings")}
+      {!active.chrome &&
+        !(
+          active.root.type === "view" &&
+          active.root.kind === "system" &&
+          active.root.target === "/console"
+        ) && (
+          <ControlLauncher
+            demo={demo}
+            onApps={() => setModal("settings")}
+            onEdit={toggleEditor}
+            onSettings={() => setModal("settings")}
           />
-          <Button
-            icon={edit ? "check" : "sliders-horizontal"}
-            label={edit ? t("done") : t("edit")}
-            onClick={toggleEditor}
-          />
-          <Button
-            icon="gear-six"
-            label={t("settings")}
-            onClick={() => setModal("settings")}
-          />
-        </div>
-      )}
+        )}
       <nav className="wb-nav" aria-label={t("apps")}>
         <div className="wb-nav-caption">{t("apps")}</div>
         {state.apps.map((a) => (
@@ -714,6 +752,15 @@ export function Workbench({
             <div className="wb-settings-grid">
               <section>
                 <h3>{t("application")}</h3>
+                <label className="wb-check">
+                  <input
+                    type="checkbox"
+                    checked={launcherHidden}
+                    onChange={(e) => setLauncherHidden(e.target.checked)}
+                  />
+                  {t("launcherHidden")}
+                </label>
+                <p className="wb-hint">{t("launcherHint")}</p>
                 <label>
                   {t("rename")}
                   <input

@@ -357,24 +357,22 @@
   min-width: 0;
   gap: 0;
 }
-.wb-split.row {
-  grid-template-columns: minmax(
-      0,
-      calc((100% - 16px) * var(--wb-ratio))
-    ) 16px minmax(0, 1fr);
+.wb-split.wb-axis-row {
+  grid-template-columns:
+    minmax(0, calc((100% - 16px) * var(--wb-ratio)))
+    16px minmax(0, 1fr);
 }
-.wb-split.column {
-  grid-template-rows: minmax(
-      0,
-      calc((100% - 16px) * var(--wb-ratio))
-    ) 16px minmax(0, 1fr);
+.wb-split.wb-axis-column {
+  grid-template-rows:
+    minmax(0, calc((100% - 16px) * var(--wb-ratio)))
+    16px minmax(0, 1fr);
 }
 .wb-split-handle {
   position: relative;
   cursor: col-resize;
   touch-action: none;
 }
-.wb-split.column > .wb-split-handle {
+.wb-split.wb-axis-column > .wb-split-handle {
   cursor: row-resize;
 }
 .wb-split-handle:after {
@@ -388,7 +386,7 @@
   transform: translate(-50%, -50%);
   border-radius: 3px;
 }
-.wb-split.column > .wb-split-handle:after {
+.wb-split.wb-axis-column > .wb-split-handle:after {
   width: 32px;
   height: 2px;
 }
@@ -1311,18 +1309,18 @@
     min-height: 72px;
     padding: 16px;
   }
-  .wb-split.row {
+  .wb-split.wb-axis-row {
     display: flex;
     flex-direction: column;
     overflow: auto;
     gap: 12px;
   }
-  .wb-split.row > .wb-tree {
+  .wb-split.wb-axis-row > .wb-tree {
     min-height: 320px;
     flex-shrink: 0;
     flex-basis: 50%;
   }
-  .wb-split.row > .wb-split-handle {
+  .wb-split.wb-axis-row > .wb-split-handle {
     display: none;
   }
   .wb-modal-shade {
@@ -1580,4 +1578,226 @@
   border: 1px solid var(--wb-line);
   border-radius: var(--wb-radius);
   color: var(--wb-text);
+}
+
+/* Full Console owns a normal header: never float builder controls over charts. */
+.wb .topbar .wb-console-actions {
+  position: static;
+  flex: 0 0 auto;
+  padding: 0;
+  gap: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.wb .topbar .wb-console-actions button {
+  min-width: 32px;
+  width: 32px;
+  min-height: 32px;
+  padding: 0;
+}
+@media (max-width: 600px) {
+  .wb .topbar {
+    gap: 4px;
+  }
+  .wb .topbar .wb-console-actions button {
+    min-width: 36px;
+    width: 36px;
+    min-height: 40px;
+  }
+}
+/* Transient host controls. The collapsed affordance never carries a permanent menu. */
+.wb .wb-control-launcher {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  gap: 6px;
+}
+.wb-control-launcher > button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  min-width: 36px;
+  min-height: 40px;
+  padding: 0;
+  background: var(--wb-surface);
+  border: 1px solid var(--wb-line);
+  border-radius: 10px;
+}
+.wb-launcher-menu {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: var(--wb-surface);
+  border: 1px solid var(--wb-line);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px #0002;
+}
+.wb-launcher-menu > button {
+  width: 36px;
+  min-width: 36px;
+  min-height: 40px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 6px;
+}
+.wb-launcher-status {
+  font-size: 12px;
+  color: var(--wb-muted);
+  padding: 0 8px;
+}
+.wb .topbar .wb-control-launcher {
+  position: relative;
+}
+.wb-console-actions .wb-launcher-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 100;
+  white-space: nowrap;
+}
+.wb-control-launcher[data-hidden="true"]:not([data-expanded="true"]) {
+  min-width: 0;
+  width: 0;
+  min-height: 1px;
+  height: 1px;
+}
+@media (max-width: 600px) {
+  .wb-launcher-status {
+    display: none;
+  }
+  .wb-control-launcher > button,
+  .wb-launcher-menu > button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+/* Dock reserves its own row: floating appearance without covering application content. */
+@media (min-width: 601px) {
+  .wb[data-wb-nav="dock"] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 64px minmax(0, 1fr) 84px;
+  }
+  .wb[data-wb-nav="dock"] > .wb-nav {
+    grid-row: 3;
+    grid-column: 1;
+  }
+  .wb[data-wb-nav="dock"] > .wb-main {
+    grid-row: 2;
+  }
+  .wb[data-wb-nav="dock"].wb-edit {
+    grid-template-columns: minmax(0, 1fr) 300px;
+  }
+  .wb[data-wb-nav="dock"].wb-edit > .wb-inspector {
+    grid-row: 2/4;
+    grid-column: 2;
+  }
+  .wb[data-wb-nav="dock"] > .wb-nav {
+    justify-self: center;
+    align-self: center;
+    width: max-content;
+    max-width: calc(100% - 32px);
+    height: 64px;
+    padding: 8px;
+    flex-direction: row;
+    gap: 6px;
+    overflow-x: auto;
+    border: 1px solid var(--wb-line);
+    border-radius: 18px;
+    background: var(--wb-surface);
+    box-shadow: 0 6px 24px #0002;
+  }
+  .wb[data-wb-nav="dock"] > .wb-nav .wb-nav-caption,
+  .wb[data-wb-nav="dock"] > .wb-nav .wb-nav-spacer {
+    display: none;
+  }
+  .wb[data-wb-nav="dock"] > .wb-nav button {
+    position: relative;
+    flex: 0 0 46px;
+    min-width: 46px;
+    width: 46px;
+    min-height: 46px;
+    height: 46px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    transition: transform 140ms ease;
+  }
+  .wb[data-wb-nav="dock"] > .wb-nav button:hover {
+    transform: translateY(-3px);
+  }
+  .wb[data-wb-nav="dock"] > .wb-nav button span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .wb[data-wb-nav="dock"] > .wb-nav button svg {
+    width: 23px;
+    height: 23px;
+  }
+  .wb[data-wb-nav="dock"] > .wb-nav button.active:before {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    left: calc(50% - 2px);
+    top: auto;
+    bottom: 1px;
+  }
+}
+@media (max-width: 600px) {
+  .wb[data-wb-mobile="dock"]:not(.wb-edit) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 60px minmax(0, 1fr) 80px;
+  }
+  .wb[data-wb-mobile="dock"]:not(.wb-edit) > .wb-main {
+    grid-row: 2;
+    grid-column: 1;
+  }
+  .wb[data-wb-mobile="dock"]:not(.wb-edit) > .wb-nav {
+    grid-row: 3;
+    grid-column: 1;
+    justify-self: center;
+    align-self: center;
+    width: max-content;
+    max-width: calc(100% - 24px);
+    height: 64px;
+    padding: 8px;
+    gap: 4px;
+    flex-direction: row;
+    border: 1px solid var(--wb-line);
+    border-radius: 18px;
+    background: var(--wb-surface);
+    box-shadow: 0 6px 24px #0002;
+  }
+  .wb[data-wb-mobile="dock"] > .wb-nav button {
+    min-width: 44px;
+    width: 44px;
+    min-height: 46px;
+    max-width: 44px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+  }
+  .wb[data-wb-mobile="dock"] > .wb-nav button span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .wb[data-wb-mobile="dock"] > .wb-nav button svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+.wb .topbar .wb-control-launcher {
+  inset: auto;
 }

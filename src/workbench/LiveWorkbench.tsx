@@ -122,6 +122,7 @@ function PluginSlot({
 // Frames are never reparented. Moving an iframe DOM node reloads it on several hosts.
 // One stable overlay per installed app follows its visible slot and remains mounted while hidden.
 export function LiveWorkbench({ demo = false }: { demo?: boolean }) {
+  const api = useApi();
   const remote = useMemo(nodeWorkspace, []);
   const slots = useRef<Slot[]>([]),
     preferred = useRef<HTMLDivElement | null>(null);
@@ -317,7 +318,7 @@ export function LiveWorkbench({ demo = false }: { demo?: boolean }) {
   return (
     <Workbench
       live
-      demo={demo}
+      demo={demo || api.mode === "mock"}
       remote={demo ? undefined : remote}
       palette={palette}
       renderView={(n: Tree, theme, appearance) =>

@@ -1,3 +1,6 @@
+import { mkdir } from "node:fs/promises";
+const output = process.env.DELTA_TEST_OUTPUT || "/data";
+await mkdir(output, { recursive: true });
 import { chromium } from "playwright";
 import assert from "node:assert/strict";
 const b = await chromium.launch({
@@ -13,7 +16,7 @@ try {
   await p.waitForSelector(".wb .sidebar");
   await p.waitForTimeout(1400);
   assert((await p.locator(".widget").count()) > 0);
-  await p.screenshot({ path: "/data/workbench-parity-home.png" });
+  await p.screenshot({ path: `${output}/workbench-parity-home.png` });
   for (const [path, name] of [
     ["/plugins", "plugins"],
     ["/nodes", "nodes"],
@@ -23,12 +26,14 @@ try {
     await p.locator(`.sidebar a[href="${path}"]`).click();
     await p.waitForTimeout(850);
     console.log(name, await p.locator("h1").allTextContents());
-    await p.screenshot({ path: `/data/workbench-parity-${name}.png` });
+    await p.screenshot({ path: `${output}/workbench-parity-${name}.png` });
     if (name === "nodes") {
       await p.locator("tr.clickable").first().click();
       await p.waitForTimeout(850);
       console.log("node tabs", await p.locator(".tabs").innerText());
-      await p.screenshot({ path: "/data/workbench-parity-node-detail.png" });
+      await p.screenshot({
+        path: `${output}/workbench-parity-node-detail.png`,
+      });
     }
   }
   const hrefs = await p
@@ -44,13 +49,31 @@ try {
   await p.waitForTimeout(1200);
   assert((await p.locator(".widget").count()) > 0);
   assert((await p.locator(".recharts-wrapper").count()) > 0);
-  await p.screenshot({ path: "/data/workbench-parity-type.png" });
+  await p.screenshot({ path: `${output}/workbench-parity-type.png` });
   await p.setViewportSize({ width: 390, height: 844 });
   await p.waitForTimeout(500);
-  await p.screenshot({ path: "/data/workbench-parity-mobile.png" });
+  await p.screenshot({ path: `${output}/workbench-parity-mobile.png` });
   assert.equal(
     await p.evaluate(() => document.documentElement.scrollWidth),
     390,
+  );
+  await p
+    .locator(".topbar > button[title]")
+    .filter({ has: p.locator("svg") })
+    .first()
+    .click();
+  await p.waitForTimeout(300);
+  assert.equal(await p.locator(".wb").getAttribute("data-wb-theme"), "paper");
+  assert.equal(
+    await p.evaluate(() => document.documentElement.dataset.theme),
+    "light",
+  );
+  await p.screenshot({ path: `${output}/workbench-parity-mobile-light.png` });
+  assert.equal(
+    await p
+      .locator(".wb-console-actions")
+      .evaluate((e) => getComputedStyle(e).position),
+    "relative",
   );
   assert.deepEqual(errors, []);
   console.log(

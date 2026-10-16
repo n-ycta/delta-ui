@@ -16,6 +16,18 @@ jobs:
       - run: npm test && npm run test:apps && npm run test:i18n && npm run build
       - run: npx playwright install --with-deps chromium
       - run: npm run test:navigation && npm run test:onboarding && npm run test:language && npm run test:profile && npm run test:embedding
+      - name: Verify composable workbench
+        run: |
+          npm run dev -- --host 127.0.0.1 --port 5190 > /tmp/workbench-vite.log 2>&1 &
+          PID=$!
+          trap 'kill "$PID"' EXIT
+          for n in $(seq 1 40); do curl -fsS http://127.0.0.1:5190/workbench.html >/dev/null && break || sleep 1; done
+          export DELTA_TEST_OUTPUT="$RUNNER_TEMP/delta-workbench"
+          export CHROMIUM_PATH=$(node --input-type=module -e "import {chromium} from 'playwright'; console.log(chromium.executablePath())")
+          node tests/workbench.browser.mjs
+          node tests/workbench-parity.browser.mjs
+          node tests/workbench-customize.browser.mjs
+          node tests/workbench-controls.browser.mjs
       - uses: actions/upload-artifact@v4
         with:
           name: delta-ui-bundled-preview
