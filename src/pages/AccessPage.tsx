@@ -1,6 +1,6 @@
 import { tr } from '../i18n';
 import { useState } from 'react';
-import { Copy, Eye, KeyRound, Plus, ShieldCheck, Trash2 } from 'lucide-react';
+import { Copy, Eye, KeyRound, Plus, ShieldCheck, Trash2 } from '../ui/icons';
 import { useMutation, useQuery } from '../app/query';
 import { toast, useCan, usePrefs, useRole } from '../app/stores';
 import { CONSOLE_PERMISSIONS, ROLE_LABEL, ROLE_PERMISSIONS, type Principal, type Role } from '../core/contracts';

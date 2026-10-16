@@ -1,7 +1,7 @@
 import { tr } from '../i18n';
 import { useEffect, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { WifiOff, X } from 'lucide-react';
+import { WifiOff, X } from '../ui/icons';
 import { usePrefs, useUi, useRuntimeAccess } from '../app/stores';
 import { useResolvedTheme } from '../app/theme';
 import { useApi } from '../app/ApiContext';

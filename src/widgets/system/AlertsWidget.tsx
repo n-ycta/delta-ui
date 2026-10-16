@@ -1,6 +1,6 @@
 import { tr } from '../../i18n';
 import { Link } from 'react-router-dom';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2 } from '../../ui/icons';
 import type { WidgetProps } from '../types';
 import { useNodes, usePlugins } from '../../app/data';
 import { hasUpdate } from '../../core/registry/plugins';

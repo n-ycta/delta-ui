@@ -1,7 +1,7 @@
 import {SSHConnectDialog} from './SSHConnectDialog';
 import { tr } from '../../i18n';
 import { useEffect, useState } from 'react';
-import { Copy } from 'lucide-react';
+import { Copy } from '../../ui/icons';
 import { useMutation } from '../../app/query';
 import { Modal } from '../../ui/overlays';
 import { Button, Field, Segmented } from '../../ui/primitives';

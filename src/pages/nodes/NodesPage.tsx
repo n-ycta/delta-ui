@@ -1,7 +1,7 @@
 import { tr } from '../../i18n';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { BatteryLow, Plus, Search } from 'lucide-react';
+import { BatteryLow, Plus, Search } from '../../ui/icons';
 import { useNodes } from '../../app/data';
 import { NODE_KIND_LABEL, type NodeInfo } from '../../core/contracts';
 import { ago, fmtBytes } from '../../core/lib/format';

@@ -1,7 +1,7 @@
 import { tr } from '../i18n';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Pause, Play, Search, RefreshCw } from 'lucide-react';
+import { Pause, Play, Search, RefreshCw } from '../ui/icons';
 import { useQuery } from '../app/query';
 import { useUi } from '../app/stores';
 import { useApi } from '../app/ApiContext';

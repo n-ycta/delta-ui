@@ -1,8 +1,9 @@
+import {incompatibility} from '../../core/lib/compatibility';
 import {control} from '../../api/control';
 import {readConnectionSettings} from '../../api';
 import { tr } from '../../i18n';
 import { useEffect, useState } from 'react';
-import { ShieldAlert } from 'lucide-react';
+import { ShieldAlert } from '../../ui/icons';
 import type { PluginEntry } from '../../core/contracts';
 import { NODE_KIND_LABEL } from '../../core/contracts';
 import { useNodes } from '../../app/data';
@@ -26,7 +27,7 @@ export function InstallDialog({ entry, open, onClose }: { entry: PluginEntry; op
   const live=readConnectionSettings().mode!=='mock';
   useEffect(()=>{if(!open||!live)return;let active=true;setPlanning(true);setPlanError('');setPlans([]);Promise.all(nodeIds.map(node=>control('packages.plan',{id:m.id,optionalDependencies:optional},node))).then(p=>{if(active)setPlans(p)}).catch(e=>{if(active)setPlanError(e.message)}).finally(()=>{if(active)setPlanning(false)});return()=>{active=false}},[open,live,m.id,nodeIds.join(','),optional.join(',')]);
   const [perms, setPerms] = useState<string[]>([]);
-  const eligible = (nodes.data ?? []).filter((n) => m.runtime.targets.includes(n.kind));
+  const eligible = (nodes.data ?? []).filter((n) => !incompatibility(m.runtime,n));
   useEffect(() => {
     if (!open) return;
     setStep(0);setOptional([]);
@@ -57,15 +58,17 @@ export function InstallDialog({ entry, open, onClose }: { entry: PluginEntry; op
           <div className="muted">{tr("pages.plugins.InstallDialog.s_1a94698e9d")}{m.runtime.targets.map((t) => <Badge key={t}>{NODE_KIND_LABEL[t]}</Badge>)} {m.runtime.minAgent && <>{tr("pages.plugins.InstallDialog.s_78e7e3ab08")}<code>{m.runtime.minAgent}</code></>}</div>
           {eligible.length === 0 && <div className="banner warn" style={{ borderRadius: 6 }}>{tr("pages.plugins.InstallDialog.s_e0c0b2243c")}</div>}
           <div className="panel">
-            {eligible.map((n) => {
+            {(nodes.data ?? []).map((n) => {
+              const reason=incompatibility(m.runtime,n);
               const old = !!m.runtime.minAgent && compare(n.agentVersion, m.runtime.minAgent) < 0;
               return (
                 <label key={n.id} className="row" style={{ padding: '9px 14px', borderBottom: '1px solid var(--rule)', cursor: 'pointer' }}>
-                  <input type="checkbox" checked={nodeIds.includes(n.id)} onChange={(e) => setNodeIds(e.target.checked ? [...nodeIds, n.id] : nodeIds.filter((x) => x !== n.id))} />
+                  <input type="checkbox" disabled={!!reason} checked={nodeIds.includes(n.id)} onChange={(e) => setNodeIds(e.target.checked ? [...nodeIds, n.id] : nodeIds.filter((x) => x !== n.id))} />
                   <Dot tone={NODE_STATUS[n.status].tone} />
                   <span style={{ fontWeight: 500 }}>{n.name}</span><span className="muted">{NODE_KIND_LABEL[n.kind]} {tr("pages.plugins.InstallDialog.s_d3dacf895c")}{n.os}</span>
                   <span className="spacer" />
                   {n.status === 'offline' && <Badge tone="warn">{tr("pages.plugins.InstallDialog.s_345ebe32be")}</Badge>}
+                  {reason&&<Badge tone="warn">{tr('compatibility.'+reason)}</Badge>}
                   {old && <Badge tone="warn">{tr("pages.plugins.InstallDialog.s_d28654e1e7")}{n.agentVersion} {tr("pages.plugins.InstallDialog.s_ac3abe28a6")}</Badge>}
                 </label>
               );

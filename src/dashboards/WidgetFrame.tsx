@@ -12,7 +12,7 @@ import {
   Settings2,
   Table2,
   Trash2,
-} from 'lucide-react';
+} from '../ui/icons';
 import type { PluginEntry, WidgetConfig, WidgetDisplay, TimeRangePreset } from '../core/contracts';
 import { widgetRegistry } from '../widgets/registry';
 import type { WidgetContext } from '../widgets/types';

@@ -10,7 +10,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { AlertTriangle, ChevronLeft, Play, RotateCcw, Terminal, Trash2, Wifi } from 'lucide-react';
+import { AlertTriangle, ChevronLeft, Play, RotateCcw, Terminal, Trash2, Wifi } from '../../ui/icons';
 import { useNodes, usePlugins } from '../../app/data';
 import { queryClient, useMutation, useQuery } from '../../app/query';
 import { toast, useCan } from '../../app/stores';

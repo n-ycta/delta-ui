@@ -65,6 +65,7 @@ export function projectNative(raw:HostBridge):HostBridge{
   if(r.capability==='host.services'){if(r.args?.node!==undefined){const n=String(r.args.node);const peers=await call('peers.list');if(n&&!peers.some((p:Obj)=>p.node_id===n))fail('bad_request','Unknown service node');serviceNode=n||undefined;prefsLoaded=true;await put('preferences','services',{id:'services',node:serviceNode||''})}return{node:await preferences()||''}}
   if(r.capability==='dependencies.check'&&typeof r.args?.capability==='string'&&r.args.capability.startsWith('web.')){const t=targets[r.args.capability.slice(4)];if(t)return service('dependencies.check',{capability:t});return{available:true}}
   if(r.capability.startsWith('web.'))return dispatch(r.capability.slice(4),r.args||{});
+  if(['packages.plan','packages.install'].includes(r.capability)&&(await raw.info()).kind==='android'){const local=await call('core.info');if(!r.node||r.node===local.node_id)fail('unsupported',tr('compatibility.installer'))}
   return call(r.capability,r.args||{},r.node);
  }};
 }

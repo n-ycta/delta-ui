@@ -1,6 +1,6 @@
 import { tr } from '../../i18n';
 import { useMemo, useState } from 'react';
-import { FileJson, Wand2 } from 'lucide-react';
+import { FileJson, Wand2 } from '../../ui/icons';
 import {
   MetricKind,
   PANEL_CONTRACT_VERSION,

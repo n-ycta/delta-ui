@@ -250,6 +250,9 @@ export const PluginManifest = z.object({
   runtime: z.object({
     targets: z.array(NodeKind).min(1),
     minAgent: SemverStr.optional(),
+    platforms: z.array(z.enum(['android','linux','windows','macos'])).min(1).optional(),
+    architectures: z.array(z.enum(['arm64','x64','arm','x86'])).min(1).optional(),
+    execution: z.enum(['process','embedded','web']).optional(),
   }),
   changelog: z
     .array(z.object({ version: SemverStr, date: z.string(), notes: z.array(z.string()) }))

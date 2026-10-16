@@ -1,5 +1,5 @@
 import { tr } from '../i18n';
-import { X } from 'lucide-react';
+import { X } from './icons';
 import { useUi } from '../app/stores';
 
 export function Toasts() {

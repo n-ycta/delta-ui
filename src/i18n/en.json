@@ -1985,5 +1985,24 @@
     "invalidEndpoint": "Invalid API endpoint",
     "https": "Use HTTPS or a localhost SSH tunnel before sending credentials.",
     "setupSession": "Temporary setup session: create and save a recovery key, then sign in with it."
+  },
+  "onboarding": {
+    "title": "Set up Delta",
+    "description": "The encrypted local node is initialized for startup. Create or import your personal recovery key explicitly; no user identity is created automatically.",
+    "loading": "Checking local setup…",
+    "existing": "Existing identities: {{names}}. Continue without changing them, or enroll another key.",
+    "continue": "Continue",
+    "generate": "Generate",
+    "create": "Create",
+    "pairing": "After setup, open Settings → Connection to scan an invitation image or connect using a link opened by your camera. Pairing requires explicit confirmation."
+  },
+  "compatibility": {
+    "target": "Device type not supported",
+    "offline": "Device unavailable",
+    "version": "Core update required",
+    "process": "Android cannot run desktop/Node.js processes",
+    "platform": "OS not supported",
+    "architecture": "CPU architecture unsupported or unknown",
+    "installer": "No compatible local plugin installer is available. Select a supported paired node."
   }
 }

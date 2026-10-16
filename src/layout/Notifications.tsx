@@ -1,7 +1,7 @@
 import { tr } from '../i18n';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BellOff, CheckCheck } from 'lucide-react';
+import { BellOff, CheckCheck } from '../ui/icons';
 import { useNotifications } from '../app/data';
 import { useUi } from '../app/stores';
 import { useMutation } from '../app/query';

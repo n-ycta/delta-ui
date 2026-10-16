@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Download, RefreshCw } from 'lucide-react';
+import { Download, RefreshCw } from '../ui/icons';
 import { tr, locale } from '../i18n';
 import { useApi } from '../app/ApiContext';
 import { useQuery, useMutation } from '../app/query';

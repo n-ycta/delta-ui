@@ -15,7 +15,7 @@ import {
   PlugZap,
   RotateCcw,
   Upload,
-} from 'lucide-react';
+} from '../ui/icons';
 import { useApi } from '../app/ApiContext';
 import { useDashboards, usePlugins } from '../app/data';
 import { queryClient, useQuery } from '../app/query';

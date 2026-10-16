@@ -1,4 +1,4 @@
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw } from '../../ui/icons';
 import { useState } from 'react';
 import { tr, locale } from '../../i18n';
 import type { PluginEntry, PluginDataView } from '../../core/contracts';

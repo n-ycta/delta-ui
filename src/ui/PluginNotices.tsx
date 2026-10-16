@@ -1,6 +1,6 @@
 import { tr, language } from '../i18n';
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { X } from './icons';
 import { useApi } from '../app/ApiContext';
 import { usePrefs, useRuntimeAccess } from '../app/stores';
 import { noticeKey, noticeFingerprint, dismissNotice } from './pluginNoticeState';

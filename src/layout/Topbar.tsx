@@ -1,6 +1,6 @@
 import { tr, language, setLanguage } from '../i18n';
 import { Link, useLocation } from 'react-router-dom';
-import { Bell, Menu as MenuIcon, Moon, Search, Sun } from 'lucide-react';
+import { Bell, Menu as MenuIcon, Moon, Search, Sun } from '../ui/icons';
 import { useNotifications } from '../app/data';
 import { usePrefs, useUi } from '../app/stores';
 import { useResolvedTheme } from '../app/theme';

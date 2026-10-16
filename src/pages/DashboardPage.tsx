@@ -1,7 +1,7 @@
 import { tr } from '../i18n';
 import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Download, MoreHorizontal, Pencil, RotateCcw, Trash2 } from 'lucide-react';
+import { Download, MoreHorizontal, Pencil, RotateCcw, Trash2 } from '../ui/icons';
 import { useDashboards, usePlugin } from '../app/data';
 import { useCan } from '../app/stores';
 import { generatePluginDashboard, mergeGeneratedDashboard } from '../core/registry/autodash';

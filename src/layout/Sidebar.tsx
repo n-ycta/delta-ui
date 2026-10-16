@@ -13,7 +13,7 @@ import {
   ScrollText,
   Server,
   Settings,
-} from 'lucide-react';
+} from '../ui/icons';
 import { useDashboards, useNodes, usePlugins } from '../app/data';
 import { usePrefs, useRole, useUi, useRuntimeAccess } from '../app/stores';
 import { ROLE_LABEL } from '../core/contracts';

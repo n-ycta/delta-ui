@@ -2,7 +2,7 @@ import { dashboardPlugins } from '../core/registry/dashboardIndex';
 import { tr } from '../i18n';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Copy, Download, MoreHorizontal, Pin, Plus, Trash2, Upload } from 'lucide-react';
+import { Copy, Download, MoreHorizontal, Pin, Plus, Trash2, Upload } from '../ui/icons';
 import { useDashboards, usePlugins } from '../app/data';
 import { useCan } from '../app/stores';
 import { isInstalled } from '../core/registry/plugins';

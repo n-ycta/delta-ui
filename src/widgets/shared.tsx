@@ -1,7 +1,7 @@
 import { tr } from '../i18n';
 import { queryStep } from './intervals';
 import { useMemo, type ReactNode } from 'react';
-import { ArrowDownRight, ArrowUpRight, Minus } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, Minus } from '../ui/icons';
 import type { MetricDescriptor, MetricQuery, MetricResult, Series, WidgetConfig } from '../core/contracts';
 import { fmtAxisTime, fmtDateTime, fmtValue } from '../core/lib/format';
 import { useMetric } from '../app/data';

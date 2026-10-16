@@ -1,7 +1,7 @@
 import { tr } from '../../i18n';
 import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowUpCircle, LayoutGrid, List, Search } from 'lucide-react';
+import { ArrowUpCircle, LayoutGrid, List, Search } from '../../ui/icons';
 import { usePlugins } from '../../app/data';
 import { hasUpdate, isInstalled } from '../../core/registry/plugins';
 import type { PluginCategory, PluginEntry } from '../../core/contracts';

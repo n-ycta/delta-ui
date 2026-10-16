@@ -16,7 +16,7 @@ import {
   RotateCcw,
   Trash2,
   Zap,
-} from 'lucide-react';
+} from '../../ui/icons';
 import { useNodes, usePlugin } from '../../app/data';
 import { useMutation, useQuery } from '../../app/query';
 import { toast, useCan } from '../../app/stores';

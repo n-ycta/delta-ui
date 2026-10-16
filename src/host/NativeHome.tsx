@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw } from '../ui/icons';
 import { tr } from '../i18n';
 import type { HostBridge, HostInfo } from './contract';
 interface Snapshot {host:HostInfo;core:Record<string,unknown>;components:Record<string,unknown>[];caps:Record<string,unknown>[]}

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { Responsive, WidthProvider, type Layout } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
-import { Check, LayoutGrid, Pencil, Plus, RefreshCw, X } from 'lucide-react';
+import { Check, LayoutGrid, Pencil, Plus, RefreshCw, X } from '../ui/icons';
 import type {
   DashboardConfig,
   TimeRangePreset,

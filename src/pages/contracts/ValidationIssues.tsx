@@ -1,5 +1,5 @@
 import { tr } from '../../i18n';
-import { AlertCircle, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
+import { AlertCircle, AlertTriangle, CheckCircle2, Info } from '../../ui/icons';
 import type { ValidationReport } from '../../core/contracts';
 
 export function ValidationIssues({ report }: { report: ValidationReport }) {
