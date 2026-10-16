@@ -1,3 +1,4 @@
+import {RecoverySecret} from '../ui/RecoverySecret';
 import { useEffect, useState, type ReactNode } from "react";
 import { schnorr } from "@noble/curves/secp256k1";
 import { bytesToHex } from "@noble/hashes/utils";
@@ -132,8 +133,7 @@ export function NativeOnboarding({ children }: { children: ReactNode }) {
                 </Button>
                 {phrase ? (
                   <>
-                    <strong>{tr("polish.recoveryPhrase")}</strong>
-                    <code style={{ overflowWrap: "anywhere" }}>{phrase}</code>
+                    <RecoverySecret value={phrase}/>
                     <p>{tr("polish.recoveryWarning")}</p>
                     <label className="check">
                       <input

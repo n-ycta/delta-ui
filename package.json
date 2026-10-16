@@ -1,7 +1,7 @@
 {
   "name": "@delta/ui",
   "private": false,
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "description": "Shared Delta UI and host/Plugin UI contracts",
   "scripts": {
@@ -16,7 +16,8 @@
     "test:onboarding": "node tests/native-onboarding.browser.mjs",
     "test:language": "node tests/language-settings.browser.mjs",
     "test:apps": "node --test tests/app-runtime.test.mjs",
-    "test:embedding": "node scripts/prepare-test-app.mjs && node tests/app-embedding.browser.mjs"
+    "test:embedding": "node scripts/prepare-test-app.mjs && node tests/app-embedding.browser.mjs",
+    "test:profile": "node tests/profile-seed.browser.mjs"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.0.14",

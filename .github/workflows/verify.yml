@@ -15,7 +15,7 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm test && npm run test:apps && npm run test:i18n && npm run build
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:navigation && npm run test:onboarding && npm run test:language && npm run test:embedding
+      - run: npm run test:navigation && npm run test:onboarding && npm run test:language && npm run test:profile && npm run test:embedding
       - uses: actions/upload-artifact@v4
         with:
           name: delta-ui-bundled-preview

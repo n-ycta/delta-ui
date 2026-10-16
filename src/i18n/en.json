@@ -2037,5 +2037,28 @@
     "unavailable": "This host does not support isolated applications.",
     "loading": "Loading",
     "console": "Console"
+  },
+  "recovery": {
+    "show": "Show phrase",
+    "hide": "Hide phrase",
+    "copy": "Copy phrase",
+    "download": "Download Markdown",
+    "copied": "Copied",
+    "copyFailed": "Copy failed. Show the phrase and copy it manually.",
+    "fileWarning": "Unencrypted recovery key. Keep offline and never share.",
+    "downloadFailed": "Could not save the file"
+  },
+  "profile": {
+    "title": "Profile",
+    "name": "Name",
+    "nickname": "Nickname",
+    "avatar": "Avatar",
+    "upload": "Upload",
+    "remove": "Remove avatar",
+    "save": "Save",
+    "saved": "Profile saved",
+    "help": "Display profile for this node. Changing it does not replace your access keys.",
+    "invalidImage": "Choose PNG, JPEG or WebP up to 10 MB.",
+    "invalidProfile": "Check the name, nickname and avatar."
   }
 }

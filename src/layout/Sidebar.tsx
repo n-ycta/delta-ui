@@ -1,3 +1,6 @@
+import {Link} from 'react-router-dom';
+import {useQuery} from '../app/query';
+import {loadProfile} from '../api/profile';
 import { dashboardCount } from '../core/registry/dashboardIndex';
 import { tr } from '../i18n';
 import { NavLink } from 'react-router-dom';
@@ -57,6 +60,7 @@ export function Sidebar() {
   const nodes = useNodes();
   const dashboards = useDashboards();
   const role = useRole();
+  const profile=useQuery('profile',()=>loadProfile());
   const userName = useRuntimeAccess((s) => s.name);
   const pluginIssues =
     plugins.data?.filter((p) => ['error', 'degraded'].includes(p.instance.status)).length ?? 0;
@@ -152,20 +156,20 @@ export function Sidebar() {
           label={tr('layout.Sidebar.s_7f17c7c62a')}
         />
       </nav>
-      <div className="sidebar-foot">
+      <Link to="/settings?tab=profile" className="sidebar-foot profile-link" title={tr('profile.title')} onClick={()=>useUi.getState().set({mobileNav:false})}>
         <span className="profile-avatar" aria-hidden="true">
-          <UserRound size={15} />
+          {profile.data?.avatar?<img className="profile-avatar-image" src={profile.data.avatar} alt=""/>:<UserRound size={15} />}
         </span>
         <span className="sidebar-foot-text col grow" style={{ gap: 0, minWidth: 0 }}>
           <span className="truncate" style={{ fontWeight: 500 }}>
-            {userName || tr('runtime.noUser')}
+            {profile.data?.name || userName || tr('runtime.noUser')}
           </span>
           <span className="muted" style={{ fontSize: 11 }}>
-            {ROLE_LABEL[role]}
+            {profile.data?.nickname?'@'+profile.data.nickname:ROLE_LABEL[role]}
             {role !== 'owner' && tr('layout.Sidebar.s_64fc2b8469')}
           </span>
         </span>
-      </div>
+      </Link>
     </aside>
   );
 }

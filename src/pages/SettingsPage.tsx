@@ -1,3 +1,4 @@
+import {ProfileSettings} from './ProfileSettings';
 import {NativeConnection} from '../host/NativeConnection';
 import {hostBridge} from '../host/contract';
 import {CapabilityGate} from '../ui/Dependencies';
@@ -44,7 +45,7 @@ import { ErrorState, Skeleton } from '../ui/states';
 import { downloadJson } from '../dashboards/useDashboardActions';
 import { widgetRegistry } from '../widgets/registry';
 
-type Tab = 'general' | 'connection' | 'backup' | 'developer' | 'updates';
+type Tab = 'profile' | 'general' | 'connection' | 'backup' | 'developer' | 'updates';
 const PREF_KEYS = [
   'theme',
   'density',
@@ -69,6 +70,7 @@ export function SettingsPage() {
         value={tab}
         onChange={(t) => setParams({ tab: t })}
         tabs={[
+          { id: 'profile', label: tr('profile.title') },
           { id: 'updates', label: tr('updates.title') },
           { id: 'general', label: tr('pages.SettingsPage.s_8d7038f840') },
           { id: 'connection', label: tr('pages.SettingsPage.s_47a23743fc') },
@@ -79,6 +81,7 @@ export function SettingsPage() {
         ]}
       />
       <div className="settings-content">
+        {tab === 'profile' && <ProfileSettings />}
         {tab === 'updates' && <CapabilityGate capability="web.updates_status"><Updates /></CapabilityGate>}
         {tab === 'general' && <General />}
         {tab === 'connection' && (hostBridge()?<NativeConnection />:<Connection />)}

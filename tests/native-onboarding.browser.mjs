@@ -39,7 +39,9 @@ try {
   await page.locator("input.input").first().fill("Test owner");
   await page.getByRole("button", { name: "Generate", exact: true }).click();
   assert(await create.isDisabled());
-  const phrase = await page.locator("code").textContent();
+  assert.equal(await page.locator("[data-recovery-secret]").count(),0);
+  await page.getByRole("button",{name:"Show phrase",exact:true}).click();
+  const phrase = await page.locator("[data-recovery-secret]").textContent();
   await page.getByRole("checkbox").check();
   await create.click();
   await page.locator("#shell-ready").waitFor();

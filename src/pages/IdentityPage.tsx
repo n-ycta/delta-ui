@@ -1,3 +1,4 @@
+import {RecoverySecret} from '../ui/RecoverySecret';
 import { useCan, toast } from "../app/stores";
 import { signInWithKey, keyFromInput, sessionRequest } from "../auth/key-login";
 import { authError } from "../auth/errors";
@@ -224,8 +225,7 @@ export function IdentityPage() {
                     <div className="banner warn" role="status">
                       {tr(registered ? "auth.keyRegistered" : "auth.keyDraft")}
                     </div>
-                    <strong>{tr("polish.recoveryPhrase")}</strong>
-                    <code className="recovery-phrase">{phrase}</code>
+                    <RecoverySecret value={phrase} />
                     <p className="muted">{tr("polish.recoveryWarning")}</p>
                     <label className="check">
                       <input
