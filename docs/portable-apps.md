@@ -7,3 +7,15 @@ A package is bounded JSON containing `format`, `manifest` and `files` (`path`, S
 Each catalog ID has a unique protocol (`deltaapp-dev-delta-media`); app origins do not share localStorage/IndexedDB or Console cookies. Frames are sandboxed and cannot navigate the root. Native IPC initialization is main-frame-only, with Tauri's invoke key and origin ACL; plugin frames receive no owner token or direct transport. The parent pins Window + origin + fresh channel nonce via `pluginChannel`. `connectPlugin` is the app-side SDK and checks source/origin before accepting context. This first app release has zero capability grants; theme and language are non-secret launch context only.
 
 No security claim is made for arbitrary side-loaded packages. Only reviewed catalog releases are accepted. HTTP media, DRM extraction, native background playback and multi-device binary synchronization are not granted by this package format.
+
+### Updating an installed application
+
+The catalog displays an Update action when its reviewed version differs from the
+installed manifest. Replacement is explicit (`host.apps_install` with
+`replace: true`) and uses the same owner authorization and package hash checks as
+installation. Assets are verified and staged before replacing the installed
+folder; a failed activation restores the previous folder. Browser library data
+and workspace layouts are stored outside that folder and are not removed.
+An open application frame restarts after a successful update, interrupting
+playback. This is not a crash-proof filesystem exchange: a power loss between
+renames can leave a previous-folder backup requiring local recovery.

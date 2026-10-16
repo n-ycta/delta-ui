@@ -1,5 +1,5 @@
 import { appCall } from "../sdk/apps";
-import { useQuery } from "../app/query";
+import { queryClient, useQuery } from "../app/query";
 import { readInstalledSurfaceApps } from "../sdk/surfaces";
 import { language } from "../i18n";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -123,6 +123,17 @@ function PluginSlot({
 // One stable overlay per installed app follows its visible slot and remains mounted while hidden.
 export function LiveWorkbench({ demo = false }: { demo?: boolean }) {
   const api = useApi();
+  const [appRevisions, setAppRevisions] = useState<Record<string, number>>({});
+  useEffect(() => {
+    const changed = (e: Event) => {
+      const id = (e as CustomEvent).detail?.id;
+      if (typeof id !== "string") return;
+      setAppRevisions((v) => ({ ...v, [id]: (v[id] || 0) + 1 }));
+      queryClient.invalidate("workbench-app-surfaces");
+    };
+    window.addEventListener("delta:apps-changed", changed);
+    return () => window.removeEventListener("delta:apps-changed", changed);
+  }, []);
   const remote = useMemo(nodeWorkspace, []);
   const slots = useRef<Slot[]>([]),
     preferred = useRef<HTMLDivElement | null>(null);
@@ -343,7 +354,7 @@ export function LiveWorkbench({ demo = false }: { demo?: boolean }) {
         <>
           {frames.map((f) => (
             <div
-              key={f.id}
+              key={f.id + ":" + (appRevisions[f.id] || 0)}
               hidden={!f.visible}
               className="wb-plugin-overlay wb-system-surface"
               style={{

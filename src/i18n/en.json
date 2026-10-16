@@ -2036,7 +2036,9 @@
     "removeConfirm": "Remove the application? Local media stays in its storage.",
     "unavailable": "This host does not support isolated applications.",
     "loading": "Loading",
-    "console": "Console"
+    "console": "Console",
+    "update": "Update",
+    "updateConfirm": "Update this app? Playback will restart. Your browser library and saved layout are kept."
   },
   "recovery": {
     "show": "Show phrase",

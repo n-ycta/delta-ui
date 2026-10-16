@@ -79,3 +79,44 @@ test("atomic install refuses overwrite and exposes only in-root assets", async (
     await rm(root, { recursive: true, force: true });
   }
 });
+test("explicit package replacement validates first and preserves the old app on rejection", async () => {
+  const { bytes, expected, p } = fixture();
+  const root = await mkdtemp(join(tmpdir(), "delta-app-update-"));
+  try {
+    await install(root, bytes, expected);
+    await assert.rejects(
+      install(root, bytes, { ...expected, sha256: "bad" }, { replace: true }),
+    );
+    assert.equal(
+      await (
+        await import("node:fs/promises")
+      ).readFile(await asset(root, expected.id, "index.html"), "utf8"),
+      "<h1>Media</h1>",
+    );
+    p.manifest.version = "2";
+    const html = Buffer.from("<h1>Updated</h1>");
+    p.files = [
+      {
+        path: "index.html",
+        sha256: digest(html),
+        data: html.toString("base64"),
+      },
+    ];
+    const next = Buffer.from(JSON.stringify(p));
+    await install(
+      root,
+      next,
+      { ...expected, version: "2", sha256: digest(next) },
+      { replace: true },
+    );
+    assert.equal(
+      await (
+        await import("node:fs/promises")
+      ).readFile(await asset(root, expected.id, "index.html"), "utf8"),
+      "<h1>Updated</h1>",
+    );
+    assert.deepEqual(await installed(root), [expected.id]);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});

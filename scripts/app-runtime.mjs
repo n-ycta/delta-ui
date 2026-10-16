@@ -76,11 +76,16 @@ export async function installed(root) {
     throw e;
   }
 }
-export async function install(root, bytes, expected) {
+export async function install(root, bytes, expected, { replace = false } = {}) {
   const p = verify(bytes, expected);
   await mkdir(root, { recursive: true, mode: 0o700 });
-  if ((await installed(root)).includes(p.manifest.id))
-    throw Error("already_installed");
+  const exists = (await installed(root)).includes(p.manifest.id);
+  if (exists && !replace) throw Error("already_installed");
+  const destination = join(root, p.manifest.id);
+  const backup = join(
+    root,
+    ".previous-" + p.manifest.id + "-" + randomBytes(12).toString("hex"),
+  );
   const stage = join(root, ".stage-" + randomBytes(12).toString("hex"));
   try {
     await mkdir(stage, { mode: 0o700 });
@@ -94,7 +99,14 @@ export async function install(root, bytes, expected) {
       JSON.stringify(p.manifest),
       { mode: 0o600 },
     );
-    await rename(stage, join(root, p.manifest.id));
+    if (exists) await rename(destination, backup);
+    try {
+      await rename(stage, destination);
+    } catch (error) {
+      if (exists) await rename(backup, destination);
+      throw error;
+    }
+    if (exists) await rm(backup, { recursive: true, force: true });
     return p.manifest;
   } finally {
     await rm(stage, { recursive: true, force: true });
