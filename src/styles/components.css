@@ -471,4 +471,6 @@ select option, select optgroup { color: var(--ink); background-color: var(--surf
   .page-head .row, .panel-head { flex-wrap: wrap; }
 }
 
-.dependency-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--rule);min-width:0}.dependency-row>.grow{min-width:0;overflow-wrap:anywhere}.dependency-row:last-child{border-bottom:0}
+.dependency-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--rule);min-width:0}.dependency-row>.grow{flex:1 1 220px;min-width:min(100%,180px);overflow-wrap:anywhere}.dependency-row:last-child{border-bottom:0}
+
+@media(max-width:640px){.dependency-row>.grow{flex-basis:100%}}
