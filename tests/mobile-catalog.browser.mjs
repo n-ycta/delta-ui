@@ -41,6 +41,12 @@ try {
    await page.evaluate(()=>window.mobileFixture.dock.getState().set({position:'hidden'}));await page.locator('.dx-peek-handle').click();await page.locator('.dx-dock.peek').waitFor();
    const peek=await page.locator('.dx-dock.peek').boundingBox();assert(peek.x>=0&&peek.x+peek.width<=width);await page.keyboard.press('Escape');
   }
+  if(width===320&&language==='ru') {
+   await page.goto(`http://127.0.0.1:${server.httpServer.address().port}/__mobile#/settings?tab=general`);
+   await page.locator('.settings-content .panel').waitFor();
+   await page.screenshot({path:`${output}/settings-${width}-${language}-${scheme}.png`,animations:'disabled'});
+   const overflow=await page.locator('.settings-page').evaluate(e=>e.scrollWidth>e.clientWidth+1);assert.equal(overflow,false,'settings page overflow');
+  }
   assert.deepEqual(errors,[]);await context.close();
  }
  console.log('PASS: actual shell/catalog at 320/360/390/1440, RU/EN, light/dark; zero horizontal overflow; centered view icons; real clicks for mock install, tabs and manager; mobile player and hidden-dock reveal.');
