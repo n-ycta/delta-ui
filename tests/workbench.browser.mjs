@@ -142,7 +142,9 @@ try {
     s.apps.find((a) => a.template === "studio").root.children[0].type,
     "split",
   );
-  await page.locator(".wb-system-surface .grid-aside .panel").first().waitFor();
+  // Studio now opens its browser by default; explicitly select the MCP form under test.
+  await page.locator(".wb-app-surface:not([hidden])").getByRole("tab", {name:"MCP",exact:true}).click();
+  await page.locator(".wb-app-surface:not([hidden]) .wb-system-surface .grid-aside .panel").first().waitFor();
   assert(
     await page
       .locator(".wb-system-surface .grid-aside .panel")
