@@ -125,6 +125,29 @@ export function FrameHost({ children }: { children: ReactNode }) {
             }
             parent = parent.parentElement;
           }
+          // Frames stay mounted above the router; subtract higher canvas windows so
+          // a background iframe cannot paint or intercept clicks through their chrome.
+          let clip = `inset(${Math.max(0, (top - r.top)/scale)}px ${Math.max(0, (r.right - right)/scale)}px ${Math.max(0, (r.bottom - bottom)/scale)}px ${Math.max(0, (left - r.left)/scale)}px)`;
+          const ownWindow = slot.el.closest<HTMLElement>(".wb-window");
+          if (ownWindow && right > left && bottom > top) {
+            const ownZ = Number(getComputedStyle(ownWindow).zIndex) || 0;
+            const rectPath = (l:number,t:number,rr:number,b:number) => {
+              const x=(l-r.left)/scale,y=(t-r.top)/scale,w=(rr-l)/scale,h=(b-t)/scale;
+              return `M${x} ${y}h${w}v${h}h${-w}Z`;
+            };
+            let tiles = [{l:left,t:top,r:right,b:bottom}];
+            for (const other of ownWindow.parentElement?.querySelectorAll<HTMLElement>(":scope > .wb-window") || []) {
+              if (other===ownWindow || other.hidden || (Number(getComputedStyle(other).zIndex)||0)<=ownZ) continue;
+              const b=other.getBoundingClientRect();
+              tiles=tiles.flatMap(q=>{
+                const l=Math.max(q.l,b.left),t=Math.max(q.t,b.top),rr=Math.min(q.r,b.right),bb=Math.min(q.b,b.bottom);
+                if(rr<=l||bb<=t)return [q];
+                return [{l:q.l,t:q.t,r:q.r,b:t},{l:q.l,t:bb,r:q.r,b:q.b},{l:q.l,t,r:l,b:bb},{l:rr,t,r:q.r,b:bb}].filter(v=>v.r>v.l&&v.b>v.t);
+              });
+            }
+            const path=tiles.map(q=>rectPath(q.l,q.t,q.r,q.b)).join('');
+            clip = `path("${path || 'M0 0Z'}")`;
+          }
           return {
             key,
             id,
@@ -135,7 +158,7 @@ export function FrameHost({ children }: { children: ReactNode }) {
             width: slot.el.offsetWidth,
             height: slot.el.offsetHeight,
             scale,
-            clip: `inset(${Math.max(0, (top - r.top)/scale)}px ${Math.max(0, (r.right - right)/scale)}px ${Math.max(0, (r.bottom - bottom)/scale)}px ${Math.max(0, (left - r.left)/scale)}px)`,
+            clip,
           };
         });
         for(const f of next){const el=nodes.current.get(f.key);if(el){

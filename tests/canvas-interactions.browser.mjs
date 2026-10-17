@@ -1,3 +1,5 @@
+import {mkdir} from 'node:fs/promises';
+const output=process.env.DELTA_TEST_OUTPUT || '/data';await mkdir(output,{recursive:true});
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/local/bin/chromium', args: ['--no-sandbox'] });
@@ -23,7 +25,7 @@ try {
  assert.equal(await canvas.locator('[data-zoom]').textContent(), '83%');
  await page.keyboard.press('Control+0');
  assert.equal(await canvas.locator('[data-zoom]').textContent(), '100%');
- await page.screenshot({ path: '/data/canvas-fixed.png' });
+ await page.screenshot({ path: output+'/canvas-fixed.png' });
  // Hidden dock was horizontal inside a vertical fixed shell. Test real persisted setting.
  await page.evaluate(() => localStorage.setItem('delta.shell.dock', JSON.stringify({ version: 1, state: { position:'hidden', labels:false, size:'md', order:[], unpinned:[], showDesktops:true, showPlayer:true } })));
  await page.reload();
@@ -34,7 +36,7 @@ try {
   assert.equal(await dock.getAttribute('data-position'), 'left');
   const r = await dock.boundingBox();
   for(const b of await dock.locator('.dx-dock-tail button').all()) { const br = await b.boundingBox(); if(br) assert(br.x >= r.x && br.x+br.width <= r.x+r.width+1); }
-  await page.screenshot({ path: '/data/hidden-dock-fixed.png' });
+  await page.screenshot({ path: output+'/hidden-dock-fixed.png' });
  }
  assert.deepEqual(errors, []); console.log('PASS: context menu, add, edge resize, zoom shortcuts, hidden dock, no runtime errors');
 } finally { await browser.close(); }

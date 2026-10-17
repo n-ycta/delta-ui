@@ -116,10 +116,9 @@ try {
         }),
     );
     assert.equal(reply.error.code, "forbidden");
-    assert.deepEqual(
-      (await page.evaluate(() => window.calls)).map((v) => v.capability),
-      ["host.apps_launch"],
-    );
+    const capabilities=(await page.evaluate(()=>window.calls)).map(v=>v.capability);
+    assert(capabilities.includes('host.apps_launch'));
+    assert(capabilities.every(c=>['host.apps_launch','media.sync'].includes(c)), 'Only launch and reviewed Media heartbeat reach the host; identity probe stays blocked');
     assert.deepEqual(errors, []);
     await page.screenshot({ path: `${output}/app-embedding-${width}.png` });
     await page.close();

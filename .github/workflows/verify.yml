@@ -33,6 +33,7 @@ jobs:
           node tests/workbench-controls.browser.mjs
           node tests/canvas-interactions.browser.mjs
           node tests/plugin-widget.browser.mjs
+          node tests/canvas-performance.browser.mjs
       - uses: actions/upload-artifact@v4
         with:
           name: delta-ui-bundled-preview
