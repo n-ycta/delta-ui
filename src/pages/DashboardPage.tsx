@@ -1,47 +1,70 @@
-import { tr } from '../i18n';
-import { useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Download, MoreHorizontal, Pencil, RotateCcw, Trash2 } from '../ui/icons';
-import { useDashboards, usePlugin } from '../app/data';
-import { useCan } from '../app/stores';
-import { generatePluginDashboard, mergeGeneratedDashboard } from '../core/registry/autodash';
-import { widgetRegistry } from '../widgets/registry';
-import { DashboardView } from '../dashboards/DashboardView';
-import { downloadJson, useDashboardActions } from '../dashboards/useDashboardActions';
-import { Button, Field, PageHead } from '../ui/primitives';
-import { Confirm, Menu, Modal } from '../ui/overlays';
-import { Empty, ErrorState, Skeleton } from '../ui/states';
-import { Icon } from '../ui/Icon';
-import type { DashboardConfig } from '../core/contracts';
+import { useApi } from "../app/ApiContext";
+import { useInstalledApps } from "../shell/apps";
+import { generateSurfaceDashboard } from "../core/registry/surfaceDashboards";
+import { tr } from "../i18n";
+import { useMemo, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import {
+  Download,
+  MoreHorizontal,
+  Pencil,
+  RotateCcw,
+  Trash2,
+} from "../ui/icons";
+import { useDashboards, usePlugin } from "../app/data";
+import { useCan } from "../app/stores";
+import {
+  generatePluginDashboard,
+  mergeGeneratedDashboard,
+} from "../core/registry/autodash";
+import { widgetRegistry } from "../widgets/registry";
+import { DashboardView } from "../dashboards/DashboardView";
+import {
+  downloadJson,
+  useDashboardActions,
+} from "../dashboards/useDashboardActions";
+import { Button, Field, PageHead } from "../ui/primitives";
+import { Confirm, Menu, Modal } from "../ui/overlays";
+import { Empty, ErrorState, Skeleton } from "../ui/states";
+import { Icon } from "../ui/Icon";
+import type { DashboardConfig } from "../core/contracts";
 
 export function DashboardPage() {
-  const { id = '' } = useParams();
+  const { id = "" } = useParams();
   const nav = useNavigate();
   const dashboards = useDashboards();
   const stored = dashboards.data?.find((d) => d.id === id);
+  const isSurfaceDashboard = id.startsWith("gen_ui_");
+  const apps = useInstalledApps(useApi().mode !== "mock");
   const genFor =
-    stored?.origin === 'generated'
+    stored?.origin === "generated"
       ? stored.generatedFrom
-      : id.startsWith('gen_')
-        ? id.slice(4)
-        : undefined;
-  const plugin = usePlugin(genFor);
+      : isSurfaceDashboard
+        ? id.slice(7)
+        : id.startsWith("gen_")
+          ? id.slice(4)
+          : undefined;
+  const plugin = usePlugin(isSurfaceDashboard ? undefined : genFor);
+  const surfaceApp = apps.find((a) => a.id === genFor);
   const { save, remove } = useDashboardActions();
-  const canWrite = useCan('dashboards.write');
+  const canWrite = useCan("dashboards.write");
   const [rename, setRename] = useState<string | null>(null);
   const [del, setDel] = useState(false);
   const [resetGen, setResetGen] = useState(false);
 
   const generated = useMemo(
     () =>
-      genFor && plugin.data && !stored
-        ? generatePluginDashboard(plugin.data, widgetRegistry)
-        : undefined,
-    [genFor, plugin.data, stored],
+      isSurfaceDashboard && surfaceApp && !stored
+        ? generateSurfaceDashboard(surfaceApp)
+        : genFor && plugin.data && !stored
+          ? generatePluginDashboard(plugin.data, widgetRegistry)
+          : undefined,
+    [genFor, plugin.data, stored, isSurfaceDashboard, surfaceApp],
   );
   // Add newly declared metrics to saved generated dashboards without moving user widgets.
   const d: DashboardConfig | undefined = useMemo(() => {
-    if (!stored || stored.origin !== 'generated' || !plugin.data) return stored ?? generated;
+    if (!stored || stored.origin !== "generated" || !plugin.data)
+      return stored ?? generated;
     const fresh = generatePluginDashboard(plugin.data, widgetRegistry);
     return mergeGeneratedDashboard(stored, fresh);
   }, [stored, generated, plugin.data]);
@@ -69,28 +92,32 @@ export function DashboardPage() {
       <div className="page">
         <div className="panel">
           <Empty
-            title={tr('pages.DashboardPage.s_201cf81628')}
+            title={tr("pages.DashboardPage.s_201cf81628")}
             action={
               <Link className="btn" to="/dashboards">
-                {tr('pages.DashboardPage.s_f7bcb06361')}
+                {tr("pages.DashboardPage.s_f7bcb06361")}
               </Link>
             }
           >
-            {tr('pages.DashboardPage.s_d5547a1a16')}
-            {genFor && tr('pages.DashboardPage.s_c816ac6440')}
+            {tr("pages.DashboardPage.s_d5547a1a16")}
+            {genFor && tr("pages.DashboardPage.s_c816ac6440")}
           </Empty>
         </div>
       </div>
     );
 
-  const isGen = d.origin === 'generated';
+  const isGen = d.origin === "generated";
   return (
     <div className="page">
       <PageHead
-        eyebrow={tr('pages.DashboardPage.s_c957a35c33')}
+        eyebrow={tr("pages.DashboardPage.s_c957a35c33")}
         title={
           <span className="row" style={{ gap: 10 }}>
-            <Icon name={d.icon ?? 'layout-dashboard'} size={20} className="muted" />
+            <Icon
+              name={d.icon ?? "layout-dashboard"}
+              size={20}
+              className="muted"
+            />
             {d.name}
           </span>
         }
@@ -104,20 +131,21 @@ export function DashboardPage() {
             )}
             items={[
               {
-                label: tr('pages.DashboardPage.s_715e8f0c32'),
+                label: tr("pages.DashboardPage.s_715e8f0c32"),
                 icon: <Pencil size={14} />,
                 onSelect: () => setRename(d.name),
                 disabled: !canWrite,
               },
               {
-                label: tr('pages.DashboardPage.s_4910a3a93b'),
+                label: tr("pages.DashboardPage.s_4910a3a93b"),
                 icon: <Download size={14} />,
-                onSelect: () => downloadJson(`${d.name}.delta-dashboard.json`, d),
+                onSelect: () =>
+                  downloadJson(`${d.name}.delta-dashboard.json`, d),
               },
               ...(isGen && stored
                 ? [
                     {
-                      label: tr('pages.DashboardPage.s_ba47c18401'),
+                      label: tr("pages.DashboardPage.s_ba47c18401"),
                       icon: <RotateCcw size={14} />,
                       onSelect: () => setResetGen(true),
                       disabled: !canWrite,
@@ -128,7 +156,7 @@ export function DashboardPage() {
                 ? [
                     { separator: true },
                     {
-                      label: tr('pages.DashboardPage.s_86ea33aef5'),
+                      label: tr("pages.DashboardPage.s_86ea33aef5"),
                       icon: <Trash2 size={14} />,
                       danger: true,
                       onSelect: () => setDel(true),
@@ -143,16 +171,18 @@ export function DashboardPage() {
       <DashboardView
         key={d.id}
         dashboard={d}
-        onSave={(x) => save({ ...x, updatedAt: Date.now() }, { silent: !!stored })}
+        onSave={(x) =>
+          save({ ...x, updatedAt: Date.now() }, { silent: !!stored })
+        }
       />
       <Modal
         open={rename !== null}
         onClose={() => setRename(null)}
-        title={tr('pages.DashboardPage.s_715e8f0c32')}
+        title={tr("pages.DashboardPage.s_715e8f0c32")}
         footer={
           <>
             <Button variant="ghost" onClick={() => setRename(null)}>
-              {tr('pages.DashboardPage.s_0ec753be8d')}
+              {tr("pages.DashboardPage.s_0ec753be8d")}
             </Button>
             <Button
               variant="primary"
@@ -161,16 +191,16 @@ export function DashboardPage() {
                 setRename(null);
               }}
             >
-              {tr('pages.DashboardPage.s_4864057d62')}
+              {tr("pages.DashboardPage.s_4864057d62")}
             </Button>
           </>
         }
       >
-        <Field label={tr('pages.DashboardPage.s_3de49828e8')}>
+        <Field label={tr("pages.DashboardPage.s_3de49828e8")}>
           <input
             className="input"
             autoFocus
-            value={rename ?? ''}
+            value={rename ?? ""}
             onChange={(e) => setRename(e.target.value)}
           />
         </Field>
@@ -179,22 +209,28 @@ export function DashboardPage() {
         open={del}
         onClose={() => setDel(false)}
         danger
-        title={tr('pages.DashboardPage.s_2b6531cd72')}
-        confirmLabel={tr('pages.DashboardPage.s_86ea33aef5')}
-        body={tr('pages.DashboardPage.s_6e572fde68', { p0: d.name })}
+        title={tr("pages.DashboardPage.s_2b6531cd72")}
+        confirmLabel={tr("pages.DashboardPage.s_86ea33aef5")}
+        body={tr("pages.DashboardPage.s_6e572fde68", { p0: d.name })}
         onConfirm={async () => {
           await remove(d);
-          nav('/dashboards');
+          nav("/dashboards");
         }}
       />
       <Confirm
         open={resetGen}
         onClose={() => setResetGen(false)}
-        title={tr('pages.DashboardPage.s_0b04a8cb71')}
-        confirmLabel={tr('pages.DashboardPage.s_600363a73d')}
-        body={tr('pages.DashboardPage.s_37c44a307c')}
+        title={tr("pages.DashboardPage.s_0b04a8cb71")}
+        confirmLabel={tr("pages.DashboardPage.s_600363a73d")}
+        body={tr("pages.DashboardPage.s_37c44a307c")}
         onConfirm={async () => {
-          if (plugin.data)
+          if (isSurfaceDashboard && surfaceApp)
+            await save({
+              ...generateSurfaceDashboard(surfaceApp),
+              id: d.id,
+              name: d.name,
+            });
+          else if (plugin.data)
             await save({
               ...generatePluginDashboard(plugin.data, widgetRegistry),
               id: d.id,

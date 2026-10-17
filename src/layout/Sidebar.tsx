@@ -1,12 +1,14 @@
-import {useContext} from 'react';
-import {BrandOverride} from '../app/AppearanceContext';
-import {WIcon} from '../workbench/Icon';
-import {Link} from 'react-router-dom';
-import {useQuery} from '../app/query';
-import {loadProfile} from '../api/profile';
-import { dashboardCount } from '../core/registry/dashboardIndex';
-import { tr } from '../i18n';
-import { NavLink } from 'react-router-dom';
+import { useApi } from "../app/ApiContext";
+import { useInstalledApps } from "../shell/apps";
+import { useContext } from "react";
+import { BrandOverride } from "../app/AppearanceContext";
+import { WIcon } from "../workbench/Icon";
+import { Link } from "react-router-dom";
+import { useQuery } from "../app/query";
+import { loadProfile } from "../api/profile";
+import { dashboardCount } from "../core/registry/dashboardIndex";
+import { tr } from "../i18n";
+import { NavLink } from "react-router-dom";
 import {
   FileCheck2,
   Gauge,
@@ -19,12 +21,12 @@ import {
   ScrollText,
   Server,
   Settings,
-} from '../ui/icons';
-import { useDashboards, useNodes, usePlugins } from '../app/data';
-import { usePrefs, useRole, useUi, useRuntimeAccess } from '../app/stores';
-import { ROLE_LABEL } from '../core/contracts';
-import { hasUpdate } from '../core/registry/plugins';
-import { Icon } from '../ui/Icon';
+} from "../ui/icons";
+import { useDashboards, useNodes, usePlugins } from "../app/data";
+import { usePrefs, useRole, useUi, useRuntimeAccess } from "../app/stores";
+import { ROLE_LABEL } from "../core/contracts";
+import { hasUpdate } from "../core/registry/plugins";
+import { Icon } from "../ui/Icon";
 
 function Item({
   to,
@@ -46,38 +48,70 @@ function Item({
     <NavLink
       to={to}
       end={end}
-      className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+      className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
       title={label}
-      onClick={e => {close({ mobileNav: false });if(to==='/workbench'&&e.currentTarget.closest('.wb')){e.preventDefault();window.dispatchEvent(new Event('delta:workbench-choose'))}}}
+      onClick={(e) => {
+        close({ mobileNav: false });
+        if (to === "/workbench" && e.currentTarget.closest(".wb")) {
+          e.preventDefault();
+          window.dispatchEvent(new Event("delta:workbench-choose"));
+        }
+      }}
     >
       {icon}
       <span className="nav-label truncate">{label}</span>
-      {count !== undefined && <span className={`count ${alert ? 'alert' : ''}`}>{count}</span>}
+      {count !== undefined && (
+        <span className={`count ${alert ? "alert" : ""}`}>{count}</span>
+      )}
     </NavLink>
   );
 }
 
 export function Sidebar() {
-  const appearance=useContext(BrandOverride);
+  const appearance = useContext(BrandOverride);
   const { sidebarCollapsed, set } = usePrefs();
   const plugins = usePlugins();
   const nodes = useNodes();
   const dashboards = useDashboards();
+  const apps = useInstalledApps(useApi().mode !== "mock");
   const role = useRole();
-  const profile=useQuery('profile',()=>loadProfile());
+  const profile = useQuery("profile", () => loadProfile());
   const userName = useRuntimeAccess((s) => s.name);
   const pluginIssues =
-    plugins.data?.filter((p) => ['error', 'degraded'].includes(p.instance.status)).length ?? 0;
+    plugins.data?.filter((p) =>
+      ["error", "degraded"].includes(p.instance.status),
+    ).length ?? 0;
   const updates = plugins.data?.filter(hasUpdate).length ?? 0;
-  const nodeIssues = nodes.data?.filter((n) => n.status !== 'online').length ?? 0;
-  const online = nodes.data?.filter((n) => n.status !== 'offline').length;
-  const pinned = (dashboards.data ?? []).filter((d) => d.origin !== 'home' && d.pinned);
+  const nodeIssues =
+    nodes.data?.filter((n) => n.status !== "online").length ?? 0;
+  const online = nodes.data?.filter((n) => n.status !== "offline").length;
+  const pinned = (dashboards.data ?? []).filter(
+    (d) => d.origin !== "home" && d.pinned,
+  );
   return (
     <aside className="sidebar">
       <div className="sidebar-head">
         <div className="brand">
-          {(!appearance||appearance.logo)&&(appearance&&appearance.brandSymbol!=='delta'?<WIcon name={appearance.brandSymbol} size={28}/>:<img className="delta-logo" src="./delta-logo.svg" alt="Delta"/>)}
-          {(!appearance||appearance.brand)&&<span className="brand-text col" style={{gap:0}}><span className="brand-name">{appearance?appearance.brandName:tr('layout.Sidebar.s_a4cbd21f4a')}</span>{!appearance&&<span className="brand-sub">{tr('layout.Sidebar.s_12062dd4e9')}</span>}</span>}
+          {(!appearance || appearance.logo) &&
+            (appearance && appearance.brandSymbol !== "delta" ? (
+              <WIcon name={appearance.brandSymbol} size={28} />
+            ) : (
+              <img className="delta-logo" src="./delta-logo.svg" alt="Delta" />
+            ))}
+          {(!appearance || appearance.brand) && (
+            <span className="brand-text col" style={{ gap: 0 }}>
+              <span className="brand-name">
+                {appearance
+                  ? appearance.brandName
+                  : tr("layout.Sidebar.s_a4cbd21f4a")}
+              </span>
+              {!appearance && (
+                <span className="brand-sub">
+                  {tr("layout.Sidebar.s_12062dd4e9")}
+                </span>
+              )}
+            </span>
+          )}
         </div>
         <button
           className="btn ghost icon sidebar-toggle desktop-only"
@@ -85,23 +119,43 @@ export function Sidebar() {
           aria-expanded={!sidebarCollapsed}
           aria-controls="sidebar-navigation"
           aria-label={
-            sidebarCollapsed ? tr('layout.Sidebar.s_fd3ae0eaeb') : tr('layout.Sidebar.s_4faa82f560')
+            sidebarCollapsed
+              ? tr("layout.Sidebar.s_fd3ae0eaeb")
+              : tr("layout.Sidebar.s_4faa82f560")
           }
           title={
-            sidebarCollapsed ? tr('layout.Sidebar.s_fd3ae0eaeb') : tr('layout.Sidebar.s_4faa82f560')
+            sidebarCollapsed
+              ? tr("layout.Sidebar.s_fd3ae0eaeb")
+              : tr("layout.Sidebar.s_4faa82f560")
           }
         >
-          {sidebarCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
+          {sidebarCollapsed ? (
+            <PanelLeftOpen size={20} />
+          ) : (
+            <PanelLeftClose size={20} />
+          )}
         </button>
       </div>
       <nav className="nav" id="sidebar-navigation">
-        <Item to="/workbench" icon={<WIcon name="browsers" size={16}/>} label={tr('workbench.entry')}/>
-      <Item to="/" end icon={<Gauge size={16} />} label={tr('layout.Sidebar.s_39c6387206')} />
+        <Item
+          to="/workbench"
+          icon={<WIcon name="browsers" size={16} />}
+          label={tr("workbench.entry")}
+        />
+        <Item
+          to="/"
+          end
+          icon={<Gauge size={16} />}
+          label={tr("layout.Sidebar.s_39c6387206")}
+        />
         <Item
           to="/dashboards"
           icon={<LayoutDashboard size={16} />}
-          label={tr('layout.Sidebar.s_292999fc23')}
-          count={dashboardCount(dashboards.data ?? [], plugins.data ?? []) || undefined}
+          label={tr("layout.Sidebar.s_292999fc23")}
+          count={
+            dashboardCount(dashboards.data ?? [], plugins.data ?? [], apps) ||
+            undefined
+          }
         />
         {pinned.length > 0 && (
           <div className="nav-sub">
@@ -109,62 +163,88 @@ export function Sidebar() {
               <Item
                 key={d.id}
                 to={`/dashboards/${d.id}`}
-                icon={<Icon name={d.icon ?? 'layout-dashboard'} size={13} />}
+                icon={<Icon name={d.icon ?? "layout-dashboard"} size={13} />}
                 label={d.name}
               />
             ))}
           </div>
         )}
-        <div className="nav-section label">{tr('layout.Sidebar.s_1991e69ece')}</div>
+        <div className="nav-section label">
+          {tr("layout.Sidebar.s_1991e69ece")}
+        </div>
         <Item
           to="/plugins"
           icon={<Puzzle size={16} />}
-          label={tr('layout.Sidebar.s_ff13ef845f')}
+          label={tr("layout.Sidebar.s_ff13ef845f")}
           count={pluginIssues || updates || undefined}
           alert={pluginIssues > 0}
         />
         <Item
           to="/nodes"
           icon={<Server size={16} />}
-          label={tr('layout.Sidebar.s_3293ac18db')}
+          label={tr("layout.Sidebar.s_3293ac18db")}
           count={nodes.data ? `${online}/${nodes.data.length}` : undefined}
           alert={nodeIssues > 0}
         />
         <Item
           to="/events"
           icon={<ScrollText size={16} />}
-          label={tr('layout.Sidebar.s_bb9ac87531')}
+          label={tr("layout.Sidebar.s_bb9ac87531")}
         />
         <Item
           to="/contracts"
           icon={<FileCheck2 size={16} />}
-          label={tr('layout.Sidebar.s_ae73060f94')}
+          label={tr("layout.Sidebar.s_ae73060f94")}
         />
-        <div className="nav-section label">{tr('layout.Sidebar.s_3ac98f278c')}</div>
+        <div className="nav-section label">
+          {tr("layout.Sidebar.s_3ac98f278c")}
+        </div>
         <Item
           to="/access"
           icon={<KeyRound size={16} />}
-          label={tr('layout.Sidebar.s_fefc535f60')}
+          label={tr("layout.Sidebar.s_fefc535f60")}
         />
-        <Item to="/identity" icon={<KeyRound size={16} />} label={tr('polish.keys')} />
-        <Item to="/mcp" icon={<Puzzle size={16} />} label={tr('polish.mcp')} />
+        <Item
+          to="/identity"
+          icon={<KeyRound size={16} />}
+          label={tr("polish.keys")}
+        />
+        <Item to="/mcp" icon={<Puzzle size={16} />} label={tr("polish.mcp")} />
         <Item
           to="/settings"
           icon={<Settings size={16} />}
-          label={tr('layout.Sidebar.s_7f17c7c62a')}
+          label={tr("layout.Sidebar.s_7f17c7c62a")}
         />
       </nav>
-      <Link to="/settings?tab=profile" className="sidebar-foot profile-link" title={tr('profile.title')} onClick={()=>useUi.getState().set({mobileNav:false})}>
+      <Link
+        to="/settings?tab=profile"
+        className="sidebar-foot profile-link"
+        title={tr("profile.title")}
+        onClick={() => useUi.getState().set({ mobileNav: false })}
+      >
         <span className="profile-avatar" aria-hidden="true">
-          {profile.data?.avatar?<img className="profile-avatar-image" src={profile.data.avatar} alt=""/>:<UserRound size={15} />}
+          {profile.data?.avatar ? (
+            <img
+              className="profile-avatar-image"
+              src={profile.data.avatar}
+              alt=""
+            />
+          ) : (
+            <UserRound size={15} />
+          )}
         </span>
-        <span className="sidebar-foot-text col grow" style={{ gap: 0, minWidth: 0 }}>
+        <span
+          className="sidebar-foot-text col grow"
+          style={{ gap: 0, minWidth: 0 }}
+        >
           <span className="truncate" style={{ fontWeight: 500 }}>
-            {profile.data?.name || userName || tr('runtime.noUser')}
+            {profile.data?.name || userName || tr("runtime.noUser")}
           </span>
           <span className="muted" style={{ fontSize: 11 }}>
-            {profile.data?.nickname?'@'+profile.data.nickname:ROLE_LABEL[role]}
-            {role !== 'owner' && tr('layout.Sidebar.s_64fc2b8469')}
+            {profile.data?.nickname
+              ? "@" + profile.data.nickname
+              : ROLE_LABEL[role]}
+            {role !== "owner" && tr("layout.Sidebar.s_64fc2b8469")}
           </span>
         </span>
       </Link>
