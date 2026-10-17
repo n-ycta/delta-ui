@@ -37,5 +37,152 @@
         "media.enqueue"
       ]
     }
+  },
+  {
+    "id": "dev.delta.vector",
+    "name": "Delta Vector",
+    "version": "0.1.0",
+    "icon": "compass",
+    "description": {
+      "en": "Tasks, journal, calendar and practices without streak pressure.",
+      "ru": "Задачи, дневник, календарь и практики без давления серий."
+    },
+    "asset": "https://github.com/n-ycta/delta-vector/releases/download/v0.1.0/delta-vector.delta-app",
+    "sha256": "e084c49a3d2649b5a5a4f6c24cd4fa628c9a69c5d02434b737328b469da2ade5",
+    "runtime": {
+      "execution": "web",
+      "platforms": [
+        "android",
+        "windows",
+        "linux",
+        "macos",
+        "ios",
+        "web"
+      ],
+      "architectures": [
+        "any"
+      ]
+    },
+    "permissions": [
+      "storage.local"
+    ],
+    "grants": [],
+    "intents": {
+      "send": [],
+      "receive": []
+    },
+    "ui": {
+      "version": 1,
+      "surfaces": [
+        {
+          "id": "today",
+          "name": {
+            "en": "Today",
+            "ru": "Сегодня"
+          },
+          "icon": "sun",
+          "kind": "widget",
+          "minWidth": 280,
+          "minHeight": 240,
+          "instance": "shared"
+        },
+        {
+          "id": "capture",
+          "name": {
+            "en": "Quick capture",
+            "ru": "Быстрая запись"
+          },
+          "icon": "plus-circle",
+          "kind": "widget",
+          "minWidth": 280,
+          "minHeight": 240,
+          "instance": "shared"
+        },
+        {
+          "id": "tasks",
+          "name": {
+            "en": "Tasks",
+            "ru": "Задачи"
+          },
+          "icon": "check-square",
+          "kind": "widget",
+          "minWidth": 280,
+          "minHeight": 240,
+          "instance": "shared"
+        },
+        {
+          "id": "journal",
+          "name": {
+            "en": "Journal",
+            "ru": "Дневник"
+          },
+          "icon": "notebook",
+          "kind": "widget",
+          "minWidth": 280,
+          "minHeight": 240,
+          "instance": "shared"
+        },
+        {
+          "id": "calendar",
+          "name": {
+            "en": "Calendar",
+            "ru": "Календарь"
+          },
+          "icon": "calendar-blank",
+          "kind": "widget",
+          "minWidth": 280,
+          "minHeight": 240,
+          "instance": "shared"
+        },
+        {
+          "id": "practices",
+          "name": {
+            "en": "Practices",
+            "ru": "Практики"
+          },
+          "icon": "plant",
+          "kind": "widget",
+          "minWidth": 280,
+          "minHeight": 240,
+          "instance": "shared"
+        },
+        {
+          "id": "projects",
+          "name": {
+            "en": "Projects",
+            "ru": "Проекты"
+          },
+          "icon": "stack",
+          "kind": "widget",
+          "minWidth": 280,
+          "minHeight": 240,
+          "instance": "shared"
+        },
+        {
+          "id": "skills",
+          "name": {
+            "en": "Skills",
+            "ru": "Навыки"
+          },
+          "icon": "graduation-cap",
+          "kind": "widget",
+          "minWidth": 280,
+          "minHeight": 240,
+          "instance": "shared"
+        },
+        {
+          "id": "review",
+          "name": {
+            "en": "Review",
+            "ru": "Обзор"
+          },
+          "icon": "compass",
+          "kind": "widget",
+          "minWidth": 280,
+          "minHeight": 240,
+          "instance": "shared"
+        }
+      ]
+    }
   }
 ]

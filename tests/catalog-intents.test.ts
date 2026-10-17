@@ -37,3 +37,18 @@ test('a current process does not hide an older installed interface update',()=>{
  assert.equal(hasUiUpdate('dev.delta.media',[{id:'dev.delta.media',version:'0.3.3'}],catalog),false);
  assert.equal(hasUiUpdate('dev.delta.media',[],catalog),false);
 });
+
+import {readUiContributions} from '../src/sdk/surfaces';
+test('Vector is in the install catalog with nine composable surfaces and no ambient grants',()=>{
+ const vector=raw.find((a:any)=>a.id==='dev.delta.vector');
+ assert(vector,'A GitHub release alone must not hide Vector from the install catalog');
+ assert.equal(vector.icon,'compass');
+ assert.equal(vector.runtime.execution,'web');
+ assert.match(vector.asset,/\/delta-vector\/releases\/download\/v[^/]+\/delta-vector\.delta-app$/);
+ assert.equal(readCatalog(raw).filter(a=>a.id===vector.id).length,1);
+ const contribution=readUiContributions(vector);
+ assert(contribution);
+ assert.deepEqual(contribution.surfaces.map(s=>s.id),['today','capture','tasks','journal','calendar','practices','projects','skills','review']);
+ assert(contribution.surfaces.every(s=>s.instance==='shared'));
+ assert.deepEqual(vector.grants,[]);
+});
