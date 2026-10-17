@@ -104,9 +104,8 @@ export function LocalMedia() {
     <div className="wb-localmedia">
       <div className="wb-view-actions">
         <h3>{t("files")}</h3>
-        <button onClick={() => input.current?.click()}>
-          <WIcon name="plus" />
-          {t("import")}
+        <button title={t("import")} aria-label={t("import")} onClick={() => input.current?.click()}>
+          <WIcon name="upload-simple" />
         </button>
       </div>
       <input
@@ -224,9 +223,10 @@ export function WebView({ id }: { id: string }) {
         onSubmit={(e) => {
           e.preventDefault();
           try {
-            const u = new URL(draft);
-            if (u.protocol !== "https:" || u.username || u.password)
-              throw Error("HTTPS URL required");
+            const text = draft.trim();
+            const address = /^https:\/\//i.test(text) ? text : /^[\w.-]+\.[a-z]{2,}(?:[/:?#]|$)/i.test(text) ? 'https://' + text : 'https://www.google.com/search?igu=1&q=' + encodeURIComponent(text);
+            const u = new URL(address);
+            if (u.protocol !== "https:" || u.username || u.password) throw Error("HTTPS URL required");
             setUrl(u.href);
             localStorage.setItem(key, u.href);
             setError("");
@@ -236,9 +236,9 @@ export function WebView({ id }: { id: string }) {
         }}
       >
         <input
-          type="url"
+          type="text"
           value={draft}
-          placeholder="https://"
+          placeholder={t("search") + " / https://"}
           aria-label={t("url")}
           onChange={(e) => setDraft(e.target.value)}
         />

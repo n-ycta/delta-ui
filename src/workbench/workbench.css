@@ -1764,3 +1764,22 @@
 .wb .topbar .wb-control-launcher {
   inset: auto;
 }
+/* Canvas gestures never re-render embedded dashboards until pointer release. */
+.wb-canvas-world { will-change: transform; }
+.wb-window { min-height: 200px; box-shadow: none; contain: layout style; }
+.wb-window > header { min-height: 40px; }
+.wb .wb-window-title { display: block; border-radius: 0; cursor: inherit; background: none; padding: 0; }
+.wb-gesturing .wb-window-body { pointer-events: none; }
+.wb-window-edge { position: absolute; z-index: 10; touch-action: none; }
+.wb-window-edge.edge-n, .wb-window-edge.edge-s { height: 6px; left: 10px; right: 10px; cursor: ns-resize; }
+.wb-window-edge.edge-n { top: 0; } .wb-window-edge.edge-s { bottom: 0; }
+.wb-window-edge.edge-e, .wb-window-edge.edge-w { width: 6px; top: 10px; bottom: 10px; cursor: ew-resize; }
+.wb-window-edge.edge-e { right: 0; } .wb-window-edge.edge-w { left: 0; }
+.wb-window-edge:is(.edge-ne,.edge-nw,.edge-se,.edge-sw) { width: 10px; height: 10px; }
+.edge-ne { top: 0; right: 0; cursor: nesw-resize; } .edge-nw { top: 0; left: 0; cursor: nwse-resize; }
+.edge-se { bottom: 0; right: 0; cursor: nwse-resize; } .edge-sw { bottom: 0; left: 0; cursor: nesw-resize; }
+.wb-canvas-menu-backdrop { position: fixed; inset: 0; z-index: 140; }
+.wb-canvas-menu { position: fixed; z-index: 141; width: min(300px, calc(100vw - 16px)); max-height: 370px; overflow: auto; padding: 6px; border: 1px solid var(--rule-strong); border-radius: var(--r-md); background: var(--surface); color: var(--ink); box-shadow: 0 6px 24px #0003; }
+.wb-canvas-menu input { width: 100%; box-sizing: border-box; padding: 8px; background: var(--bg); color: inherit; border: 1px solid var(--rule); border-radius: var(--r-sm); margin-bottom: 6px; }
+.wb-canvas-menu button { display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px; border: 0; border-radius: var(--r-sm); text-align: left; background: none; color: inherit; cursor: pointer; font: inherit; }
+.wb-canvas-menu button:hover, .wb-canvas-menu button:focus-visible { background: var(--hover); }

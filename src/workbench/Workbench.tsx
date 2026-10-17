@@ -354,9 +354,8 @@ export function Workbench({
           <b>{active.name}</b>
         </div>
         <div className="wb-top-actions">
-          <span className="wb-mode">
-            <i />
-            {demo ? t("demo") : live ? t("core") : t("local")}
+          <span className="wb-mode" role="status" aria-label={demo ? t("demo") : live ? t("core") : t("local")} title={demo ? t("demo") : live ? t("core") : t("local")}>
+            <i style={{ background: live ? 'var(--ok)' : 'var(--muted)' }} />
           </span>
           <Button
             icon="plus"

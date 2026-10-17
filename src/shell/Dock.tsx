@@ -92,7 +92,7 @@ export function Dock({ live, peek = false }: { live: boolean; peek?: boolean }) 
     e.preventDefault();
     setMenu({ x: e.clientX, y: e.clientY, l });
   };
-  const position = dock.position === "hidden" ? "bottom" : dock.position;
+  const position = peek ? "left" : dock.position === "hidden" ? "left" : dock.position;
   const appsIn = (k: Launcher["kind"]) => pinned.filter((l) => l.kind === k);
   const groups = [appsIn("console").concat(appsIn("app")), appsIn("desk")].filter((g) => g.length);
   return (

@@ -271,3 +271,13 @@
 .dx-widget-app { flex: 1; min-height: 0; border-radius: var(--r-md); overflow: hidden; }
 /* Overlays anchor to the stage so the global dock (any side, incl. the mobile bar) never covers them. */
 .dx-stage .wb-recovery-dock, .dx-stage > .toasts { position: absolute; }
+/* A revealed hidden dock is vertical too; never inherit the bottom-bar layout. */
+.dx-dock.peek { width: 72px; box-sizing: border-box; flex-direction: column; align-items: stretch; overflow: hidden; }
+.dx-dock.peek[data-labels="false"] { width: 56px; }
+.dx-dock.peek :is(.dx-dock-scroll,.dx-dock-group,.dx-dock-tail) { flex-direction: column; align-items: stretch; }
+.dx-dock.peek .dx-mini { flex-direction: column; max-width: 100%; }
+.dx-dock.peek .dx-mini-text { display: none; }
+.dx-dock :is(.dx-dock-tail,.dx-mini) { flex-shrink: 0; min-width: 0; }
+.dx-dock.peek .dx-launch { flex-direction: column; padding: 6px 2px; }
+.dx-dock.peek .dx-mini-open { display: grid; width: 100%; min-width: 0; padding: 0; }
+.widget-plugin-surfaces { display: grid; grid-template-columns: repeat(auto-fill,minmax(min(200px,100%),1fr)); gap: 6px; padding: 8px; }

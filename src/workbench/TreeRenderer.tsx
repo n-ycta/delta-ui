@@ -1,5 +1,5 @@
+import { Canvas } from "./Canvas";
 import {
-  useState,
   useRef,
   useEffect,
   type ReactNode,
@@ -7,7 +7,6 @@ import {
 } from "react";
 import type { Application, Tree } from "./model";
 import type { WorkbenchProps } from "./Workbench";
-import { Button } from "./WorkbenchControls";
 import { LocalMedia, Notes, WebView, OfflineView } from "./LocalViews";
 import { WIcon } from "./Icon";
 import { t } from "./strings";
@@ -27,9 +26,6 @@ interface TreeProps extends WorkbenchProps {
 export function TreeRenderer(p: TreeProps) {
   const { tree: n, edit, selected, onSelect, onChange } = p;
   const scheme = useResolvedTheme();
-  const [front, setFront] = useState<string | null>(null),
-    [max, setMax] = useState<string | null>(null),
-    [min, setMin] = useState<Set<string>>(new Set());
   const dragCleanup = useRef<(() => void) | undefined>(undefined);
   useEffect(() => () => dragCleanup.current?.(), []);
   const child = (c: Tree) => (
@@ -69,30 +65,6 @@ export function TreeRenderer(p: TreeProps) {
   // During a pointer operation, callbacks must use the freshest draft, not stale parent state.
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
-  const moveCanvas = (e: React.PointerEvent, id: string, resize = false) => {
-    if (n.type !== "canvas") return;
-    const start = n.rects[id] || { x: 24, y: 24, w: 480, h: 360 };
-    drag(e, (dx, dy) => {
-      const rect = resize
-        ? {
-            ...start,
-            w: Math.max(280, Math.min(3000, start.w + dx / n.camera.zoom)),
-            h: Math.max(240, Math.min(3000, start.h + dy / n.camera.zoom)),
-          }
-        : {
-            ...start,
-            x: Math.max(
-              -100000,
-              Math.min(100000, start.x + dx / n.camera.zoom),
-            ),
-            y: Math.max(
-              -100000,
-              Math.min(100000, start.y + dy / n.camera.zoom),
-            ),
-          };
-      onChangeRef.current({ ...n, rects: { ...n.rects, [id]: rect } });
-    });
-  };
   let content: ReactNode;
   const activeTab =
     n.type === "tabs"
@@ -216,151 +188,7 @@ export function TreeRenderer(p: TreeProps) {
         {child(n.children[1])}
       </div>
     );
-  else
-    content = (
-      <div className="wb-canvas">
-        <div className="wb-canvas-controls">
-          <Button
-            icon="minus"
-            label={t("scale")}
-            onClick={() =>
-              onChange({
-                ...n,
-                camera: {
-                  ...n.camera,
-                  zoom: Math.max(0.25, n.camera.zoom - 0.1),
-                },
-              })
-            }
-          />
-          <span>
-            {Math.round(n.camera.zoom * 100)}
-            {"%"}
-          </span>
-          <Button
-            icon="plus"
-            label={t("scale")}
-            onClick={() =>
-              onChange({
-                ...n,
-                camera: { ...n.camera, zoom: Math.min(2, n.camera.zoom + 0.1) },
-              })
-            }
-          />
-          <Button
-            icon="crosshair-simple"
-            label={t("resetView")}
-            onClick={() => onChange({ ...n, camera: { x: 0, y: 0, zoom: 1 } })}
-          />
-        </div>
-        <div
-          className="wb-canvas-pan"
-          aria-label={t("canvas")}
-          onPointerDown={(e) => {
-            if (e.target !== e.currentTarget) return;
-            drag(e, (dx, dy) =>
-              onChangeRef.current({
-                ...n,
-                camera: {
-                  ...n.camera,
-                  x: Math.max(-100000, Math.min(100000, n.camera.x + dx)),
-                  y: Math.max(-100000, Math.min(100000, n.camera.y + dy)),
-                },
-              }),
-            );
-          }}
-        >
-          <div
-            className="wb-canvas-world"
-            style={{
-              transform: `translate(${n.camera.x}px,${n.camera.y}px) scale(${n.camera.zoom})`,
-            }}
-          >
-            {n.children.map((c) => {
-              const r = n.rects[c.id] || { x: 24, y: 24, w: 480, h: 360 };
-              return (
-                <div
-                  key={c.id}
-                  className={"wb-window" + (max === c.id ? " maximized" : "")}
-                  hidden={min.has(c.id) || (!!c.hidden && !edit)}
-                  style={{
-                    left: r.x,
-                    top: r.y,
-                    width: r.w,
-                    height: r.h,
-                    zIndex:
-                      max === c.id
-                        ? 20
-                        : front === c.id
-                          ? 15
-                          : n.children.indexOf(c) + 1,
-                  }}
-                >
-                  <header
-                    onPointerDown={(e) => {
-                      setFront(c.id);
-                      if ((e.target as HTMLElement).closest(".wb-icon-btn"))
-                        return;
-                      moveCanvas(e, c.id);
-                    }}
-                  >
-                    <WIcon name={c.icon} size={18} />
-                    <button
-                      className="wb-window-title"
-                      onClick={() => {
-                        if (edit) onSelect(c.id);
-                      }}
-                    >
-                      {c.title}
-                    </button>
-                    <Button
-                      icon="minus"
-                      label={t("minimize")}
-                      onClick={() => setMin((s) => new Set([...s, c.id]))}
-                    />
-                    <Button
-                      icon={max === c.id ? "corners-in" : "corners-out"}
-                      label={t("maximize")}
-                      onClick={() => setMax(max === c.id ? null : c.id)}
-                    />
-                  </header>
-                  <div className="wb-window-body">{child(c)}</div>
-                  <button
-                    className="wb-resize"
-                    aria-label={t("scale")}
-                    onPointerDown={(e) => moveCanvas(e, c.id, true)}
-                  >
-                    <WIcon name="resize" size={14} />
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-        {min.size > 0 && (
-          <div className="wb-minimized">
-            {n.children
-              .filter((c) => min.has(c.id))
-              .map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() =>
-                    setMin((s) => {
-                      const next = new Set(s);
-                      next.delete(c.id);
-                      return next;
-                    })
-                  }
-                >
-                  <WIcon name={c.icon} />
-                  {c.title}
-                </button>
-              ))}
-          </div>
-        )}
-        {!n.children.length && <div className="wb-empty">{t("noWindows")}</div>}
-      </div>
-    );
+  else content = <Canvas tree={n} palette={p.palette} render={child} onChange={onChange} edit={edit} onSelect={onSelect} />;
   return (
     <section
       className={

@@ -1,3 +1,4 @@
+import { MEDIA_API, pluginApiCall } from "../../sdk/pluginApi";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { appCall } from "../../sdk/apps";
@@ -84,10 +85,8 @@ export function PluginSurface({
         broker = pluginChannel({
           source,
           origin,
-          grants: new Set(),
-          call: async () => {
-            throw Error("forbidden");
-          },
+          grants: new Set(id === 'dev.delta.media' ? MEDIA_API : []),
+          call: request => pluginApiCall(id!, request.capability, request.args || {}),
         });
       brokerRef.current = broker;
       source.postMessage({ type: "delta:initialize", channel: broker.channel, context: presentation.current }, origin);

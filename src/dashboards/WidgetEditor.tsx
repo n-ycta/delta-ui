@@ -1,3 +1,7 @@
+import { useInstalledApps } from "../shell/apps";
+import { useApi } from "../app/ApiContext";
+import { WIcon } from "../workbench/Icon";
+import { s } from "../shell/strings";
 import {Select} from '../ui/Select';
 import { tr } from '../i18n';
 import { BUCKET_INTERVALS } from '../widgets/intervals';
@@ -45,6 +49,7 @@ export function WidgetEditor({
   onClose: () => void;
   onSave: (w: WidgetConfig) => void;
 }) {
+  const apps = useInstalledApps(useApi().mode !== "mock");
   const [cfg, setCfg] = useState<WidgetConfig | null>(initial);
   const [tab, setTab] = useState<'source' | 'viz' | 'style'>('source');
   useEffect(() => {
@@ -68,6 +73,12 @@ export function WidgetEditor({
   const ranked = useMemo(() => (metric ? widgetRegistry.rank(metric) : []), [metric]);
   const colors = useChartColors(cfg?.display.palette);
 
+  const pickApp = (id: string, surface?: string) => {
+    const d = widgetRegistry.get('app')!;
+    setCfg(prev => ({ id: prev?.id ?? uid('w'), type: 'app', typeVersion: d.version,
+      source: { kind: 'system', feed: 'app' }, display: { app: id, surface },
+      layout: prev?.layout ?? { x: 0, y: 9999, ...d.defaultSize } }));
+  };
   const pickMetric = (p: PluginEntry, m: MetricDescriptor) => {
     const w = widgetForMetric(widgetRegistry, p.manifest.id, m);
     const { size, ...rest } = w;
@@ -163,7 +174,13 @@ export function WidgetEditor({
       {tab === 'source' && (
         <div className="col gap-4">
           <div className="label">{tr('dashboards.WidgetEditor.s_0d846d47b3')}</div>
-          {installed.length === 0 && (
+          {apps.map(app => <div className="panel" key={'ui:' + app.id}>
+            <div className="panel-head"><WIcon name={app.icon} size={16} /><span className="panel-title">{app.name}</span><span className="badge">{s('pluginUi')}</span></div>
+            <div className="widget-plugin-surfaces">
+              {[{ id: '', name: app.name, icon: app.icon }, ...app.surfaces].map(surface => <button key={surface.id} className="viz-option" aria-pressed={cfg?.display.app === app.id && (cfg?.display.surface || '') === surface.id} onClick={() => pickApp(app.id, surface.id || undefined)}><WIcon name={surface.icon} size={16} /><span>{surface.name}</span></button>)}
+            </div>
+          </div>)}
+          {installed.length === 0 && apps.length === 0 && (
             <div className="muted">{tr('dashboards.WidgetEditor.s_8095b4c7d7')}</div>
           )}
           {installed.map((p) => (

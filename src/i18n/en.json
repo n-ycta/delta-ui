@@ -2257,7 +2257,7 @@
     "pause": "Pause",
     "play": "Play",
     "next": "Next",
-    "allApps": "All apps",
+    "allApps": "Plugins & desktops",
     "newDesktop": "New desktop",
     "newDesktopShort": "New",
     "open": "Open",
@@ -2317,16 +2317,17 @@
     "density": "Density",
     "comfortable": "Comfortable",
     "compact": "Compact",
-    "apps": "Apps",
+    "apps": "Plugins",
     "desktops": "Desktops",
     "dockTab": "Dock",
     "manager": "Apps and desktops",
     "close": "Close",
-    "widgetApp": "App",
+    "widgetApp": "Plugin interface",
     "widgetAppDesc": "An installed app inside the dashboard",
     "widgetAppPick": "App",
     "widgetAppNone": "No apps installed yet",
     "updateReady": "A new interface version is ready",
-    "reload": "Reload"
+    "reload": "Reload",
+    "pluginUi": "Interface"
   }
 }
