@@ -1,3 +1,4 @@
+import { hasUiUpdate } from '../../shell/plugin-updates';
 import { useInstalledApps, useCatalog } from '../../shell/apps';
 import { appCall } from '../../sdk/apps';
 import { useApi } from '../../app/ApiContext';
@@ -28,12 +29,12 @@ function PluginCard({ p, onOpen, ui, onInstall, onLaunch, uiUpdate, busy }: { p:
       <div className="row" style={{ alignItems: 'flex-start', gap: 12 }}>
         <span className={`plug-icon ${p.validation.compatible ? '' : 'muted'}`}><Icon name={p.manifest.icon} size={17} /></span>
         <div className="col grow" style={{ gap: 1, minWidth: 0 }}>
-          <div className="row" style={{ gap: 6 }}><span style={{ fontWeight: 600 }} className="truncate">{p.manifest.name}</span>{ui && <Badge>{s("pluginUi")}</Badge>}{hasUpdate(p) && <Badge tone="accent">{tr("pages.plugins.PluginsPage.s_6f6312ab93")}{p.instance.latestVersion}</Badge>}</div>
+          <div className="row" style={{ gap: 6 }}><span style={{ fontWeight: 600 }} className="truncate">{p.manifest.name}</span>{ui && <Badge tone={uiUpdate ? "accent" : undefined}>{s("pluginUi")}{uiUpdate ? " ↑" : ""}</Badge>}{hasUpdate(p) && <Badge tone="accent">{tr("pages.plugins.PluginsPage.s_6f6312ab93")}{p.instance.latestVersion}</Badge>}</div>
           <span className="mono faint truncate" style={{ fontSize: 11 }}>{p.manifest.id} {tr("pages.plugins.PluginsPage.s_d3dacf895c")}{p.manifest.version}</span>
         </div>
         <StatusBadge tone={st.tone} label={st.label} pulse={p.instance.status === 'installing' || p.instance.status === 'updating'} />
       </div>
-      {onInstall && <Button icon={<ArrowUpCircle size={14} />} disabled={busy} onClick={e => { e.stopPropagation(); onInstall(); }}>{tr(uiUpdate ? 'apps.update' : 'apps.install')}</Button>}
+      {onInstall && <Button icon={<ArrowUpCircle size={14} />} disabled={busy} onClick={e => { e.stopPropagation(); onInstall(); }}>{tr(uiUpdate || onLaunch ? 'apps.update' : 'apps.install')}</Button>}
       {onLaunch && <Button title={s('pluginUi')} aria-label={s('pluginUi')} onClick={e=>{e.stopPropagation();onLaunch();}}><Icon name="play" size={16}/></Button>}
       <p className="plug-desc">{p.instance.error ? <span style={{ color: 'var(--err)' }}>{p.instance.error.message}</span> : p.manifest.description}</p>
       <div className="plug-foot">
@@ -71,17 +72,19 @@ export function PluginsPage() {
     return { manifest, latest: { ...manifest, version: a.version }, instance: { pluginId: a.id, status: installed ? 'active' : 'available', installedVersion: installed?.version, latestVersion: a.version, nodeIds: [], settings: {}, grantedPermissions: [] }, validation: { ok: true, compatible: true, issues: [], unknownVisualizations: [], unknownCapabilities: [] } } as PluginEntry;
   });
   const all = [...core, ...uiOnly];
+  const uiNeedsUpdate = (id:string) => hasUiUpdate(id,uiInstalled,uiCatalog);
+  const needsUpdate = (p:PluginEntry) => hasUpdate(p) || uiNeedsUpdate(p.manifest.id);
   const open = (p: PluginEntry) => uiOnly.some(a => a.manifest.id === p.manifest.id) ? (isInstalled(p) ? nav('/apps/' + encodeURIComponent(p.manifest.id)) : void installUi(p.manifest.id)) : nav('/plugins/' + encodeURIComponent(p.manifest.id));
   const counts = {
     installed: all.filter(isInstalled).length,
     available: all.filter((p) => !isInstalled(p)).length,
-    updates: all.filter(hasUpdate).length,
+    updates: all.filter(needsUpdate).length,
     issues: all.filter((p) => ['error', 'degraded', 'incompatible'].includes(p.instance.status) || !p.validation.ok).length,
   };
   const list = useMemo(() => all.filter((p) => {
     if (tab === 'installed' && !isInstalled(p)) return false;
     if (tab === 'available' && isInstalled(p)) return false;
-    if (tab === 'updates' && !hasUpdate(p)) return false;
+    if (tab === 'updates' && !needsUpdate(p)) return false;
     if (tab === 'issues' && !(['error', 'degraded', 'incompatible'].includes(p.instance.status) || !p.validation.ok)) return false;
     if (cat && p.manifest.category !== cat) return false;
     if (q) { const t = q.toLowerCase(); return `${p.manifest.name} ${p.manifest.id} ${p.manifest.description} ${p.manifest.metrics.map((m) => m.label).join(' ')}`.toLowerCase().includes(t); }
@@ -112,16 +115,16 @@ export function PluginsPage() {
       {plugins.loading && <SkeletonRows rows={6} h={60} />}
       {plugins.error && !plugins.data && <ErrorState error={plugins.error} onRetry={plugins.refetch} />}
       {plugins.data && list.length === 0 && <div className="panel"><Empty title={q || cat ? tr("pages.plugins.PluginsPage.s_1e1b70b17c") : tab === 'updates' ? tr("pages.plugins.PluginsPage.s_5ab23fd08c") : tab === 'issues' ? tr("pages.plugins.PluginsPage.s_12ef865f61") : tr("pages.plugins.PluginsPage.s_1526c02015")} action={(q || cat) && <Button onClick={() => { setQ(''); setCat(''); }}>{tr("pages.plugins.PluginsPage.s_03ead01c5b")}</Button>} /></div>}
-      {list.length > 0 && view === 'grid' && <div className="catalog">{list.map((p) => <PluginCard key={p.manifest.id} p={p} ui={uiIds.has(p.manifest.id)} busy={!!busy} uiUpdate={uiInstalled.some(a=>a.id===p.manifest.id)} onInstall={uiCatalog.some(a=>a.id===p.manifest.id && !uiInstalled.some(i=>i.id===a.id&&i.version===a.version)) ? () => void installUi(p.manifest.id) : undefined} onLaunch={uiInstalled.some(a=>a.id===p.manifest.id) ? ()=>nav('/apps/'+encodeURIComponent(p.manifest.id)) : undefined} onOpen={() => open(p)} />)}</div>}
+      {list.length > 0 && view === 'grid' && <div className="catalog">{list.map((p) => <PluginCard key={p.manifest.id} p={p} ui={uiIds.has(p.manifest.id)} busy={!!busy} uiUpdate={uiNeedsUpdate(p.manifest.id)} onInstall={uiCatalog.some(a=>a.id===p.manifest.id && !uiInstalled.some(i=>i.id===a.id&&i.version===a.version)) ? () => void installUi(p.manifest.id) : undefined} onLaunch={uiInstalled.some(a=>a.id===p.manifest.id) ? ()=>nav('/apps/'+encodeURIComponent(p.manifest.id)) : undefined} onOpen={() => open(p)} />)}</div>}
       {list.length > 0 && view === 'table' && (
         <div className="panel table-wrap"><table className="t">
           <thead><tr><th>{tr("pages.plugins.PluginsPage.s_f79d7e1e29")}</th><th>{tr("pages.plugins.PluginsPage.s_f7f293b5c5")}</th><th>{tr("pages.plugins.PluginsPage.s_97c248cbe0")}</th><th>{tr("pages.plugins.PluginsPage.s_2ff930d7e7")}</th><th>{tr("pages.plugins.PluginsPage.s_3293ac18db")}</th><th>{tr("pages.plugins.PluginsPage.s_3aeb33af51")}</th><th>{tr("pages.plugins.PluginsPage.s_4e14b19eb5")}</th></tr></thead>
           <tbody>{list.map((p) => (
             <tr key={p.manifest.id} className="clickable" onClick={() => open(p)}>
-              <td><span className="row"><Icon name={p.manifest.icon} size={15} className="muted" /><span className="col" style={{ gap: 0 }}><span style={{ fontWeight: 500 }}>{p.manifest.name}</span><span className="mono faint" style={{ fontSize: 11 }}>{p.manifest.id}</span></span></span></td>
+              <td><span className="row"><Icon name={p.manifest.icon} size={15} className="muted" /><span className="col" style={{ gap: 0 }}><span style={{ fontWeight: 500 }}>{p.manifest.name} {uiIds.has(p.manifest.id) && <Badge>{s('pluginUi')}</Badge>}</span><span className="mono faint" style={{ fontSize: 11 }}>{p.manifest.id}</span></span></span></td>
               <td><StatusBadge {...PLUGIN_STATUS[p.instance.status]} /></td>
               <td className="mono">{p.instance.installedVersion ?? '—'}{hasUpdate(p) && <span style={{ color: 'var(--accent)' }}> {tr("pages.plugins.PluginsPage.s_0d9f4dcfc3")}{p.instance.latestVersion}</span>}</td>
-              <td className="mono">{p.manifest.contract} {!p.validation.compatible && <Badge tone="err">{tr("pages.plugins.PluginsPage.s_0951b9a022")}</Badge>}</td>
+              <td className="mono">{uiNeedsUpdate(p.manifest.id) && <Button disabled={!!busy} title={tr('apps.update')} aria-label={tr('apps.update')} onClick={e=>{e.stopPropagation();void installUi(p.manifest.id);}}><ArrowUpCircle size={15}/></Button>}{p.manifest.contract} {!p.validation.compatible && <Badge tone="err">{tr("pages.plugins.PluginsPage.s_0951b9a022")}</Badge>}</td>
               <td className="num" style={{ textAlign: 'left' }}>{p.instance.nodeIds.length || '—'}</td>
               <td className="num" style={{ textAlign: 'left' }}>{p.manifest.metrics.length}</td>
               <td className="muted">{p.instance.lastSyncAt ? ago(p.instance.lastSyncAt) : '—'}</td>

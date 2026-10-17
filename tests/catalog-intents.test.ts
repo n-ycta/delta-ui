@@ -29,3 +29,11 @@ test("catalog parsing drops malformed intent names and payloads stay plain JSON"
   assert.deepEqual(sanitizePayload({ url: "https://x", f: () => 1, d: undefined }), { url: "https://x" });
   assert.throws(() => sanitizePayload({ big: "x".repeat(70000) }), /payload_too_large/);
 });
+
+import {hasUiUpdate} from '../src/shell/plugin-updates';
+test('a current process does not hide an older installed interface update',()=>{
+ const catalog=[{id:'dev.delta.media',version:'0.3.3'}];
+ assert.equal(hasUiUpdate('dev.delta.media',[{id:'dev.delta.media',version:'0.1.0'}],catalog),true);
+ assert.equal(hasUiUpdate('dev.delta.media',[{id:'dev.delta.media',version:'0.3.3'}],catalog),false);
+ assert.equal(hasUiUpdate('dev.delta.media',[],catalog),false);
+});
