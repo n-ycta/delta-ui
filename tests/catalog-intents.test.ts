@@ -12,16 +12,16 @@ test("reviewed catalog: every asset is checksum-pinned and grant-free", () => {
     assert.deepEqual(a.grants, []);
   }
 });
-test("media intents: sources send, exactly one player receives", () => {
+test("media intents: one UI player, providers are headless", () => {
   const c = readCatalog(raw);
   assert.equal(c.length, raw.length);
   for (const intent of ["media.play", "media.enqueue"]) {
     const receivers = c.filter((a) => a.intents.receive.includes(intent)).map((a) => a.id);
     assert.deepEqual(receivers, ["dev.delta.media"]);
     const senders = c.filter((a) => a.intents.send.includes(intent)).map((a) => a.id).sort();
-    assert.deepEqual(senders, ["dev.delta.soundcloud", "dev.delta.spotify", "dev.delta.youtube"]);
+    assert.deepEqual(senders, []);
   }
-  assert.equal(c.find((a) => a.id === "dev.delta.youtube")?.icon, "youtube-logo");
+  assert.equal(c.some((a) => ["dev.delta.youtube","dev.delta.soundcloud","dev.delta.spotify"].includes(a.id)),false);
 });
 test("catalog parsing drops malformed intent names and payloads stay plain JSON", () => {
   const [a] = readCatalog([{ id: "dev.x.app", intents: { send: ["media.play", "BAD", 3, "x"], receive: "media.play" } }]);

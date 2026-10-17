@@ -468,7 +468,7 @@
     "s_dac966853e": "1 - Source",
     "s_fa562472a3": "2 • Visualization",
     "s_ce6b4ba5bf": "3 · Display",
-    "s_0d846d47b3": "Plugin metrics",
+    "s_0d846d47b3": "Plugins",
     "s_8095b4c7d7": "There are no plugins with metrics installed.",
     "s_9a78211436": "@",
     "s_fb4d324eca": "Systemic",
@@ -2236,7 +2236,8 @@
     "fromTemplate": "From a template",
     "tipAdd": "Edit layout (pencil in the top bar) to add apps and Console pages as panels.",
     "tipEdit": "Drag panel edges to resize; drop tabs to split.",
-    "tipTheme": "Theme, dock and desktops: All apps → Theme."
+    "tipTheme": "Theme, dock and desktops: All apps → Theme.",
+    "media_visualizer": "Visualizer"
   },
   "shell": {
     "theme": "Theme",

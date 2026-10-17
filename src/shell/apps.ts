@@ -35,7 +35,7 @@ export function readInstalled(value: unknown): InstalledApp[] {
   if (!Array.isArray(value)) return [];
   const seen = new Set<string>();
   return value.slice(0, 128).flatMap((v: any) => {
-    if (!v || !ID.test(str(v.id, 120)) || seen.has(v.id)) return [];
+    if (!v || !ID.test(str(v.id, 120)) || seen.has(v.id) || ["dev.delta.youtube","dev.delta.soundcloud","dev.delta.spotify"].includes(v.id)) return [];
     seen.add(v.id);
     const ui = readUiContributions(v);
     const surfaces = (ui?.surfaces || []).map((x) => ({ id: x.id, name: x.name[language] || x.name.en, icon: x.icon }));

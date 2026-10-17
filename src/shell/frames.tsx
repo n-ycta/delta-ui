@@ -15,6 +15,7 @@ interface Slot {
   el: HTMLDivElement;
 }
 interface FramePosition {
+  key: string;
   id: string;
   surface?: string;
   visible: boolean;
@@ -23,6 +24,7 @@ interface FramePosition {
   width: number;
   height: number;
   clip: string;
+  scale: number;
 }
 interface Running {
   running: string[];
@@ -42,6 +44,7 @@ const FrameContext = createContext<FrameApi | null>(null);
 /** Desktops render some views in separate React roots; they reach the one host through this. */
 let activeHost: FrameApi | null = null;
 export function FrameHost({ children }: { children: ReactNode }) {
+  const nodes = useRef(new Map<string,HTMLDivElement>());
   const slots = useRef<Slot[]>([]),
     preferred = useRef<HTMLDivElement | null>(null);
   const running = useRunningApps((s) => s.running);
@@ -83,24 +86,33 @@ export function FrameHost({ children }: { children: ReactNode }) {
       lastTime = 0;
     const measure = (time: number) => {
       handle = requestAnimationFrame(measure);
-      if (time - lastTime < 50) return;
+      if (time - lastTime < 12) return;
       lastTime = time;
       setFrames((old) => {
-        const next = runningRef.current.map((id) => {
+        const keys = new Map<string, { id: string; surface?: string }>();
+        for (const id of runningRef.current) {
+          const own = slots.current.filter(x => x.id === id);
+          if (!own.length && !old.some(f=>f.id===id)) keys.set(id, { id });
+          for (const x of own) keys.set(x.id + (x.surface ? '#' + x.surface : ''), { id:x.id, surface:x.surface });
+        }
+        for (const f of old) if (runningRef.current.includes(f.id) && !keys.has(f.key)) keys.set(f.key, {id:f.id,surface:f.surface});
+        const next = [...keys].map(([key, {id, surface}]) => {
           const candidates = slots.current.filter(
-            (x) => x.id === id && !x.el.closest("[hidden]") && x.el.getClientRects().length,
+            (x) => x.id === id && x.surface === surface && !x.el.closest("[hidden]") && x.el.getClientRects().length,
           );
           const slot = candidates.find((x) => x.el === preferred.current) || candidates[0];
-          const prior = old.find((f) => f.id === id);
+          const prior = old.find((f) => f.key === key);
           if (!slot)
             return prior
               ? { ...prior, visible: false }
-              : { id, visible: false, left: 0, top: 0, width: 0, height: 0, clip: "inset(0)" };
+              : { key, id, surface, visible: false, left: 0, top: 0, width: 0, height: 0, clip: "inset(0)", scale: 1 };
           const r = slot.el.getBoundingClientRect();
-          let left = Math.max(r.left, 0),
-            right = Math.min(r.right, innerWidth),
+          const scale = r.width / Math.max(1,slot.el.offsetWidth);
+          const edge = slot.el.closest(".wb-window") ? 6*scale : 0;
+          let left = Math.max(r.left+edge, 0),
+            right = Math.min(r.right-edge, innerWidth),
             top = Math.max(r.top, 0),
-            bottom = Math.min(r.bottom, innerHeight);
+            bottom = Math.min(r.bottom-edge, innerHeight);
           let parent = slot.el.parentElement;
           while (parent) {
             const st = getComputedStyle(parent);
@@ -114,17 +126,22 @@ export function FrameHost({ children }: { children: ReactNode }) {
             parent = parent.parentElement;
           }
           return {
+            key,
             id,
             surface: slot.surface,
             visible: right > left && bottom > top,
             left: r.left,
             top: r.top,
-            width: r.width,
-            height: r.height,
-            clip: `inset(${Math.max(0, top - r.top)}px ${Math.max(0, r.right - right)}px ${Math.max(0, r.bottom - bottom)}px ${Math.max(0, left - r.left)}px)`,
+            width: slot.el.offsetWidth,
+            height: slot.el.offsetHeight,
+            scale,
+            clip: `inset(${Math.max(0, (top - r.top)/scale)}px ${Math.max(0, (r.right - right)/scale)}px ${Math.max(0, (r.bottom - bottom)/scale)}px ${Math.max(0, (left - r.left)/scale)}px)`,
           };
         });
-        const serial = JSON.stringify(next);
+        for(const f of next){const el=nodes.current.get(f.key);if(el){
+          Object.assign(el.style,{left:f.left+'px',top:f.top+'px',width:f.width+'px',height:f.height+'px',clipPath:f.clip,transform:`scale(${f.scale})`,transformOrigin:'top left'});
+        }}
+        const serial = JSON.stringify(next.map(({key,id,surface,visible})=>({key,id,surface,visible})));
         if (serial === last) return old;
         last = serial;
         return next;
@@ -139,10 +156,11 @@ export function FrameHost({ children }: { children: ReactNode }) {
       <div className="dx-frames" aria-hidden={frames.every((f) => !f.visible) || undefined}>
         {frames.map((f) => (
           <div
-            key={f.id + ":" + (revisions[f.id] || 0)}
+            key={f.key + ":" + (revisions[f.id] || 0)}
+            ref={el=>{if(el)nodes.current.set(f.key,el);else nodes.current.delete(f.key);}}
             hidden={!f.visible}
             className="wb-plugin-overlay wb-system-surface dx-frame"
-            style={{ position: "fixed", left: f.left, top: f.top, width: f.width, height: f.height, clipPath: f.clip, zIndex: 15 }}
+            style={{ position: "fixed", left: f.left, top: f.top, width: f.width, height: f.height, clipPath: f.clip, transform:`scale(${f.scale})`, transformOrigin:"top left", zIndex: 15 }}
           >
             <PluginSurface id={f.id} surface={f.surface} inline />
           </div>

@@ -20,7 +20,7 @@ export const CATEGORY_LABEL: Record<PluginCategory, string> = { input: tr("pages
 
 type Tab = 'installed' | 'available' | 'updates' | 'issues';
 
-function PluginCard({ p, onOpen, ui, onInstall, busy }: { p: PluginEntry; onOpen: () => void; ui?: boolean; onInstall?: () => void; busy?: boolean }) {
+function PluginCard({ p, onOpen, ui, onInstall, onLaunch, uiUpdate, busy }: { p: PluginEntry; onOpen: () => void; ui?: boolean; onInstall?: () => void; onLaunch?: () => void; uiUpdate?: boolean; busy?: boolean }) {
   const st = PLUGIN_STATUS[p.instance.status];
   const warn = p.validation.issues.filter((i) => i.severity !== 'info').length;
   return (
@@ -33,7 +33,8 @@ function PluginCard({ p, onOpen, ui, onInstall, busy }: { p: PluginEntry; onOpen
         </div>
         <StatusBadge tone={st.tone} label={st.label} pulse={p.instance.status === 'installing' || p.instance.status === 'updating'} />
       </div>
-      {onInstall && <Button icon={<ArrowUpCircle size={14} />} disabled={busy} onClick={e => { e.stopPropagation(); onInstall(); }}>{tr('apps.install')}</Button>}
+      {onInstall && <Button icon={<ArrowUpCircle size={14} />} disabled={busy} onClick={e => { e.stopPropagation(); onInstall(); }}>{tr(uiUpdate ? 'apps.update' : 'apps.install')}</Button>}
+      {onLaunch && <Button title={s('pluginUi')} aria-label={s('pluginUi')} onClick={e=>{e.stopPropagation();onLaunch();}}><Icon name="play" size={16}/></Button>}
       <p className="plug-desc">{p.instance.error ? <span style={{ color: 'var(--err)' }}>{p.instance.error.message}</span> : p.manifest.description}</p>
       <div className="plug-foot">
         <span>{CATEGORY_LABEL[p.manifest.category]}</span>{tr("pages.plugins.PluginsPage.s_1fdf0d90c3")}<span>{p.manifest.metrics.length} {tr("pages.plugins.PluginsPage.s_dbed049336")}</span>
@@ -54,7 +55,7 @@ export function PluginsPage() {
   const [busy, setBusy] = useState(''), [operationError, setOperationError] = useState('');
   const installUi = async (id: string) => {
     setBusy(id); setOperationError('');
-    try { await appCall('host.apps_install', { id }); window.dispatchEvent(new CustomEvent('delta:apps-changed', { detail: { id } })); }
+    try { await appCall('host.apps_install', { id, replace: uiInstalled.some(a=>a.id===id) }); window.dispatchEvent(new CustomEvent('delta:apps-changed', { detail: { id } })); }
     catch (e) { setOperationError((e as Error).message); } finally { setBusy(''); }
   };
   const [params, setParams] = useSearchParams();
@@ -111,7 +112,7 @@ export function PluginsPage() {
       {plugins.loading && <SkeletonRows rows={6} h={60} />}
       {plugins.error && !plugins.data && <ErrorState error={plugins.error} onRetry={plugins.refetch} />}
       {plugins.data && list.length === 0 && <div className="panel"><Empty title={q || cat ? tr("pages.plugins.PluginsPage.s_1e1b70b17c") : tab === 'updates' ? tr("pages.plugins.PluginsPage.s_5ab23fd08c") : tab === 'issues' ? tr("pages.plugins.PluginsPage.s_12ef865f61") : tr("pages.plugins.PluginsPage.s_1526c02015")} action={(q || cat) && <Button onClick={() => { setQ(''); setCat(''); }}>{tr("pages.plugins.PluginsPage.s_03ead01c5b")}</Button>} /></div>}
-      {list.length > 0 && view === 'grid' && <div className="catalog">{list.map((p) => <PluginCard key={p.manifest.id} p={p} ui={uiIds.has(p.manifest.id)} busy={!!busy} onInstall={uiOnly.some(a => a.manifest.id === p.manifest.id) && !isInstalled(p) ? () => void installUi(p.manifest.id) : undefined} onOpen={() => open(p)} />)}</div>}
+      {list.length > 0 && view === 'grid' && <div className="catalog">{list.map((p) => <PluginCard key={p.manifest.id} p={p} ui={uiIds.has(p.manifest.id)} busy={!!busy} uiUpdate={uiInstalled.some(a=>a.id===p.manifest.id)} onInstall={uiCatalog.some(a=>a.id===p.manifest.id && !uiInstalled.some(i=>i.id===a.id&&i.version===a.version)) ? () => void installUi(p.manifest.id) : undefined} onLaunch={uiInstalled.some(a=>a.id===p.manifest.id) ? ()=>nav('/apps/'+encodeURIComponent(p.manifest.id)) : undefined} onOpen={() => open(p)} />)}</div>}
       {list.length > 0 && view === 'table' && (
         <div className="panel table-wrap"><table className="t">
           <thead><tr><th>{tr("pages.plugins.PluginsPage.s_f79d7e1e29")}</th><th>{tr("pages.plugins.PluginsPage.s_f7f293b5c5")}</th><th>{tr("pages.plugins.PluginsPage.s_97c248cbe0")}</th><th>{tr("pages.plugins.PluginsPage.s_2ff930d7e7")}</th><th>{tr("pages.plugins.PluginsPage.s_3293ac18db")}</th><th>{tr("pages.plugins.PluginsPage.s_3aeb33af51")}</th><th>{tr("pages.plugins.PluginsPage.s_4e14b19eb5")}</th></tr></thead>

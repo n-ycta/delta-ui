@@ -20,7 +20,10 @@ jobs:
         run: |
           npm run dev -- --host 127.0.0.1 --port 5190 > /tmp/workbench-vite.log 2>&1 &
           PID=$!
-          trap 'kill "$PID"' EXIT
+          node tests/serve-media-fixture.mjs > /tmp/media-fixture.log 2>&1 &
+          MEDIA_PID=$!
+          trap 'kill "$PID" "$MEDIA_PID"' EXIT
+          for n in $(seq 1 60); do curl -fsS http://127.0.0.1:5193/index.html >/dev/null && break || sleep 1; done
           for n in $(seq 1 40); do curl -fsS http://127.0.0.1:5190/workbench.html >/dev/null && break || sleep 1; done
           export DELTA_TEST_OUTPUT="$RUNNER_TEMP/delta-workbench"
           export CHROMIUM_PATH=$(node --input-type=module -e "import {chromium} from 'playwright'; console.log(chromium.executablePath())")
@@ -28,6 +31,8 @@ jobs:
           node tests/workbench-parity.browser.mjs
           node tests/workbench-customize.browser.mjs
           node tests/workbench-controls.browser.mjs
+          node tests/canvas-interactions.browser.mjs
+          node tests/plugin-widget.browser.mjs
       - uses: actions/upload-artifact@v4
         with:
           name: delta-ui-bundled-preview

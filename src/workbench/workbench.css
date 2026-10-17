@@ -1783,3 +1783,10 @@
 .wb-canvas-menu input { width: 100%; box-sizing: border-box; padding: 8px; background: var(--bg); color: inherit; border: 1px solid var(--rule); border-radius: var(--r-sm); margin-bottom: 6px; }
 .wb-canvas-menu button { display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px; border: 0; border-radius: var(--r-sm); text-align: left; background: none; color: inherit; cursor: pointer; font: inherit; }
 .wb-canvas-menu button:hover, .wb-canvas-menu button:focus-visible { background: var(--hover); }
+
+/* Controls open as a compact anchored popover, never push the layout sideways. */
+.wb-control-launcher { position:relative; }
+.wb-control-launcher .wb-launcher-menu { position:absolute; right:0; bottom:calc(100% + 8px); z-index:100; }
+.wb-console-actions .wb-launcher-menu { bottom:auto; top:calc(100% + 8px); }
+.wb-tree-tabs { border-radius:var(--wb-radius); overflow:hidden; }
+.wb-tree-tabs > .wb-tabs-body { border-radius:0 0 var(--wb-radius) var(--wb-radius); }

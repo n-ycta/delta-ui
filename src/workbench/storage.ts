@@ -4,6 +4,18 @@ const MIGRATED = "delta.workbench.v2-apps";
 /** v2: Console and Media are apps, not desktops. Drop untouched v1 starters once. */
 function migrate(state: Workspace): Workspace {
   try {
+    if(!localStorage.getItem('delta.workbench.media-panels-v3')){
+      state={...state,apps:state.apps.map(a=>{
+        if(a.template!=='media'||a.root.type!=='split'||a.root.children.length!==2)return a;
+        const original=a.root.children.find(n=>n.type==='view'&&n.kind==='plugin'&&n.target==='dev.delta.media');
+        const note=a.root.children.find(n=>n.type==='view'&&n.kind==='notes');
+        if(!original||!note)return a;
+        const root=template('media').root;
+        if(root.type==='canvas'){root.children.push(note);root.rects[note.id]={x:24,y:1164,w:560,h:320};}
+        return {...a,root};
+      })};
+      localStorage.setItem('delta.workbench.media-panels-v3','1');
+    }
     if (localStorage.getItem(MIGRATED)) return state;
     localStorage.setItem(MIGRATED, "1");
   } catch {

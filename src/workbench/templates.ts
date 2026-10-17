@@ -61,9 +61,15 @@ export function template(which: TemplateName): Application {
     };
   }
   if (which === "media") {
-    const m = view("plugin", t("media"), "music-notes", "dev.delta.media"),
-      n = view("notes", t("notes"), "note-pencil");
-    base.root = { id: uid(), title: t("media"), icon: base.icon, type: "split", axis: "row", ratio: 0.72, children: [m, n] };
+    const panels = [
+      view('plugin', t('media'), 'play-circle', 'dev.delta.media#player'),
+      view('plugin', t('media_playlists'), 'playlist', 'dev.delta.media#playlists'),
+      view('plugin', t('media_queue'), 'queue', 'dev.delta.media#queue'),
+      view('plugin', t('media_stats'), 'chart-bar', 'dev.delta.media#stats'),
+      view('plugin', t('media_visualizer'), 'waveform', 'dev.delta.media#visualizer'),
+    ];
+    base.root = { id:uid(), title:t('media'), icon:base.icon, type:'canvas', camera:{x:0,y:0,zoom:1}, children:panels,
+      rects:Object.fromEntries(panels.map((p,i)=>[p.id,{x:24+(i%2)*584,y:24+Math.floor(i/2)*380,w:560,h:356}])) };
   }
   if (which === "overview") {
     const h = view("system", t("summary"), "gauge", "/fragments/summary"),
@@ -80,7 +86,7 @@ export function template(which: TemplateName): Application {
       icon: base.icon,
       type: "tabs",
       active: m.id,
-      children: [m, w],
+      children: [m, view("system", t("events"), "pulse", "/events"), w],
     };
     base.root = {
       id: uid(),
