@@ -1,4 +1,4 @@
-import { MEDIA_API, pluginApiCall } from "../../sdk/pluginApi";
+import { pluginGrants, pluginApiCall } from "../../sdk/pluginApi";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { appCall } from "../../sdk/apps";
@@ -85,7 +85,7 @@ export function PluginSurface({
         broker = pluginChannel({
           source,
           origin,
-          grants: new Set(id === 'dev.delta.media' ? MEDIA_API : []),
+          grants: new Set(pluginGrants(id)),
           call: request => pluginApiCall(id!, request.capability, request.args || {}),
         });
       brokerRef.current = broker;

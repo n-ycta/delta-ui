@@ -8,7 +8,7 @@ export function pluginChannel(options: { source: Window; origin: string; grants:
   if(typeof id!=='string'||id.length>80) return;
   let reply:unknown;
   try {validateRequest(request);if(request.node||!options.grants.has(request.capability))throw Error('forbidden');if(active>=4)throw Error('busy');active++;try{reply={ok:true,result:await options.call(request)}}finally{active--}}
-  catch(e){reply={ok:false,error:{code:e instanceof Error&&['forbidden','busy','invalid_request'].includes(e.message)?e.message:'operation_failed'}}}
+  catch(e){const safe=['forbidden','busy','invalid_request','conflict','not_found','bad_request','capacity','unavailable'];const value=e instanceof Error?((e as Error & {code?:string}).code||e.message):'';reply={ok:false,error:{code:safe.includes(value)?value:'operation_failed'}}}
   if(!revoked)options.source.postMessage({channel:nonce,id,...(reply as object)},options.origin==='null'?'*':options.origin);
  };
  window.addEventListener('message',receive);

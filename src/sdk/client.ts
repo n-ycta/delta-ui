@@ -57,6 +57,12 @@ export function applyThemeTokens(tokens: ThemeTokens | undefined, root: HTMLElem
     if (typeof v === "number" && v >= 0 && v <= 40) set("r-" + k, v + "px");
   }
   if (typeof tokens.border === "number" && tokens.border >= 0 && tokens.border <= 4) set("border", tokens.border + "px");
+  if(tokens.type && Number.isFinite(tokens.type.base) && tokens.type.base>=10 && tokens.type.base<=24 && Number.isFinite(tokens.type.scale) && tokens.type.scale>=1 && tokens.type.scale<=2){
+    const b=tokens.type.base-(tokens.density==='compact'?.5:0),scale=tokens.type.scale;
+    const sizes={xs:b-2.5,sm:b-1.5,md:b-.5,lg:b*1.1,xl:b*scale*1.15,'2xl':b*scale**2*1.2,num:b*scale**3*1.2};
+    for(const [k,v]of Object.entries(sizes))set('fs-'+k,Math.round(v*10)/10+'px');
+    if(Number.isFinite(tokens.type.lh)&&tokens.type.lh>=1&&tokens.type.lh<=2)set('lh',String(tokens.type.lh));
+  }
   if (tokens.type && typeof tokens.type.headingWeight === "number") set("heading-weight", String(tokens.type.headingWeight));
   if (tokens.type && /^(none|uppercase)$/.test(tokens.type.headingCase)) set("heading-case", tokens.type.headingCase);
   if (tokens.type && /^-?[0-9.]+(em)?$/.test(tokens.type.headingTracking)) set("heading-tracking", tokens.type.headingTracking);

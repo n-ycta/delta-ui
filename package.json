@@ -11,7 +11,7 @@
     "typecheck": "tsc -b --noEmit",
     "test": "tsx tests/run.ts && npm run test:host && npm run test:workbench",
     "test:i18n": "node scripts/check-i18n.cjs && node scripts/check-locales.cjs",
-    "test:host": "tsx --test tests/host-channel.test.ts tests/native-projection.test.ts tests/native-navigation.test.ts tests/compatibility.test.ts tests/auth-errors.test.ts",
+    "test:host": "tsx --test tests/host-channel.test.ts tests/native-projection.test.ts tests/native-navigation.test.ts tests/compatibility.test.ts tests/auth-errors.test.ts tests/vector-grants.test.ts",
     "test:navigation": "node tests/native-navigation.browser.mjs",
     "test:onboarding": "node tests/native-onboarding.browser.mjs",
     "test:language": "node tests/language-settings.browser.mjs",
@@ -45,7 +45,8 @@
     "react-router-dom": "^7.18.4",
     "recharts": "^2.12.7",
     "zod": "^3.23.8",
-    "zustand": "^4.5.5"
+    "zustand": "^4.5.5",
+    "@phosphor-icons/core": "^2.1.1"
   },
   "devDependencies": {
     "@types/d3-hierarchy": "^3.1.7",
@@ -67,7 +68,10 @@
     "./sdk": "./src/sdk/channel.ts",
     "./package.json": "./package.json",
     "./sdk/client": "./src/sdk/client.ts",
-    "./sdk/surfaces": "./src/sdk/surfaces.ts"
+    "./sdk/surfaces": "./src/sdk/surfaces.ts",
+    "./sdk/styles.css": "./src/sdk/styles.css",
+    "./sdk/controls": "./src/sdk/controls.ts",
+    "./sdk/icons": "./src/sdk/icons.ts"
   },
   "files": [
     "src",

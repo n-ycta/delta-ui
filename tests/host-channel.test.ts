@@ -19,3 +19,5 @@ test('plugin channel limits concurrent calls and sanitizes internal errors',asyn
 test('bridge request refuses oversized payloads',()=>{assert.throws(()=>validateRequest({capability:'demo.read',args:{data:'x'.repeat(70000)}}),/invalid_request/)});
 
 test('JS contract matches Rust capability segments and rejects an empty target',()=>{for(const request of [{capability:'core.Info'},{capability:'core..info'},{capability:'core.'+'a'.repeat(49)},{capability:'core.info',node:''}])assert.throws(()=>validateRequest(request),/invalid_request/)});
+
+test('broker preserves safe conflict codes but never internal error messages',async()=>{for(const [err,expected] of [[Object.assign(Error('private detail'),{code:'conflict'}),'conflict'],[Error('secret backend URL'),'operation_failed']] as const){const f=fixture(async()=>{throw err});try{f.send();await tick();assert.equal(f.messages[0][0].error.code,expected);assert(!JSON.stringify(f.messages).includes('private detail'));assert(!JSON.stringify(f.messages).includes('backend URL'))}finally{f.close()}}});
