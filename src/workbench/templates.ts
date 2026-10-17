@@ -8,8 +8,8 @@ import {
 } from "./model";
 import { t } from "./strings";
 /** Gallery order. "console" stays loadable for older layouts but is no longer a desktop: the Console is an app. */
-export const templateNames = ["home", "studio", "canvas", "media", "overview"] as const;
-export type TemplateName = (typeof templateNames)[number] | "console";
+export const templateNames = ["home", "studio", "canvas", "overview"] as const;
+export type TemplateName = (typeof templateNames)[number] | "console" | "media";
 export function template(which: TemplateName): Application {
   const base: Application = {
     home: { ...defaultHome },
@@ -85,7 +85,7 @@ export function template(which: TemplateName): Application {
       title: t("studio"),
       icon: base.icon,
       type: "tabs",
-      active: m.id,
+      active: w.id,
       children: [m, view("system", t("events"), "pulse", "/events"), w],
     };
     base.root = {

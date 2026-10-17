@@ -7,13 +7,13 @@ import { useRuntimeAccess, toast } from '../app/stores';
 import { Button, Panel, Switch, Field, Badge } from '../ui/primitives';
 import { Confirm } from '../ui/overlays';
 import type { UpdateSettings } from '../api/updates';
-const text = (code?: string) => tr('updates.' + (code || 'operation_failed'));
+const text = (code?: string) => { try { return tr('updates.' + (code || 'operation_failed')); } catch { return tr('updates.operation_failed'); } };
 export function Updates() {
   const api = useApi(),
     owner = useRuntimeAccess((s) => s.scopes.includes('admin'));
   const live = api.mode === 'http';
   const q = useQuery(live && owner ? 'updates' : null, (a) => a.updateStatus(), {
-    refetchMs: 3000,
+    refetchMs: 1000,
   });
   const [draft, setDraft] = useState<UpdateSettings | null>(null),
     [target, setTarget] = useState<string | null>(null),
@@ -48,7 +48,7 @@ export function Updates() {
   if (!q.data || !draft) return <Panel>{tr('updates.loading')}</Panel>;
   const state = q.data,
     job = state.job,
-    busy = job && ['queued', 'running'].includes(job.status),
+    busy = install.pending || !!(job && ['queued', 'running'].includes(job.status)),
     available = state.items.filter((i) => i.available && !i.blocked),
     dirty = JSON.stringify(draft) !== JSON.stringify(state.settings),
     webUpdated =
@@ -75,6 +75,7 @@ export function Updates() {
           <Button
             variant="primary"
             icon={<Download size={16} />}
+            loading={install.pending}
             disabled={!available.length || !!busy}
             onClick={() => setTarget('all')}
           >
@@ -101,17 +102,22 @@ export function Updates() {
           </div>
         )}
       </Panel>
+      {install.pending && <div className="banner warn update-progress" role="status">{tr('updates.starting')}</div>}
       <Panel title={tr('updates.components')}>
         <div className="updates-items">
-          {state.items.map((i) => (
+          {[...new Set(state.items.map(i => i.nodeId || 'local'))].map(nodeId => {
+            const items = state.items.filter(i => (i.nodeId || 'local') === nodeId);
+            const updates = items.filter(i => i.available && !i.blocked).length;
+            return <details className="update-node" key={nodeId} open={updates > 0}>
+              <summary><strong>{items[0].nodeName || items[0].nodeId || tr('updates.localNode')}</strong>
+                <span>{tr('updates.componentCount', {count:items.length})}</span>
+                <Badge>{updates ? tr('updates.updateCount', {count:updates}) : tr('updates.current')}</Badge>
+              </summary>
+              {items.map((i) => (
             <div key={i.target || i.id} className="update-item">
               <div className="grow" style={{ minWidth: 0 }}>
                 <strong>{i.name}</strong>
-                {i.nodeId && (
-                  <div className="muted" style={{ overflowWrap: 'anywhere' }}>
-                    {i.nodeName || i.nodeId}
-                  </div>
-                )}
+
                 <div className="mono muted">
                   {i.installed || tr('updates.version_unknown')}
                   {i.available ? ' → ' + i.latest : ''}
@@ -138,10 +144,13 @@ export function Updates() {
                 </Button>
               )}
             </div>
-          ))}
+              ))}
+            </details>;
+          })}
         </div>
       </Panel>
       {job && (
+        <section className={'update-progress ' + (busy ? 'is-active' : '')} aria-live="polite">
         <Panel title={tr('updates.progress')}>
           <div role="status">
             <strong>{text(job.status)}</strong>
@@ -156,7 +165,7 @@ export function Updates() {
                 {i.latest}
               </span>
               <span>
-                {text(i.status)}
+                {text(i.status === 'pending' && !busy ? 'skipped' : i.status)}
                 {i.phase ? ' · ' + text(i.phase) : ''}
               </span>
             </div>
@@ -172,6 +181,7 @@ export function Updates() {
             </Button>
           )}
         </Panel>
+        </section>
       )}
       <Panel title={tr('updates.preferences')}>
         <div className="form-row">
@@ -247,6 +257,13 @@ export function Updates() {
             onChange={(v) => set({ autoRemote: v })}
           />
         </div>
+        {state.settings.parallelNodes !== undefined && <div className="form-row">
+          <div>{tr('updates.parallelNodes')}<div className="field-help">{tr('updates.parallelHelp')}</div></div>
+          <select className="input" aria-label={tr('updates.parallelNodes')} value={draft.parallelNodes || 1}
+            onChange={e => set({parallelNodes:Number(e.target.value)})}>
+            {[1,2,3].map(n => <option key={n} value={n}>{n}</option>)}
+          </select>
+        </div>}
         <Button
           disabled={
             !dirty ||

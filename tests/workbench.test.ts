@@ -102,3 +102,29 @@ test("targeted edits preserve unrelated nodes and do not alter permissions", () 
   assert.equal(updated.children[1], other);
   assert(!JSON.stringify(updated).includes("token"));
 });
+
+import { snapRect } from '../src/workbench/snapping';
+test('canvas snaps edges and centers at screen-pixel threshold, resize and Alt bypass',()=>{
+ const other={x:600,y:400,w:300,h:200};
+ for(const zoom of [.5,1,2]){
+  const input={x:600-280+6/zoom,y:90,w:280,h:200};
+  const got=snapRect(input,[other],zoom);
+  assert.equal(got.rect.x,320);assert(got.guides.some(g=>g.axis==='x'));
+  assert.deepEqual(snapRect(input,[other],zoom,'',true),{rect:input,guides:[]});
+  assert.equal(snapRect({x:0,y:0,w:600-6/zoom,h:200},[other],zoom,'e').rect.w,600);
+ }
+ assert.equal(snapRect({x:350,y:100,w:280,h:200},[other]).guides.length,0);
+});
+
+test('duplicate app desktop migration backs up raw data and preserves custom layouts',async()=>{
+ const {loadWorkspace}=await import('../src/workbench/storage');
+ const values=new Map<string,string>();
+ Object.defineProperty(globalThis,'localStorage',{configurable:true,value:{getItem:(k:string)=>values.get(k)||null,setItem:(k:string,v:string)=>values.set(k,v)}});
+ const original=starters();
+ const consoleApp=template('console'),mediaApp=template('media');
+ consoleApp.root=view('system','Console','terminal','/console');mediaApp.root=view('plugin','Media','play','dev.delta.media');
+ const custom=template('media');custom.name='My custom panels';
+ original.apps.push(consoleApp,mediaApp,custom);original.active=mediaApp.id;
+ const raw=JSON.stringify(original);values.set('delta.workbench.v1',raw);values.set('delta.workbench.v2-apps','1');
+ const result=loadWorkspace();assert.equal(result.recovered,false);assert(!result.state.apps.some(a=>a.id===consoleApp.id||a.id===mediaApp.id));assert(result.state.apps.some(a=>a.id===custom.id));assert.equal(values.get('delta.workbench.v1.before-app-duplicates-v4'),raw);assert.equal(loadWorkspace().state.apps.length,result.state.apps.length);
+});

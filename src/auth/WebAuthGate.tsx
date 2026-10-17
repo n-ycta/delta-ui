@@ -1,4 +1,4 @@
-import { authError } from "./errors";
+import { authError, sessionRejected } from "./errors";
 import { NativeOnboarding } from "../host/NativeOnboarding";
 import { useEffect, useState, type ReactNode } from "react";
 import { LockKeyhole } from "../ui/icons";
@@ -40,6 +40,12 @@ function Gate({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
+  // A plugin restart is not a logout. Retry quickly while retaining the shell.
+  useEffect(() => {
+    if (!info.error || sessionRejected(info.error)) return;
+    const timer = setInterval(() => { if (document.visibilityState === 'visible') info.refetch(); }, 1000);
+    return () => clearInterval(timer);
+  }, [info.error]);
   useEffect(() => {
     const exchange = () => {
       const params = new URLSearchParams(location.hash.split("?")[1] || ""),
@@ -71,7 +77,16 @@ function Gate({ children }: { children: ReactNode }) {
         </div>
       </main>
     );
-  if (info.data?.principal && !info.error) return <>{children}</>;
+  if (info.data?.principal && !sessionRejected(info.error)) return <>
+    {children}
+    {info.error && <div className="auth-reconnecting banner warn" role="status">{tr('auth.reconnecting')}</div>}
+  </>;
+  if (info.error && !sessionRejected(info.error) && !setupError) return (
+    <main className="auth-page"><div className="auth-card" role="status">
+      <h1>{tr('auth.reconnecting')}</h1><p>{tr('auth.reconnectHelp')}</p>
+      <Button onClick={info.refetch}>{tr('updates.retry')}</Button>
+    </div></main>
+  );
   return (
     <SignIn
       error={
@@ -79,7 +94,7 @@ function Gate({ children }: { children: ReactNode }) {
         (info.error &&
         !["unauthorized", "forbidden"].includes(info.error.code) &&
         ![401, 403].includes(info.error.status)
-          ? info.error.message
+          ? authError(info.error)
           : "")
       }
       retry={info.refetch}

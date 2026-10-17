@@ -40,7 +40,20 @@ export function loadWorkspace(): { state: Workspace; recovered: boolean } {
       } catch {}
       return { state: starters(), recovered: false };
     }
-    return { state: migrate(validateWorkspace(JSON.parse(raw))), recovered: false };
+    const parsed=validateWorkspace(JSON.parse(raw));
+    let next=migrate(parsed);
+    if(!localStorage.getItem('delta.workbench.app-duplicates-v4')) {
+      const apps=next.apps.filter(a=>!(a.root.type==='view'&&((a.root.kind==='system'&&a.root.target==='/console')||(a.root.kind==='plugin'&&a.root.target==='dev.delta.media'))));
+      if(apps.length!==next.apps.length){
+        const kept=apps.length?apps:[template('home')];
+        next=validateWorkspace({...next,apps:kept,active:kept.some(a=>a.id===next.active)?next.active:kept[0].id});
+      }
+      localStorage.setItem(key+'.before-app-duplicates-v4',raw);
+      // Persist before recording migration completion; never lose customized layouts.
+      localStorage.setItem(key,JSON.stringify(next));
+      localStorage.setItem('delta.workbench.app-duplicates-v4','1');
+    }
+    return { state: next, recovered: false };
   } catch {
     return { state: starters(), recovered: true };
   }

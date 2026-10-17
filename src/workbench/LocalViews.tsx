@@ -208,67 +208,31 @@ export function LocalMedia() {
 }
 export function WebView({ id }: { id: string }) {
   const key = "delta.web." + id;
-  const [url, setUrl] = useState(() => {
-      try {
-        return localStorage.getItem(key) || "";
-      } catch {
-        return "";
-      }
-    }),
-    [draft, setDraft] = useState(url),
-    [error, setError] = useState("");
-  return (
-    <div className="wb-web">
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          try {
-            const text = draft.trim();
-            const address = /^https:\/\//i.test(text) ? text : /^[\w.-]+\.[a-z]{2,}(?:[/:?#]|$)/i.test(text) ? 'https://' + text : 'https://www.google.com/search?igu=1&q=' + encodeURIComponent(text);
-            const u = new URL(address);
-            if (u.protocol !== "https:" || u.username || u.password) throw Error("HTTPS URL required");
-            setUrl(u.href);
-            localStorage.setItem(key, u.href);
-            setError("");
-          } catch (e) {
-            setError(String(e));
-          }
-        }}
-      >
-        <input
-          type="text"
-          value={draft}
-          placeholder={t("search") + " / https://"}
-          aria-label={t("url")}
-          onChange={(e) => setDraft(e.target.value)}
-        />
-        <button aria-label={t("open")} title={t("open")}>
-          <WIcon name="arrow-right" />
-        </button>
-        {url && (
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            title={t("open")}
-            aria-label={t("open")}
-          >
-            <WIcon name="arrow-square-out" />
-          </a>
-        )}
-      </form>
-      <p className="wb-hint">{error || t("webHint")}</p>
-      {url && (
-        <iframe
-          src={url}
-          title={t("web")}
-          referrerPolicy="no-referrer"
-          sandbox="allow-scripts allow-forms"
-        />
-      )}
-    </div>
-  );
+  const initial=()=>{try{return localStorage.getItem(key)||'';}catch{return '';}};
+  const [history,setHistory]=useState<string[]>(()=>[initial()]),[index,setIndex]=useState(0),
+    [draft,setDraft]=useState(initial),[error,setError]=useState(''),[revision,setRevision]=useState(0);
+  const url=history[index]||'';
+  const go=(next:string)=>{setHistory([...history.slice(0,index+1),next]);setIndex(index+1);setDraft(next);localStorage.setItem(key,next);};
+  const move=(step:number)=>{const next=index+step;if(next<0||next>=history.length)return;setIndex(next);setDraft(history[next]);localStorage.setItem(key,history[next]);};
+  return <div className="wb-web">
+    <form onSubmit={e=>{e.preventDefault();try{
+      const text=draft.trim();if(!text)return;
+      const address=/^https:\/\//i.test(text)?text:/^[\w.-]+\.[a-z]{2,}(?:[/:?#]|$)/i.test(text)?'https://'+text:'https://www.google.com/search?igu=1&q='+encodeURIComponent(text);
+      const u=new URL(address);if(u.protocol!=='https:'||u.username||u.password)throw Error(t('httpsOnly'));
+      go(u.href);setError('');
+    }catch{setError(t('httpsOnly'));}}}>
+      <button type="button" disabled={index===0} onClick={()=>move(-1)} aria-label={t('browserBack')} title={t('browserBack')}><WIcon name="arrow-left"/></button>
+      <button type="button" disabled={index>=history.length-1} onClick={()=>move(1)} aria-label={t('browserForward')} title={t('browserForward')}><WIcon name="arrow-right"/></button>
+      <button type="button" disabled={!url} onClick={()=>setRevision(v=>v+1)} aria-label={t('browserReload')} title={t('browserReload')}><WIcon name="arrow-clockwise"/></button>
+      <input type="text" value={draft} placeholder={t('search')+' / https://'} aria-label={t('url')} onChange={e=>setDraft(e.target.value)}/>
+      <button aria-label={t('open')} title={t('open')}><WIcon name="arrow-right"/></button>
+      {url&&<a href={url} target="_blank" rel="noopener noreferrer" title={t('browserExternal')} aria-label={t('browserExternal')}><WIcon name="arrow-square-out"/></a>}
+    </form>
+    <p className="wb-hint" role={error?'alert':undefined}>{error||t('webHint')}</p>
+    {url&&<iframe key={revision} src={url} title={t('web')} referrerPolicy="no-referrer" sandbox="allow-scripts allow-forms"/>}
+  </div>;
 }
+
 export function OfflineView({
   node,
   onAdd,

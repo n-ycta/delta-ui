@@ -6,6 +6,7 @@ export interface UpdateSettings {
   autoCore: boolean;
   autoPlugins: boolean;
   autoRemote: boolean;
+  parallelNodes?: number;
 }
 export interface UpdateItem {
   id: string;

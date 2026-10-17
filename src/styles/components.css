@@ -546,3 +546,13 @@ select option, select optgroup { color: var(--ink); background-color: var(--surf
   .content { scrollbar-width: none; }
   .content::-webkit-scrollbar { display: none; }
 }
+
+/* Update jobs and reconnects must not look like ordinary inventory rows. */
+.updates-page { display:flex; flex-direction:column; }
+.update-progress { order:-1; border:1px solid var(--accent); border-radius:16px; overflow:hidden; }
+.update-progress.is-active { box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 12%,transparent); }
+.update-node { border-bottom:1px solid var(--rule); }
+.update-node summary { cursor:pointer; display:flex; align-items:center; flex-wrap:wrap; gap:12px; padding:14px 0; }
+.update-node summary strong { flex:1; min-width:120px; overflow-wrap:anywhere; }
+.update-node .update-item { padding:10px 0 10px 16px; }
+.auth-reconnecting { position:fixed; top:58px; right:16px; z-index:10000; max-width:calc(100vw - 32px); }

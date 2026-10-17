@@ -1,3 +1,4 @@
+import { snapRect } from './snapping';
 import { useEffect, useRef, useState, type PointerEvent as RPointer } from 'react';
 import { createPortal } from 'react-dom';
 import type { Tree } from './model';
@@ -13,7 +14,7 @@ export function Canvas({ tree, palette = [], render, onChange, edit, onSelect }:
   tree: CanvasTree; palette?: PaletteItem[]; render: (tree: Tree) => React.ReactNode;
   onChange: (tree: Tree) => void; edit: boolean; onSelect: (id: string) => void;
 }) {
-  const root = useRef<HTMLDivElement>(null), world = useRef<HTMLDivElement>(null);
+  const root = useRef<HTMLDivElement>(null), world = useRef<HTMLDivElement>(null), guides = useRef<HTMLDivElement>(null);
   const latest = useRef(tree), change = useRef(onChange);
   latest.current = tree; change.current = onChange;
   const [front, setFront] = useState(''), [min, setMin] = useState<string[]>([]);
@@ -36,15 +37,15 @@ export function Canvas({ tree, palette = [], render, onChange, edit, onSelect }:
     camera.current = { x: x - (x - c.x) * z / c.zoom, y: y - (y - c.y) * z / c.zoom, zoom: z };
     active.current = true; paintCamera();
   };
-  const gesture = (e: RPointer, update: (dx: number, dy: number) => void, finish: () => void) => {
+  const gesture = (e: RPointer, update: (dx: number, dy: number, alt: boolean) => void, finish: () => void) => {
     e.preventDefault(); e.stopPropagation(); cleanup.current();
     const x = e.clientX, y = e.clientY;
-    let dx = 0, dy = 0, raf = 0;
-    const flush = () => { raf = 0; update(dx, dy); };
-    const move = (ev: PointerEvent) => { dx = ev.clientX - x; dy = ev.clientY - y; if (!raf) raf = requestAnimationFrame(flush); };
+    let dx = 0, dy = 0, raf = 0, alt = e.altKey;
+    const flush = () => { raf = 0; update(dx, dy, alt); };
+    const move = (ev: PointerEvent) => { dx = ev.clientX - x; dy = ev.clientY - y; alt=ev.altKey; if (!raf) raf = requestAnimationFrame(flush); };
     const end = () => {
       if (raf) cancelAnimationFrame(raf);
-      update(dx, dy); finish();
+      update(dx, dy, alt); finish();
       removeEventListener('pointermove', move); removeEventListener('pointerup', end); removeEventListener('pointercancel', end);
       root.current?.classList.remove('wb-gesturing'); cleanup.current = () => {};
     };
@@ -82,7 +83,7 @@ export function Canvas({ tree, palette = [], render, onChange, edit, onSelect }:
     const start = latest.current.rects[id] || { x: 24, y: 24, w: 480, h: 360 };
     let draft = { ...start };
     const el = world.current!.querySelector<HTMLElement>(`[data-window="${id}"]`)!;
-    gesture(e, (dx, dy) => {
+    gesture(e, (dx, dy, alt) => {
       dx /= camera.current.zoom; dy /= camera.current.zoom;
       draft = { ...start };
       if (!edge) { draft.x += dx; draft.y += dy; }
@@ -90,8 +91,11 @@ export function Canvas({ tree, palette = [], render, onChange, edit, onSelect }:
       if (edge.includes('s')) draft.h = Math.max(200, Math.min(3000, start.h + dy));
       if (edge.includes('w')) { draft.w = Math.max(280, Math.min(3000, start.w - dx)); draft.x = start.x + start.w - draft.w; }
       if (edge.includes('n')) { draft.h = Math.max(200, Math.min(3000, start.h - dy)); draft.y = start.y + start.h - draft.h; }
+      const peers=latest.current.children.filter(c=>c.id!==id&&!min.includes(c.id)&&!c.hidden).map(c=>latest.current.rects[c.id]).filter(Boolean);
+      const snapped=snapRect(draft,peers,camera.current.zoom,edge,alt);draft=snapped.rect;
+      if(guides.current)guides.current.innerHTML=snapped.guides.map(g=>`<i class="wb-snap-guide" style="left:${g.axis==='x'?g.value:g.from}px;top:${g.axis==='y'?g.value:g.from}px;width:${g.axis==='x'?1/camera.current.zoom:g.to-g.from}px;height:${g.axis==='y'?1/camera.current.zoom:g.to-g.from}px"></i>`).join('');
       Object.assign(el.style, { left: draft.x + 'px', top: draft.y + 'px', width: draft.w + 'px', height: draft.h + 'px' });
-    }, () => change.current({ ...latest.current, rects: { ...latest.current.rects, [id]: draft } }));
+    }, () => {if(guides.current)guides.current.innerHTML='';change.current({ ...latest.current, rects: { ...latest.current.rects, [id]: draft } });});
   };
   const items: PaletteItem[] = [
     { key: 'notes', title: t('notes'), kind: 'notes', icon: 'note-pencil' },
@@ -126,6 +130,7 @@ export function Canvas({ tree, palette = [], render, onChange, edit, onSelect }:
       gesture(e, (dx, dy) => { camera.current = { ...start, x: start.x + dx, y: start.y + dy }; paintCamera(); }, saveCamera);
     }}>
       <div className="wb-canvas-world" ref={world} style={{ transform: `translate3d(${tree.camera.x}px,${tree.camera.y}px,0) scale(${tree.camera.zoom})` }}>
+        <div ref={guides} className="wb-snap-guides" aria-hidden="true" />
         {tree.children.map((c, i) => {
           const r: Rect = tree.rects[c.id] || { x: 24, y: 24, w: 480, h: 360 };
           return <div data-window={c.id} key={c.id} className="wb-window" hidden={min.includes(c.id) || (!!c.hidden && !edit)} style={{ left: r.x, top: r.y, width: r.w, height: r.h, zIndex: front === c.id ? 100 : i + 1 }} onPointerDownCapture={() => setFront(c.id)}>

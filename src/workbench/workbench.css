@@ -1790,3 +1790,6 @@
 .wb-console-actions .wb-launcher-menu { bottom:auto; top:calc(100% + 8px); }
 .wb-tree-tabs { border-radius:var(--wb-radius); overflow:hidden; }
 .wb-tree-tabs > .wb-tabs-body { border-radius:0 0 var(--wb-radius) var(--wb-radius); }
+
+.wb-snap-guides {position:absolute;inset:0;pointer-events:none;z-index:1000}
+.wb-snap-guide {position:absolute;display:block;background:var(--accent);box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 20%,transparent)}

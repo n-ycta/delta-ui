@@ -82,13 +82,16 @@ export class HttpCoreAdapter implements CoreApi {
       const nodes = await this.listNodes();
       this.emit({ type: 'connection', state: 'open', latencyMs: Date.now() - start });
       nodes.forEach((node: any) => this.emit({ type: 'node.update', nodeId: node.id, patch: node }));
-      const plugins = await this.listPlugins(); plugins.forEach((p: any) => this.emit({ type: 'plugin.update', pluginId: p.instance.pluginId }));
+
     } catch { this.emit({ type: 'connection', state: 'reconnecting' }); }
+    try {
+      const plugins = await this.listPlugins(); plugins.forEach((p: any) => this.emit({ type: 'plugin.update', pluginId: p.instance.pluginId }));
+    } catch { /* An unavailable plugin inventory does not mean the Core connection is down. */ }
     try {
       const events = await this.listEvents({limit:1000,...(this.eventCursor?{after:this.eventCursor-1}:{})});
       for(const event of [...events].reverse()){if(!this.eventIds.has(event.id)){this.eventIds.add(event.id);this.emit({type:'event',event})}this.eventCursor=Math.max(this.eventCursor,event.ts)}
       if(this.eventIds.size>5000)this.eventIds=new Set(events.map(e=>e.id));
     } catch { /* A token without events.read must still receive node/plugin updates. */ }
-    if (this.listeners.size) this.timer = setTimeout(() => void this.poll(), 15000);
+    if (this.listeners.size) this.timer = setTimeout(() => void this.poll(), 2000);
   }
 }

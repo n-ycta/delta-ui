@@ -18,3 +18,9 @@ export function authError(error: unknown): string {
   if (e?.code === "rate_limited") return tr("auth.rateLimited");
   return message || tr("polish.requestFailed");
 }
+
+/** Only explicit credential rejection may tear down an authenticated shell. */
+export function sessionRejected(error: unknown): boolean {
+  const e = error as {code?: string; status?: number} | undefined;
+  return e?.status === 401 || e?.code === 'unauthorized';
+}

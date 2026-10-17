@@ -43,6 +43,12 @@ interface FrameApi {
 const FrameContext = createContext<FrameApi | null>(null);
 /** Desktops render some views in separate React roots; they reach the one host through this. */
 let activeHost: FrameApi | null = null;
+function visibleArea(el:HTMLElement):number {
+  if(el.closest('[hidden]')||!el.getClientRects().length)return 0;
+  const r=el.getBoundingClientRect();let left=Math.max(0,r.left),right=Math.min(innerWidth,r.right),top=Math.max(0,r.top),bottom=Math.min(innerHeight,r.bottom);
+  for(let p=el.parentElement;p;p=p.parentElement){const style=getComputedStyle(p);if(style.visibility==='hidden'||style.display==='none')return 0;if(/hidden|auto|scroll|clip/.test(style.overflow+style.overflowX+style.overflowY)){const b=p.getBoundingClientRect();left=Math.max(left,b.left);right=Math.min(right,b.right);top=Math.max(top,b.top);bottom=Math.min(bottom,b.bottom);}}
+  return Math.max(0,right-left)*Math.max(0,bottom-top);
+}
 export function FrameHost({ children }: { children: ReactNode }) {
   const nodes = useRef(new Map<string,HTMLDivElement>());
   const slots = useRef<Slot[]>([]),
@@ -63,6 +69,7 @@ export function FrameHost({ children }: { children: ReactNode }) {
   }, []);
   const register = useCallback((slot: Slot) => {
     slots.current.push(slot);
+    preferred.current=slot.el;
     useRunningApps.getState().start(slot.id);
     return () => {
       slots.current = slots.current.filter((x) => x !== slot);
@@ -98,9 +105,10 @@ export function FrameHost({ children }: { children: ReactNode }) {
         for (const f of old) if (runningRef.current.includes(f.id) && !keys.has(f.key)) keys.set(f.key, {id:f.id,surface:f.surface});
         const next = [...keys].map(([key, {id, surface}]) => {
           const candidates = slots.current.filter(
-            (x) => x.id === id && x.surface === surface && !x.el.closest("[hidden]") && x.el.getClientRects().length,
+            (x) => x.id === id && x.surface === surface && visibleArea(x.el)>0,
           );
-          const slot = candidates.find((x) => x.el === preferred.current) || candidates[0];
+          const slot = candidates.find((x) => x.el === preferred.current) || candidates[candidates.length-1];
+          for(const own of slots.current.filter(x=>x.id===id&&x.surface===surface))own.el.dataset.frameState=own===slot?'owner':slot?'elsewhere':'waiting';
           const prior = old.find((f) => f.key === key);
           if (!slot)
             return prior
@@ -205,7 +213,7 @@ export function AppSlot({ id, surface, className = "" }: { id: string; surface?:
     );
   return (
     <div ref={ref} className={"wb-plugin-slot dx-slot " + className}>
-      <div className="wb-empty">
+      <div className="wb-empty dx-slot-placeholder">
         <WIcon name="app-window" size={32} />
         <p>{s("singleFrame")}</p>
         <button onClick={() => ctx?.focus(ref.current!)}>{s("showHere")}</button>

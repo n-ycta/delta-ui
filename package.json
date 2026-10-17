@@ -1,7 +1,7 @@
 {
   "name": "@delta/ui",
   "private": false,
-  "version": "0.3.1",
+  "version": "0.3.2",
   "type": "module",
   "description": "Shared Delta UI and host/Plugin UI contracts",
   "scripts": {
@@ -19,7 +19,8 @@
     "test:embedding": "node scripts/prepare-test-app.mjs && node tests/app-embedding.browser.mjs",
     "test:profile": "node tests/profile-seed.browser.mjs",
     "test:workbench": "tsx --test tests/workbench.test.ts tests/surfaces.test.ts tests/catalog-intents.test.ts",
-    "test:mobile": "node tests/mobile-catalog.browser.mjs"
+    "test:mobile": "node tests/mobile-catalog.browser.mjs",
+    "test:reliability": "node tests/reliability.browser.mjs"
   },
   "dependencies": {
     "@fontsource/golos-text": "^5.3.0",

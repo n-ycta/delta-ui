@@ -302,3 +302,5 @@
   .dx-dock:not(.peek) .dx-mini-text { display: flex; flex: 1; min-width: 0; }
   .dx-dock:not(.peek) .dx-mini-btn { min-width: 44px; min-height: 44px; }
 }
+
+.dx-slot:not([data-frame-state="elsewhere"]) > .dx-slot-placeholder {visibility:hidden}

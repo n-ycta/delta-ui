@@ -611,8 +611,8 @@
     "s_901ab2e263": "Read it."
   },
   "layout.Shell": {
-    "s_315bc1ad23": "The connection to the core is lost, reconnect.",
-    "s_b3cbff7b29": "No connection to the nucleus.{{p0}}The latest data obtained are shown.",
+    "s_315bc1ad23": "Reconnecting… Your last data and open apps are preserved.",
+    "s_b3cbff7b29": "No connection to {{p0}}. Showing the last received data.",
     "s_9e506acb19": "Repeat.",
     "s_79e350f743": "Connection",
     "s_a56e3d7306": "Viewing with role rights",
@@ -1808,7 +1808,14 @@
     "remote_update_unknown": "Connection timed out. The target update may still be running; check its status before retrying.",
     "autoRemote": "Include remote cores in automatic installation",
     "autoRemoteHelp": "Separate opt-in for trusted remote nodes. Manual remote updates remain available.",
-    "preparing": "Preparing target node"
+    "preparing": "Preparing target node",
+    "skipped": "Skipped after failure",
+    "starting": "Starting update…",
+    "localNode": "This computer",
+    "componentCount": "{{count}} components",
+    "updateCount": "{{count}} updates",
+    "parallelNodes": "Concurrent nodes",
+    "parallelHelp": "Independent nodes run in parallel; each node installs sequentially. Local Web updates last."
   },
   "events": {
     "refresh": "Refresh",
@@ -2006,7 +2013,9 @@
     "register": "Register",
     "generate": "Generate",
     "registrationFailed": "The key was registered, but sign-in failed. Keep the saved phrase and try signing in again.",
-    "verifyOwner": "Checking owner access…"
+    "verifyOwner": "Checking owner access…",
+    "reconnecting": "Reconnecting…",
+    "reconnectHelp": "The service is temporarily unavailable. No new sign-in is needed; reconnection is automatic."
   },
   "onboarding": {
     "title": "Set up Delta",
@@ -2237,7 +2246,12 @@
     "tipAdd": "Edit layout (pencil in the top bar) to add apps and Console pages as panels.",
     "tipEdit": "Drag panel edges to resize; drop tabs to split.",
     "tipTheme": "Theme, dock and desktops: All apps → Theme.",
-    "media_visualizer": "Visualizer"
+    "media_visualizer": "Visualizer",
+    "browserBack": "Back",
+    "browserForward": "Forward",
+    "browserReload": "Reload",
+    "browserExternal": "Open in full browser",
+    "httpsOnly": "Enter an HTTPS URL without credentials or a search query."
   },
   "shell": {
     "theme": "Theme",

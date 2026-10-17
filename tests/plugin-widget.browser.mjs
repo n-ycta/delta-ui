@@ -25,5 +25,14 @@ const edge=p.locator('[data-window="player"] .edge-w'), eb=await edge.boundingBo
 await p.mouse.move(eb.x+eb.width/2,eb.y+90);await p.mouse.down();await p.mouse.move(eb.x-70,eb.y+90,{steps:12});await p.mouse.up();
 assert((await p.locator('[data-window="player"]').boundingBox()).width>before.width+60,'plugin iframe exposes resize edge');
 await p.screenshot({path:output+'/canvas-plugin-overlap.png'});
-assert.deepEqual(errors,[]);console.log('PASS plugin UI in source picker; save and reload; two independently visible surfaces; canvas occlusion and plugin edge resize');
+await p.goto('http://127.0.0.1:5190/tests/plugin-widget.fixture.html?frames');
+await p.frameLocator('iframe').locator('.player-surface').waitFor();
+await p.locator('iframe').evaluate(el=>el.dataset.retained='yes');
+for(let i=0;i<4;i++){
+ await p.locator('#switch-frame').click();await p.waitForTimeout(100);
+ assert.equal(await p.locator('.dx-slot[data-frame-state="owner"]').count(),1);
+ assert.equal(await p.locator('.dx-slot-placeholder:visible').count(),0);
+ assert.equal(await p.locator('iframe').count(),1);assert.equal(await p.locator('iframe').getAttribute('data-retained'),'yes');
+}
+assert.deepEqual(errors,[]);console.log('PASS route slot changes retain one iframe without false elsewhere notice');console.log('PASS plugin UI in source picker; save and reload; two independently visible surfaces; canvas occlusion and plugin edge resize');
 }finally{await b.close()}
