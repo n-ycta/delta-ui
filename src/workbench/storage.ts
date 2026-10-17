@@ -1,11 +1,34 @@
 import { validateWorkspace, type Workspace } from "./model";
-import { starters } from "./templates";
+import { starters, template } from "./templates";
+const MIGRATED = "delta.workbench.v2-apps";
+/** v2: Console and Media are apps, not desktops. Drop untouched v1 starters once. */
+function migrate(state: Workspace): Workspace {
+  try {
+    if (localStorage.getItem(MIGRATED)) return state;
+    localStorage.setItem(MIGRATED, "1");
+  } catch {
+    return state;
+  }
+  const starter = (a: Workspace["apps"][number]) =>
+    a.root.type === "view" &&
+    ((a.template === "console" && a.root.kind === "system" && a.root.target === "/console") ||
+      (a.template === "media" && a.root.kind === "plugin" && a.root.target === "dev.delta.media"));
+  let apps = state.apps.filter((a) => !starter(a));
+  if (!apps.length) apps = [template("home")];
+  if (!apps.some((a) => a.template === "home") && apps.length < 32) apps = [template("home"), ...apps];
+  return validateWorkspace({ ...state, apps, active: apps.some((a) => a.id === state.active) ? state.active : apps[0].id });
+}
 const key = "delta.workbench.v1";
 export function loadWorkspace(): { state: Workspace; recovered: boolean } {
   try {
     const raw = localStorage.getItem(key);
-    if (!raw) return { state: starters(), recovered: false };
-    return { state: validateWorkspace(JSON.parse(raw)), recovered: false };
+    if (!raw) {
+      try {
+        localStorage.setItem(MIGRATED, "1");
+      } catch {}
+      return { state: starters(), recovered: false };
+    }
+    return { state: migrate(validateWorkspace(JSON.parse(raw))), recovered: false };
   } catch {
     return { state: starters(), recovered: true };
   }
@@ -14,8 +37,10 @@ export function persist(state: Workspace) {
   validateWorkspace(state);
   const value = JSON.stringify(state);
   const last = localStorage.getItem(key);
+  if (last === value) return;
   if (last) localStorage.setItem(key + ".backup", last);
   localStorage.setItem(key, value);
+  window.dispatchEvent(new Event("delta:workspace-changed"));
 }
 export function download(
   name: string,

@@ -2,6 +2,7 @@ import { ThemeOverride } from "./AppearanceContext";
 import { tr } from "../i18n";
 import { useContext, useEffect, useState } from "react";
 import { usePrefs } from "./stores";
+import { SKINS, type Skin } from "../theme/skins";
 
 export function useResolvedTheme(): "light" | "dark" {
   const override = useContext(ThemeOverride);
@@ -18,6 +19,13 @@ export function useResolvedTheme(): "light" | "dark" {
     return () => mq.removeEventListener("change", h);
   }, []);
   return override ?? (theme === "system" ? (sys as "light" | "dark") : theme);
+}
+
+/** The active global skin. Every surface (Console, desktops, plugins) follows it. */
+export function useSkin(): Skin {
+  const scheme = useResolvedTheme();
+  const light = usePrefs((s) => s.lightSkin), dark = usePrefs((s) => s.darkSkin);
+  return SKINS[scheme === "dark" ? dark : light] ?? SKINS[scheme === "dark" ? "mocha" : "latte"];
 }
 
 /** Data palettes. Chosen for distinguishability on both paper and graphite backgrounds, without neon. */
@@ -68,39 +76,27 @@ export const PALETTES: Record<
 export function useChartColors(paletteOverride?: string) {
   const theme = useResolvedTheme();
   const pref = usePrefs((s) => s.palette);
-  const p = PALETTES[paletteOverride ?? pref] ?? PALETTES.delta;
-  const dark = theme === "dark";
+  const skin = useSkin();
+  const name = paletteOverride ?? pref;
+  const p = PALETTES[name] ?? PALETTES.delta;
+  const dark = theme === "dark", c = skin.palette;
   return {
-    series: dark ? p.dark : p.light,
-    grid: dark ? "#262523" : "#E6E2D9",
-    axis: dark ? "#7B776E" : "#8F8A7F",
-    ink: dark ? "#ECEAE3" : "#1A1A18",
-    muted: dark ? "#5F5C55" : "#A7A296",
-    warn: dark ? "#D7A443" : "#A86F12",
-    err: dark ? "#E8634F" : "#BC3424",
-    ok: dark ? "#5BB07D" : "#2E7A4C",
-    surface: dark ? "#191918" : "#FBFAF7",
-    sunken: dark ? "#0C0C0B" : "#EAE7E0",
+    series: name === "delta" || !PALETTES[name] ? skin.series : dark ? p.dark : p.light,
+    grid: c.rule,
+    axis: c.faint,
+    ink: c.ink,
+    muted: c.faint,
+    warn: c.warn,
+    err: c.err,
+    ok: c.ok,
+    surface: c.surface,
+    sunken: c.sunken,
     dark,
   };
 }
 
-/** Embedded applications own appearance; the ordinary Console retains global preferences. */
+/** Appearance is global: embedded surfaces change the same preference as the Console. */
 export function useThemeSetter() {
-  const override = useContext(ThemeOverride);
   const set = usePrefs((s) => s.set);
-  return (theme: "light" | "dark" | "system") => {
-    if (override === null) set({ theme });
-    else
-      window.dispatchEvent(
-        new CustomEvent("delta:workbench-theme", {
-          detail:
-            theme === "system"
-              ? matchMedia("(prefers-color-scheme: dark)").matches
-                ? "dark"
-                : "light"
-              : theme,
-        }),
-      );
-  };
+  return (theme: "light" | "dark" | "system") => set({ theme });
 }

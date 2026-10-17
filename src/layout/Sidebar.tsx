@@ -95,7 +95,7 @@ export function Sidebar() {
         </button>
       </div>
       <nav className="nav" id="sidebar-navigation">
-        <Item to="/workbench" icon={<LayoutDashboard size={16}/>} label={tr('workbench.entry')}/>
+        <Item to="/workbench" icon={<WIcon name="browsers" size={16}/>} label={tr('workbench.entry')}/>
       <Item to="/" end icon={<Gauge size={16} />} label={tr('layout.Sidebar.s_39c6387206')} />
         <Item
           to="/dashboards"

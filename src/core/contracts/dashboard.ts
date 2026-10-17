@@ -12,7 +12,7 @@ export const MetricSource = z.object({
 });
 export const SystemSource = z.object({
   kind: z.literal('system'),
-  feed: z.enum(['nodes', 'events', 'alerts', 'plugins', 'note']),
+  feed: z.enum(['nodes', 'events', 'alerts', 'plugins', 'note', 'app']),
   params: z.record(z.unknown()).optional(),
 });
 export const PluginViewSource = z.object({

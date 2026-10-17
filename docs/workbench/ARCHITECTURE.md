@@ -47,3 +47,33 @@ System surfaces expose named CSS inline-size containers. Legacy forms, side
 grids, event rows and Console navigation respond to their own pane rather than
 the outer screen. Workbench base controls use zero-specificity exclusions so
 component navigation and outline styling are not overridden by generic controls.
+
+## 0.3: shell above the router
+
+```
+HashRouter
+└─ DeltaRoot            src/shell/DeltaRoot.tsx
+   ├─ SkinRoot          one global skin → CSS variables on <html>, tokens for app frames
+   ├─ FrameHost         one persistent iframe per running app (fixed overlay that follows its visible AppSlot)
+   ├─ Dock              the only switcher: Console · apps · desktops · mini-player · All apps · New desktop
+   ├─ AppManager        All apps / Desktops / Dock / Theme
+   └─ stage             Console pages, /apps/:id (AppSlot) and /workbench (desktops)
+```
+
+- **Apps vs desktops.** Installed apps (Console + portable apps) are listed by the host and
+  appear in the dock right after installation. Desktops are user layouts only; the old
+  Console/Media starters were removed (an untouched v1 workspace is migrated once).
+- **Dock.** Position left/right/top/bottom/hidden (Ctrl/Cmd+Shift+Space or the edge handle),
+  size, labels, order (drag or arrows), pin/unpin, context menu (open, pin, rename,
+  duplicate, delete desktop, stop/uninstall app). Phones always get a bottom bar.
+  Settings live in `delta.shell.dock`.
+- **Workspace bus.** The dock and manager change desktops through
+  `workspaceCommand()` (`src/shell/workspaceBus.ts`): delivered to a mounted Workbench via
+  `delta:workspace-command`, otherwise applied to the stored workspace. Desktops can be
+  deleted without opening them.
+- **Persistent apps.** `AppSlot` is a placeholder; the frame is never reparented, so audio
+  keeps playing across routes, desktops, dashboards and the Console. Several slots of the
+  same app show the frame in one place (“Show here”).
+- **Dashboard “App” widget** puts an installed app (or one of its surfaces) into a dashboard
+  tile with the usual move/resize.
+- **Themes, media session, intents:** see `docs/sdk/THEMES-MEDIA-INTENTS.md`.

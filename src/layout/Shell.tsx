@@ -3,7 +3,6 @@ import { useEffect, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { WifiOff, X } from '../ui/icons';
 import { usePrefs, useUi, useRuntimeAccess } from '../app/stores';
-import { useResolvedTheme } from '../app/theme';
 import { useApi } from '../app/ApiContext';
 import { useQuery } from '../app/query';
 import { queryClient } from '../app/query';
@@ -21,7 +20,6 @@ export function Shell({ children,embedded=false }: { children: ReactNode;embedde
   const appView=route.startsWith('/apps/')||route==='/workbench';
   const setupOwner=useRuntimeAccess(s=>s.name==='browser-owner');
   const prefs = usePrefs();
-  const theme = useResolvedTheme();
   const ui = useUi();
   const api = useApi();
   const info = useQuery('info', a => a.info(), { refetchMs: 15000 });
@@ -29,11 +27,6 @@ export function Shell({ children,embedded=false }: { children: ReactNode;embedde
     if (api.mode === 'mock') useRuntimeAccess.getState().set({ role: 'owner', name: tr('runtime.demoUser'), scopes: ['admin'] });
     else useRuntimeAccess.getState().set(info.data?.principal ?? { role: 'viewer', name: '', scopes: [] });
   }, [api.mode, info.data]);
-  useEffect(() => {
-    if(embedded)return;
-    document.documentElement.dataset.theme = theme;
-    document.documentElement.dataset.density = prefs.density;
-  }, [theme, prefs.density,embedded]);
   const authRequired = (info.error as {code?:string;status?:number}|undefined)?.code === 'unauthorized' || (info.error as {status?:number}|undefined)?.status === 401;
   const disconnected = ui.connection.state === 'closed' || ui.connection.state === 'reconnecting';
   if(appView)return <><RealtimeBridge />{children}<NotificationsPanel /><Toasts /></>;

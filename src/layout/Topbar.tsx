@@ -1,4 +1,5 @@
 import { ControlLauncher } from "../workbench/ControlLauncher";
+import { openAppManager } from "../shell/state";
 import { useContext } from "react";
 import { BrandOverride } from "../app/AppearanceContext";
 import { tr } from "../i18n";
@@ -76,12 +77,10 @@ export function Topbar() {
         <ControlLauncher
           inline
           demo={api.mode === "mock"}
-          onApps={() =>
-            window.dispatchEvent(new Event("delta:workbench-choose"))
-          }
+          onApps={() => openAppManager("apps")}
           onEdit={() => window.dispatchEvent(new Event("delta:workbench-edit"))}
           onSettings={() =>
-            window.dispatchEvent(new Event("delta:workbench-choose"))
+            window.dispatchEvent(new Event("delta:workbench-settings"))
           }
         />
       )}

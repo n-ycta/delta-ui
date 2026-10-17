@@ -11,6 +11,8 @@ import { Button } from "./WorkbenchControls";
 import { LocalMedia, Notes, WebView, OfflineView } from "./LocalViews";
 import { WIcon } from "./Icon";
 import { t } from "./strings";
+import { useResolvedTheme } from "../app/theme";
+import { DesktopHome } from "./DesktopHome";
 interface TreeProps extends WorkbenchProps {
   tree: Tree;
   apps: Application[];
@@ -24,6 +26,7 @@ interface TreeProps extends WorkbenchProps {
 }
 export function TreeRenderer(p: TreeProps) {
   const { tree: n, edit, selected, onSelect, onChange } = p;
+  const scheme = useResolvedTheme();
   const [front, setFront] = useState<string | null>(null),
     [max, setMax] = useState<string | null>(null),
     [min, setMin] = useState<Set<string>>(new Set());
@@ -102,11 +105,12 @@ export function TreeRenderer(p: TreeProps) {
     if (n.kind === "notes") content = <Notes id={n.id} />;
     else if (n.kind === "files") content = <LocalMedia />;
     else if (n.kind === "web") content = <WebView id={n.id} />;
+    else if (n.kind === "welcome") content = <DesktopHome live={p.live} />;
     else if (n.kind === "app") {
       const app = p.apps.find((a) => a.id === n.target);
       content =
         app && !p.path.includes(app.id) ? (
-          <div className="wb-embedded" data-wb-theme={app.theme}>
+          <div className="wb-embedded">
             <TreeRenderer
               {...p}
               tree={app.root}
@@ -121,12 +125,7 @@ export function TreeRenderer(p: TreeProps) {
     } else if (p.live && p.renderView)
       content = p.renderView(
         n,
-        ["paper", "daylight"].includes(
-          p.apps.find((a) => a.id === p.path[p.path.length - 1])?.theme ||
-            "graphite",
-        )
-          ? "light"
-          : "dark",
+        scheme,
         p.apps.find((a) => a.id === p.path[p.path.length - 1])!,
       );
     else if (n.kind === "plugin" && n.target === "dev.delta.media")

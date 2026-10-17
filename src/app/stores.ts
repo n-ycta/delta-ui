@@ -9,6 +9,9 @@ export type Density = 'compact' | 'comfortable';
 
 interface Prefs {
   theme: Theme;
+  /** Skin used whenever the resolved scheme is light / dark. One global appearance for every surface. */
+  lightSkin: 'latte' | 'gruvbox';
+  darkSkin: 'mocha' | 'tokyo';
   density: Density;
   sidebarCollapsed: boolean;
   /** "view as" — lets the owner preview the console with reduced rights */
@@ -22,7 +25,7 @@ interface Prefs {
 }
 
 export const usePrefs = create<Prefs>()(persist((set) => ({
-  theme: 'system', density: 'comfortable', sidebarCollapsed: false, viewAs: null, palette: 'delta', hour12: false, homeStrip: true, realNoticeHidden: false, dismissedPluginNotices: {},
+  theme: 'system', lightSkin: 'latte', darkSkin: 'mocha', density: 'comfortable', sidebarCollapsed: false, viewAs: null, palette: 'delta', hour12: false, homeStrip: true, realNoticeHidden: false, dismissedPluginNotices: {},
   set: (p) => set(p),
 }), { name: 'delta.console.prefs', version: 1 }));
 

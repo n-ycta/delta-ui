@@ -16,6 +16,7 @@ import { EventFeedWidget } from './system/EventFeedWidget';
 import { AlertsWidget } from './system/AlertsWidget';
 import { PluginActivityWidget } from './system/PluginActivityWidget';
 import { NoteWidget } from './system/NoteWidget';
+import { AppWidget } from './system/AppWidget';
 
 const hasDims = (m: MetricDescriptor) => m.dimensions.some((d) => !d.values || d.values.length > 1);
 const no = (reason: string) => ({ score: 0, reason });
@@ -103,8 +104,9 @@ export const widgetRegistry = new WidgetRegistry()
   .register({ type: 'event-feed', version: '1.0.0', label: tr("widgets.registry.s_6710e64cad"), icon: 'list', category: 'system', description: tr("widgets.registry.s_24d3c6a75a"), defaultSize: { w: 6, h: 8 }, minSize: { w: 3, h: 4 }, options: ['limit'], component: EventFeedWidget })
   .register({ type: 'alerts', version: '1.0.0', label: tr("widgets.registry.s_925c5165a9"), icon: 'triangle-alert', category: 'system', description: tr("widgets.registry.s_49a9d02730"), defaultSize: { w: 4, h: 6 }, minSize: { w: 3, h: 3 }, options: [], component: AlertsWidget })
   .register({ type: 'plugin-activity', version: '1.0.0', label: tr("widgets.registry.s_b1b569eb07"), icon: 'activity', category: 'system', description: tr("widgets.registry.s_bbea526590"), defaultSize: { w: 4, h: 7 }, minSize: { w: 3, h: 4 }, options: [], component: PluginActivityWidget })
-  .register({ type: 'note', version: '1.0.0', label: tr("widgets.registry.s_917b58362c"), icon: 'sticky-note', category: 'system', description: tr("widgets.registry.s_2457b654e7"), defaultSize: { w: 4, h: 3 }, minSize: { w: 2, h: 2 }, options: ['text'], component: NoteWidget });
+  .register({ type: 'note', version: '1.0.0', label: tr("widgets.registry.s_917b58362c"), icon: 'sticky-note', category: 'system', description: tr("widgets.registry.s_2457b654e7"), defaultSize: { w: 4, h: 3 }, minSize: { w: 2, h: 2 }, options: ['text'], component: NoteWidget })
+  .register({ type: 'app', version: '1.0.0', label: tr('shell.widgetApp'), icon: 'layout-grid', category: 'system', description: tr('shell.widgetAppDesc'), defaultSize: { w: 6, h: 8 }, minSize: { w: 3, h: 4 }, options: [], component: AppWidget });
 
-export const SYSTEM_FEEDS: Record<string, 'nodes' | 'events' | 'alerts' | 'plugins' | 'note'> = {
-  'node-grid': 'nodes', 'event-feed': 'events', alerts: 'alerts', 'plugin-activity': 'plugins', note: 'note',
+export const SYSTEM_FEEDS: Record<string, 'nodes' | 'events' | 'alerts' | 'plugins' | 'note' | 'app'> = {
+  'node-grid': 'nodes', 'event-feed': 'events', alerts: 'alerts', 'plugin-activity': 'plugins', note: 'note', app: 'app',
 };

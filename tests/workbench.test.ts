@@ -9,14 +9,16 @@ import {
   view,
   visit,
 } from "../src/workbench/model";
-test("four valid distinct starters and two light/two dark themes", () => {
+test("three valid distinct desktop starters; apps and Console are not desktops", () => {
   const s = starters();
-  assert.equal(validateWorkspace(s).apps.length, 4);
-  assert.equal(new Set(s.apps.map((a) => a.theme)).size, 4);
+  assert.equal(validateWorkspace(s).apps.length, 3);
   assert.deepEqual(
     s.apps.map((a) => a.root.type),
-    ["view", "view", "split", "canvas"],
+    ["split", "split", "canvas"],
   );
+  const kinds: string[] = [];
+  for (const a of s.apps) visit(a.root, (n) => { if (n.type === "view") kinds.push(n.kind); });
+  assert(kinds.includes("welcome"));
 });
 test("tabs require active child", () => {
   const s = starters();

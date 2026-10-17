@@ -1,0 +1,18 @@
+/* Structural rules shared by every skin. Values come from SkinRoot custom properties. */
+html { background: var(--bg); }
+body { font-family: var(--font-sans); }
+h1, h2, h3, h4,
+.page-title, .panel-title, .widget-title,
+.wb h1, .wb h2, .wb h3 {
+  font-family: var(--font-heading);
+  font-weight: var(--heading-weight, 600);
+  letter-spacing: var(--heading-tracking, -0.01em);
+}
+h1, .page-title { text-transform: var(--heading-case, none); }
+:root[data-skin="tokyo"] .label,
+:root[data-skin="tokyo"] .panel-title,
+:root[data-skin="tokyo"] .widget-title { text-transform: uppercase; letter-spacing: .06em; }
+:root[data-skin="gruvbox"] h1, :root[data-skin="gruvbox"] .page-title { font-style: italic; }
+.panel, .widget, .auth-card, .modal { box-shadow: var(--shadow, none); }
+.panel, .widget { border-radius: var(--r-lg); }
+:root[data-skin] .btn, :root[data-skin] button.btn { border-radius: var(--r-md); }

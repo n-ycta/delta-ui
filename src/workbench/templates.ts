@@ -7,27 +7,26 @@ import {
   type Workspace,
 } from "./model";
 import { t } from "./strings";
-export const templateNames = ["console", "media", "studio", "canvas"] as const;
-export function template(which: (typeof templateNames)[number]): Application {
+/** Gallery order. "console" stays loadable for older layouts but is no longer a desktop: the Console is an app. */
+export const templateNames = ["home", "studio", "canvas", "media", "overview"] as const;
+export type TemplateName = (typeof templateNames)[number] | "console";
+export function template(which: TemplateName): Application {
   const base: Application = {
     home: { ...defaultHome },
     id: uid(),
     name: t(which),
     icon: {
-      console: "squares-four",
-      media: "music-notes",
-      studio: "terminal-window",
+      home: "house-line",
+      console: "terminal",
+      media: "vinyl-record",
+      studio: "code",
       canvas: "selection-all",
+      overview: "chart-donut",
     }[which],
     template: which,
-    theme: {
-      console: "graphite",
-      media: "paper",
-      studio: "midnight",
-      canvas: "daylight",
-    }[which] as Application["theme"],
-    nav: "side",
-    mobileNav: "bottom",
+    theme: "graphite",
+    nav: "hidden",
+    mobileNav: "hidden",
     chrome: true,
     brand: true,
     logo: true,
@@ -44,11 +43,32 @@ export function template(which: (typeof templateNames)[number]): Application {
     base.mobileNav = "hidden";
     base.root = view("system", t("console"), "squares-four", "/console");
   }
+  if (which === "home") {
+    const w = view("welcome", t("home"), "house-line"),
+      n = view("notes", t("notes"), "note-pencil"),
+      f = view("files", t("files"), "play-circle");
+    base.root = {
+      id: uid(),
+      title: t("home"),
+      icon: base.icon,
+      type: "split",
+      axis: "row",
+      ratio: 0.62,
+      children: [
+        w,
+        { id: uid(), title: t("tabs"), icon: "tabs", type: "tabs", active: n.id, children: [n, f] },
+      ],
+    };
+  }
   if (which === "media") {
-    base.nav = "dock";
-    base.mobileNav = "dock";
-    base.accent = "#7155da";
-    base.root = view("plugin", t("media"), "music-notes", "dev.delta.media");
+    const m = view("plugin", t("media"), "music-notes", "dev.delta.media"),
+      n = view("notes", t("notes"), "note-pencil");
+    base.root = { id: uid(), title: t("media"), icon: base.icon, type: "split", axis: "row", ratio: 0.72, children: [m, n] };
+  }
+  if (which === "overview") {
+    const h = view("system", t("summary"), "gauge", "/fragments/summary"),
+      d = view("system", t("dashboard"), "chart-line", "/fragments/dashboard");
+    base.root = { id: uid(), title: t("overview"), icon: base.icon, type: "split", axis: "column", ratio: 0.28, children: [h, d] };
   }
   if (which === "studio") {
     const n = view("notes", t("notes"), "note-pencil"),
@@ -73,8 +93,6 @@ export function template(which: (typeof templateNames)[number]): Application {
     };
   }
   if (which === "canvas") {
-    base.nav = "dock";
-    base.mobileNav = "dock";
     const n = view("notes", t("notes"), "note-pencil"),
       f = view("files", t("files"), "play-circle");
     base.root = {
@@ -93,6 +111,6 @@ export function template(which: (typeof templateNames)[number]): Application {
   return base;
 }
 export function starters(): Workspace {
-  const apps = templateNames.map(template);
+  const apps = (["home", "studio", "canvas"] as const).map(template);
   return { version: 1, active: apps[0].id, apps };
 }

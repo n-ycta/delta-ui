@@ -51,6 +51,7 @@ export function ControlLauncher({
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       if (!root.current?.getClientRects().length) return;
+      if (document.querySelector('.dx-root[data-dock="hidden"]')) return;
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.code === "Space") {
         e.preventDefault();
         setOpen((v) => !v);
@@ -128,7 +129,7 @@ export function ControlLauncher({
           onClick={() => setOpen((v) => !v)}
         >
           <WIcon
-            name={open ? "caret-right" : inline ? "squares-four" : "caret-left"}
+            name={open ? "caret-right" : inline ? "dots-three-outline" : "caret-left"}
           />
         </button>
       )}

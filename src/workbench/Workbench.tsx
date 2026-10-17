@@ -31,6 +31,9 @@ import { template, templateNames } from "./templates";
 import { iconNames, WIcon } from "./Icon";
 import { t, type Word } from "./strings";
 import { language, setLanguage } from "../i18n";
+import { applyCommand, markWorkbenchMounted, WORKSPACE_EVENT, type WorkspaceCommand } from "../shell/workspaceBus";
+import { openAppManager } from "../shell/state";
+import { SkinPicker } from "../theme/SkinPicker";
 
 import "./workbench.css";
 export interface PaletteItem {
@@ -112,11 +115,6 @@ export function Workbench({
     });
   const patchNode = (id: string, fn: (n: Tree) => Tree) =>
     patchApp({ root: mapTree(active.root, id, fn) });
-  const switchApp = (id: string) => {
-    setMounted((s) => new Set([...s, id]));
-    setSelected("");
-    setState((s) => ({ ...s, active: id }));
-  };
   const travel = (back: boolean) => {
     const from = back ? past : future,
       to = back ? future : past;
@@ -140,46 +138,24 @@ export function Workbench({
   useEffect(() => {
     setMounted((s) => new Set([...s, state.active]));
   }, [state.active]);
+  useEffect(markWorkbenchMounted, []);
   useEffect(() => {
-    const previous = document.documentElement.dataset.theme;
-    return () => {
-      if (previous) document.documentElement.dataset.theme = previous;
-      else delete document.documentElement.dataset.theme;
+    const run = (e: Event) => {
+      const cmd = (e as CustomEvent).detail as WorkspaceCommand;
+      try {
+        const next = applyCommand(stateRef.current, cmd, t("copy"));
+        if (next === stateRef.current) return;
+        if (cmd.op === "open") {
+          setMounted((m) => new Set([...m, cmd.id]));
+          setSelected("");
+          setState(next);
+        } else commit(next);
+      } catch (err) {
+        setError(String(err));
+      }
     };
-  }, []);
-  useEffect(() => {
-    document.documentElement.dataset.theme = ["paper", "daylight"].includes(
-      active.theme,
-    )
-      ? "light"
-      : "dark";
-  }, [active.theme]);
-  useEffect(() => {
-    const change = (e: Event) => {
-      const wanted = (e as CustomEvent).detail;
-      if (!["light", "dark"].includes(wanted)) return;
-      const current = stateRef.current;
-      commit({
-        ...current,
-        apps: current.apps.map((a) =>
-          a.id === current.active
-            ? {
-                ...a,
-                theme:
-                  wanted === "light"
-                    ? a.theme === "midnight" || a.theme === "daylight"
-                      ? "daylight"
-                      : "paper"
-                    : a.theme === "midnight" || a.theme === "daylight"
-                      ? "midnight"
-                      : "graphite",
-              }
-            : a,
-        ),
-      });
-    };
-    window.addEventListener("delta:workbench-theme", change);
-    return () => window.removeEventListener("delta:workbench-theme", change);
+    window.addEventListener(WORKSPACE_EVENT, run);
+    return () => window.removeEventListener(WORKSPACE_EVENT, run);
   }, [commit]);
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
@@ -200,14 +176,17 @@ export function Workbench({
         setModal("settings");
       }
     };
-    const choose = () => setModal("settings");
+    const choose = () => openAppManager("desktops");
+    const settings = () => setModal("settings");
     window.addEventListener("delta:workbench-choose", choose);
     window.addEventListener("delta:workbench-edit", toggleEditor);
+    window.addEventListener("delta:workbench-settings", settings);
     window.addEventListener("keydown", key);
     return () => {
       window.removeEventListener("keydown", key);
       window.removeEventListener("delta:workbench-choose", choose);
       window.removeEventListener("delta:workbench-edit", toggleEditor);
+      window.removeEventListener("delta:workbench-settings", settings);
     };
   }, [toggleEditor]);
   let selection: Tree | undefined;
@@ -335,18 +314,13 @@ export function Workbench({
   const iconSearch = iconNames
     .filter((n) => n.includes(search.toLowerCase()))
     .slice(0, 96);
-  const style = {
-    "--wb-accent": active.accent,
-    "--wb-gap": active.gap + "px",
-    "--wb-radius": active.radius + "px",
-  } as CSSProperties;
+  const style = { "--wb-gap": active.gap + "px" } as CSSProperties;
   return (
     <div
       className={"wb" + (edit ? " wb-edit" : "")}
-      data-wb-theme={active.theme}
       data-wb-chrome={active.chrome}
-      data-wb-nav={active.nav}
-      data-wb-mobile={active.mobileNav}
+      data-wb-nav="hidden"
+      data-wb-mobile="hidden"
       style={style}
     >
       <header className="wb-topbar">
@@ -375,7 +349,7 @@ export function Workbench({
           {active.brand && <strong>{active.brandName}</strong>}
         </div>
         <div className="wb-breadcrumb">
-          <span>{t("apps")}</span>
+          <button type="button" className="wb-crumb-link" onClick={() => openAppManager("desktops")}>{t("desktops")}</button>
           <WIcon name="caret-right" size={14} />
           <b>{active.name}</b>
         </div>
@@ -414,30 +388,11 @@ export function Workbench({
         ) && (
           <ControlLauncher
             demo={demo}
-            onApps={() => setModal("settings")}
+            onApps={() => openAppManager("apps")}
             onEdit={toggleEditor}
             onSettings={() => setModal("settings")}
           />
         )}
-      <nav className="wb-nav" aria-label={t("apps")}>
-        <div className="wb-nav-caption">{t("apps")}</div>
-        {state.apps.map((a) => (
-          <button
-            key={a.id}
-            className={a.id === state.active ? "active" : ""}
-            title={a.name}
-            onClick={() => switchApp(a.id)}
-          >
-            <WIcon name={a.icon} />
-            <span>{a.name}</span>
-          </button>
-        ))}
-        <div className="wb-nav-spacer" />
-        <button onClick={() => setModal("templates")}>
-          <WIcon name="squares-four" />
-          <span>{t("templates")}</span>
-        </button>
-      </nav>
       <main className="wb-main">
         {error && (
           <div role="alert" className="wb-warning">
@@ -479,14 +434,7 @@ export function Workbench({
                 key={a.id}
                 className="wb-app-surface"
                 hidden={a.id !== state.active}
-                data-wb-theme={a.theme}
-                style={
-                  {
-                    "--wb-accent": a.accent,
-                    "--wb-gap": a.gap + "px",
-                    "--wb-radius": a.radius + "px",
-                  } as CSSProperties
-                }
+                style={{ "--wb-gap": a.gap + "px" } as CSSProperties}
               >
                 <TreeRenderer
                   tree={a.root}
@@ -797,21 +745,10 @@ export function Workbench({
                 <HomeAppearance app={active} patch={patchApp} />
               </section>
               <section>
-                <h3>{t("apps")}</h3>
-                <div className="wb-app-choices">
-                  {state.apps.map((a) => (
-                    <button
-                      key={a.id}
-                      onClick={() => {
-                        switchApp(a.id);
-                        setModal(null);
-                      }}
-                    >
-                      <WIcon name={a.icon} />
-                      {a.name}
-                    </button>
-                  ))}
-                </div>
+                <h3>{t("theme")}</h3>
+                <SkinPicker compact />
+                <p className="wb-hint">{t("themeGlobal")}</p>
+                <h3>{t("desktop")}</h3>
                 <div className="wb-setting-actions">
                   <button onClick={duplicate}>
                     <WIcon name="copy" />
@@ -838,7 +775,7 @@ export function Workbench({
                         const restored = template(
                           templateNames.includes(active.template as any)
                             ? (active.template as (typeof templateNames)[number])
-                            : "console",
+                            : "home",
                         );
                         patchApp({ ...restored, id: active.id });
                       }

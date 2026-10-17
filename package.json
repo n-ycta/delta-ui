@@ -1,7 +1,7 @@
 {
   "name": "@delta/ui",
   "private": false,
-  "version": "0.2.1",
+  "version": "0.3.0",
   "type": "module",
   "description": "Shared Delta UI and host/Plugin UI contracts",
   "scripts": {
@@ -21,8 +21,13 @@
     "test:workbench": "tsx --test tests/workbench.test.ts tests/surfaces.test.ts"
   },
   "dependencies": {
+    "@fontsource/golos-text": "^5.3.0",
     "@fontsource/ibm-plex-mono": "^5.0.14",
     "@fontsource/ibm-plex-sans": "^5.0.21",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@fontsource/literata": "^5.3.0",
+    "@fontsource/manrope": "^5.3.0",
+    "@fontsource/onest": "^5.3.1",
     "@noble/curves": "^1.8.2",
     "@noble/hashes": "^1.7.2",
     "@phosphor-icons/react": "^2.1.10",
