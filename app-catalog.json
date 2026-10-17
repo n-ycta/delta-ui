@@ -2,14 +2,14 @@
   {
     "id": "dev.delta.media",
     "name": "Delta Media",
-    "version": "0.3.3",
+    "version": "0.3.5",
     "icon": "vinyl-record",
     "description": {
       "ru": "\u041c\u0443\u0437\u044b\u043a\u0430, \u0432\u0438\u0434\u0435\u043e, \u0440\u0430\u0434\u0438\u043e \u0438 \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0430\u0435\u043c\u044b\u0435 \u0438\u0441\u0442\u043e\u0447\u043d\u0438\u043a\u0438 \u0432 \u043e\u0434\u043d\u043e\u043c \u0438\u043d\u0442\u0435\u0440\u0444\u0435\u0439\u0441\u0435.",
       "en": "Music, video, radio and connected providers in one interface."
     },
-    "asset": "https://github.com/n-ycta/delta-media/releases/download/v0.3.3/delta-media.delta-app",
-    "sha256": "d903e15fa814fc00376315afd32adaed1d3787d8ab69f23e49ff2aaed6928725",
+    "asset": "https://github.com/n-ycta/delta-media/releases/download/v0.3.5/delta-media.delta-app",
+    "sha256": "f85191b79229af146493ccce8cddae9c16dd03419aad2e1ea32e623968a6b6ae",
     "runtime": {
       "execution": "web",
       "platforms": [

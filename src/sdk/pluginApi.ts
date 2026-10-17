@@ -1,7 +1,7 @@
 import { hostBridge } from '../host/contract';
 import { readConnectionSettings } from '../api';
 /** Approved capabilities for Media's interface; never a wildcard or a raw core token. */
-export const MEDIA_API = ['media.providers','media.search','media.resolve','media.library','media.play','media.pause','media.seek','media.next','media.previous','media.queue','media.playlists','media.settings','media.stats','media.session','media.sync'] as const;
+export const MEDIA_API = ['media.providers','media.search','media.resolve','media.library','media.play','media.pause','media.seek','media.next','media.previous','media.queue','media.playlists','media.settings','media.stats','media.session','media.sync','downloads.status','downloads.create','downloads.job','downloads.cancel','downloads.read','downloads.remove'] as const;
 export async function pluginApiCall(id: string, capability: string, args: Record<string, unknown> = {}) {
   if (id !== 'dev.delta.media' || !(MEDIA_API as readonly string[]).includes(capability)) throw Error('forbidden');
   const host = hostBridge(); if (host) return host.call({ capability, args });

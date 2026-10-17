@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Update the Media catalog to the verified 0.3.5 UI package.
+- Allow only the six explicit offline-cache capabilities through the Media UI broker; keep unrelated operations denied.
+
 ## 0.3.0
 
 - One global dock outside every app: Console, installed apps and desktops; configurable position (left/right/top/bottom/hidden), size, labels, order and pinning; context menu (open, pin, rename, duplicate, delete, stop, uninstall); bottom bar on phones.

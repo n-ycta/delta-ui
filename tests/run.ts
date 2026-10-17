@@ -1,3 +1,4 @@
+import { MEDIA_API } from '../src/sdk/pluginApi';
 import {validateRequest, compatibleBridge} from '../src/host/contract';
 import { dashboardCount, dashboardPlugins } from '../src/core/registry/dashboardIndex';
 import {
@@ -59,6 +60,10 @@ test('dependency contract keeps legacy manifests and describes optional feature 
  eq(PluginManifest.parse(M.typing).dependencies,[]);
  const d=PluginDependency.parse({id:'dev.example.search',version:'^1.0.0',features:['search']});eq(d.required,false);eq(d.kind,'plugin');
  ok(!PluginDependency.safeParse({id:'',version:'^1'}).success);
+});
+test('Media broker grants only explicit offline operations',()=>{
+ for(const op of ['status','create','job','cancel','read','remove']) ok((MEDIA_API as readonly string[]).includes('downloads.'+op));
+ for(const capability of ['downloads.settings','downloads.*','tokens.list']) ok(!(MEDIA_API as readonly string[]).includes(capability));
 });
 console.log('semver');
 test('valid / invalid', () => {

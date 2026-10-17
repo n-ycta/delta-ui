@@ -116,9 +116,21 @@ try {
         }),
     );
     assert.equal(reply.error.code, "forbidden");
+    for (const operation of ['status','create','job','cancel','read','remove','settings']) {
+      const result = await iframe.evaluate(operation => new Promise(resolve => {
+        const id = 'offline-probe-' + operation;
+        const listener = e => {
+          if (e.data?.id === id) { window.removeEventListener('message', listener); resolve(e.data); }
+        };
+        window.addEventListener('message', listener);
+        parent.postMessage({ channel: window.testChannel, id, request: { capability: 'downloads.' + operation, args: { id: 'test-job' } } }, new URL(location.href).searchParams.get('parentOrigin'));
+      }), operation);
+      if (operation === 'settings') assert.equal(result.error.code, 'forbidden');
+      else assert.deepEqual(result.result, { offlineFixture: true });
+    }
     const capabilities=(await page.evaluate(()=>window.calls)).map(v=>v.capability);
     assert(capabilities.includes('host.apps_launch'));
-    assert(capabilities.every(c=>['host.apps_launch','media.sync'].includes(c)), 'Only launch and reviewed Media heartbeat reach the host; identity probe stays blocked');
+    assert(capabilities.every(c=>['host.apps_launch','media.sync',...['status','create','job','cancel','read','remove'].map(op=>'downloads.'+op)].includes(c)), 'Only launch, reviewed Media heartbeat and explicit offline operations reach the host; unrelated probes stay blocked');
     assert.deepEqual(errors, []);
     await page.screenshot({ path: `${output}/app-embedding-${width}.png` });
     await page.close();

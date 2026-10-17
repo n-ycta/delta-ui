@@ -18,6 +18,7 @@ installHostBridge({
     (window as any).calls.push(r);
     if (r.capability === "host.apps_launch")
       return { url: (window as any).appURL, grants: [] };
+    if (['status','create','job','cancel','read','remove'].some(op => r.capability === 'downloads.' + op)) return { offlineFixture: true };
     throw Error("forbidden");
   },
 });
