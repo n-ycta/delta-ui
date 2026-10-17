@@ -281,3 +281,24 @@
 .dx-dock.peek .dx-launch { flex-direction: column; padding: 6px 2px; }
 .dx-dock.peek .dx-mini-open { display: grid; width: 100%; min-width: 0; padding: 0; }
 .widget-plugin-surfaces { display: grid; grid-template-columns: repeat(auto-fill,minmax(min(200px,100%),1fr)); gap: 6px; padding: 8px; }
+
+/* Mobile navigation keeps usable targets and reserves a stable manager action. */
+.dx-mobile-label { display: none; }
+@media (max-width: 760px) {
+  .dx-dock:not(.peek) { display: grid; grid-template-columns: minmax(0, 1fr) 56px; gap: 0 8px; padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); }
+  .dx-dock:not(.peek) .dx-dock-scroll { grid-column: 1; grid-row: 2; display: flex; gap: 4px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x proximity; overscroll-behavior-x: contain; }
+  .dx-dock:not(.peek) .dx-dock-group { display: contents; }
+  .dx-dock:not(.peek) .dx-dock-sep { display: none; }
+  .dx-dock:not(.peek) .dx-dock-tail { display: contents; }
+  .dx-dock:not(.peek) .dx-launch { flex: 1 0 56px; min-width: 56px; max-width: 88px; min-height: 52px; padding: 2px; gap: 3px; justify-content: center; scroll-snap-align: start; }
+  .dx-dock:not(.peek) .dx-launch-icon { width: 36px; height: 32px; flex: none; }
+  .dx-dock:not(.peek) .dx-launch-label { width: 100%; max-width: none; font-size: 11px; line-height: 15px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dx-dock:not(.peek) .dx-tool { grid-column: 2; grid-row: 2; width: 56px; }
+  .dx-dock:not(.peek) .dx-desktop-label { display: none; }
+  .dx-dock:not(.peek) .dx-mobile-label { display: block; }
+  .dx-dock:not(.peek) .dx-tool:last-child { display: none; }
+  .dx-dock:not(.peek) .dx-mini { grid-column: 1 / -1; grid-row: 1; width: 100%; max-width: none; min-height: 44px; margin-bottom: 8px; padding: 4px 8px; flex-direction: row; }
+  .dx-dock:not(.peek) .dx-mini-open { display: flex; flex: 1; min-width: 0; gap: 10px; }
+  .dx-dock:not(.peek) .dx-mini-text { display: flex; flex: 1; min-width: 0; }
+  .dx-dock:not(.peek) .dx-mini-btn { min-width: 44px; min-height: 44px; }
+}

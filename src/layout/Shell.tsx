@@ -37,7 +37,7 @@ export function Shell({ children,embedded=false }: { children: ReactNode;embedde
       {ui.mobileNav && <div className="overlay mobile-only" style={{ zIndex: 54 }} onClick={() => ui.set({ mobileNav: false })} />}
       <div className="main">
         <Topbar />
-        {api.mode === 'http' && !prefs.realNoticeHidden && <div className="banner info" role="note">
+        {api.mode === 'http' && (route === '/events' || route.startsWith('/nodes/')) && !prefs.realNoticeHidden && <div className="banner info" role="note">
           <span className="grow">{tr('runtime.realNotice')}</span>
           <Button variant="ghost" size="sm" iconOnly aria-label={tr('runtime.dismissNotice')} title={tr('runtime.dismissNotice')} style={{ flexShrink: 0, color: 'inherit' }} onClick={() => prefs.set({ realNoticeHidden: true })}><X size={15} /></Button>
         </div>}

@@ -26,16 +26,18 @@ function PluginCard({ p, onOpen, ui, onInstall, onLaunch, uiUpdate, busy }: { p:
   const warn = p.validation.issues.filter((i) => i.severity !== 'info').length;
   return (
     <article className="plug" onClick={onOpen} tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && onOpen()}>
-      <div className="row" style={{ alignItems: 'flex-start', gap: 12 }}>
+      <div className="plug-head">
         <span className={`plug-icon ${p.validation.compatible ? '' : 'muted'}`}><Icon name={p.manifest.icon} size={17} /></span>
         <div className="col grow" style={{ gap: 1, minWidth: 0 }}>
-          <div className="row" style={{ gap: 6 }}><span style={{ fontWeight: 600 }} className="truncate">{p.manifest.name}</span>{ui && <Badge tone={uiUpdate ? "accent" : undefined}>{s("pluginUi")}{uiUpdate ? " ↑" : ""}</Badge>}{hasUpdate(p) && <Badge tone="accent">{tr("pages.plugins.PluginsPage.s_6f6312ab93")}{p.instance.latestVersion}</Badge>}</div>
-          <span className="mono faint truncate" style={{ fontSize: 11 }}>{p.manifest.id} {tr("pages.plugins.PluginsPage.s_d3dacf895c")}{p.manifest.version}</span>
+          <div className="plug-name"><span style={{ fontWeight: 600 }} className="truncate">{p.manifest.name}</span>{ui && <Badge tone={uiUpdate ? "accent" : undefined}>{s("pluginUi")}{uiUpdate ? " ↑" : ""}</Badge>}{hasUpdate(p) && <Badge tone="accent">{tr("pages.plugins.PluginsPage.s_6f6312ab93")}{p.instance.latestVersion}</Badge>}</div>
+          <span className="mono faint truncate plug-identity">{p.manifest.id} {tr("pages.plugins.PluginsPage.s_d3dacf895c")}{p.manifest.version}</span>
         </div>
-        <StatusBadge tone={st.tone} label={st.label} pulse={p.instance.status === 'installing' || p.instance.status === 'updating'} />
+        <div className="plug-status"><StatusBadge tone={st.tone} label={st.label} pulse={p.instance.status === 'installing' || p.instance.status === 'updating'} /></div>
       </div>
+      {(onInstall || onLaunch) && <div className="plug-actions">
       {onInstall && <Button icon={<ArrowUpCircle size={14} />} disabled={busy} onClick={e => { e.stopPropagation(); onInstall(); }}>{tr(uiUpdate || onLaunch ? 'apps.update' : 'apps.install')}</Button>}
-      {onLaunch && <Button title={s('pluginUi')} aria-label={s('pluginUi')} onClick={e=>{e.stopPropagation();onLaunch();}}><Icon name="play" size={16}/></Button>}
+      {onLaunch && <Button iconOnly title={s('open')} aria-label={s('open')} onClick={e=>{e.stopPropagation();onLaunch();}}><Icon name="play" size={16}/></Button>}
+      </div>}
       <p className="plug-desc">{p.instance.error ? <span style={{ color: 'var(--err)' }}>{p.instance.error.message}</span> : p.manifest.description}</p>
       <div className="plug-foot">
         <span>{CATEGORY_LABEL[p.manifest.category]}</span>{tr("pages.plugins.PluginsPage.s_1fdf0d90c3")}<span>{p.manifest.metrics.length} {tr("pages.plugins.PluginsPage.s_dbed049336")}</span>
@@ -93,7 +95,7 @@ export function PluginsPage() {
   const cats = [...new Set(all.map((p) => p.manifest.category))];
 
   return (
-    <div className="page">
+    <div className="page plugins-page">
       <PageHead title={tr("pages.plugins.PluginsPage.s_ff13ef845f")} sub={tr("pages.plugins.PluginsPage.s_13f5b9ea75")}
         actions={counts.updates > 0 && <Button icon={<ArrowUpCircle size={14} />} onClick={() => setParams({ tab: 'updates' })}>{tr("pages.plugins.PluginsPage.s_8dcaf51985")}{counts.updates}</Button>} />
       {operationError && <div className="banner err" role="alert">{operationError}</div>}
@@ -103,13 +105,12 @@ export function PluginsPage() {
         { id: 'updates', label: tr("pages.plugins.PluginsPage.s_1392090686"), count: counts.updates },
         { id: 'issues', label: tr("pages.plugins.PluginsPage.s_7c80872ccf"), count: counts.issues, alert: counts.issues > 0 },
       ]} />
-      <div className="row wrap" style={{ marginBottom: 14 }}>
-        <div className="input-group" style={{ width: 300, maxWidth: '100%' }}><span className="addon" style={{ borderRadius: '5px 0 0 5px', borderLeft: '1px solid var(--rule-strong)', borderRight: 0 }}><Search size={13} /></span><input className="input" style={{ borderRadius: '0 5px 5px 0' }} placeholder={tr("pages.plugins.PluginsPage.s_c43dd99223")} value={q} onChange={(e) => setQ(e.target.value)} /></div>
-        <div className="row wrap gap-1">
+      <div className="plugin-toolbar">
+        <div className="input-group plugin-search"><span className="addon" style={{ borderRadius: '5px 0 0 5px', borderLeft: '1px solid var(--rule-strong)', borderRight: 0 }}><Search size={13} /></span><input className="input" style={{ borderRadius: '0 5px 5px 0' }} placeholder={tr("pages.plugins.PluginsPage.s_c43dd99223")} value={q} onChange={(e) => setQ(e.target.value)} /></div>
+        <div className="plugin-categories">
           <button className="chip" aria-pressed={cat === ''} onClick={() => setCat('')}>{tr("pages.plugins.PluginsPage.s_fd08da7a63")}</button>
           {cats.map((c) => <button key={c} className="chip" aria-pressed={cat === c} onClick={() => setCat(cat === c ? '' : c)}>{CATEGORY_LABEL[c]}</button>)}
         </div>
-        <span className="spacer" />
         <Segmented value={view} onChange={setView} options={[{ value: 'grid', label: <LayoutGrid size={13} />, title: tr("pages.plugins.PluginsPage.s_a0d17d23d2") }, { value: 'table', label: <List size={13} />, title: tr("pages.plugins.PluginsPage.s_f2729fd738") }]} />
       </div>
       {plugins.loading && <SkeletonRows rows={6} h={60} />}

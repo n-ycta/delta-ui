@@ -144,9 +144,10 @@ export function Dock({ live, peek = false }: { live: boolean; peek?: boolean }) 
             )}
           </div>
         )}
-        <button className="dx-launch dx-tool" title={s("allApps")} onClick={() => openAppManager("apps")}>
+        <button className="dx-launch dx-tool" title={s("allApps")} aria-label={s("allApps")} onClick={() => openAppManager("apps")}>
           <span className="dx-launch-icon"><WIcon name="squares-four" size={20} /></span>
-          <span className="dx-launch-label">{s("allApps")}</span>
+          <span className="dx-launch-label dx-desktop-label">{s("allApps")}</span>
+          <span className="dx-launch-label dx-mobile-label" aria-hidden="true">{s("more")}</span>
         </button>
         <button className="dx-launch dx-tool" title={s("newDesktop")} onClick={() => openAppManager("desktops")}>
           <span className="dx-launch-icon"><WIcon name="plus" size={20} /></span>

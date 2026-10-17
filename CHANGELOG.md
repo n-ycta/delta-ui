@@ -1,11 +1,19 @@
 # Changelog
 
-## Unreleased
+## 0.3.1
+
+- Reflow the mobile plugin catalog into fluid cards, a two-column tab selector and a dedicated search/filter toolbar at 320px and wider.
+- Center segmented-control icons explicitly and provide 44px touch targets.
+- Keep the mobile dock manager reachable with a short label, aligned navigation slots and a separate now-playing row.
+- Remove the unrelated history-service notice from the catalog; keep history guidance on history screens.
+- Add RU/EN light/dark browser checks for mobile overflow, icon centers, hit-testing, installation controls, manager and hidden-dock reveal.
+
+## 0.3.0
 
 - Update the Media catalog to the verified 0.3.5 UI package.
 - Allow only the six explicit offline-cache capabilities through the Media UI broker; keep unrelated operations denied.
 
-## 0.3.0
+## 0.3.0 — shell and workbench
 
 - One global dock outside every app: Console, installed apps and desktops; configurable position (left/right/top/bottom/hidden), size, labels, order and pinning; context menu (open, pin, rename, duplicate, delete, stop, uninstall); bottom bar on phones.
 - “All apps” manager: installed apps appear automatically after installation, catalog install/update, desktop previews and template gallery, dock constructor, theme.

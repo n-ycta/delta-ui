@@ -45,7 +45,7 @@ export function Switch({ checked, onChange, disabled, label }: { checked: boolea
 export function Segmented<T extends string>({ value, options, onChange, sans }: { value: T; options: { value: T; label: ReactNode; title?: string }[]; onChange: (v: T) => void; sans?: boolean }) {
   return (
     <div className={`seg ${sans ? 'sans' : ''}`} role="group">
-      {options.map((o) => <button key={o.value} type="button" title={o.title} aria-pressed={o.value === value} onClick={() => onChange(o.value)}>{o.label}</button>)}
+      {options.map((o) => <button key={o.value} type="button" title={o.title} aria-label={o.title} aria-pressed={o.value === value} onClick={() => onChange(o.value)}>{o.label}</button>)}
     </div>
   );
 }
