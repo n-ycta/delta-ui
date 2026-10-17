@@ -1,7 +1,7 @@
 """Stage checksum-pinned, static app packages. No application code is executed."""
 from pathlib import Path
 import urllib.request,hashlib,json
-catalog=json.loads(Path('node_modules/@delta/ui/app-catalog.json').read_text())
+catalog=json.loads(Path('node_modules/@delta/ui/app-catalog.json').read_text(encoding='utf-8'))
 target=Path('app-packages');target.mkdir(exist_ok=True)
 for app in catalog:
  url=app['asset'];assert url.startswith('https://github.com/n-ycta/') and '/releases/download/' in url

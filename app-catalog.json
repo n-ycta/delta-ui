@@ -6,7 +6,7 @@
     "icon": "vinyl-record",
     "description": {
       "en": "Music, video, podcasts, audiobooks and radio. Plays YouTube, SoundCloud and Spotify items sent by source apps.",
-      "ru": "Музыка, видео, подкасты, аудиокниги и радио. Играет YouTube, SoundCloud и Spotify из приложений-источников."
+      "ru": "\u041c\u0443\u0437\u044b\u043a\u0430, \u0432\u0438\u0434\u0435\u043e, \u043f\u043e\u0434\u043a\u0430\u0441\u0442\u044b, \u0430\u0443\u0434\u0438\u043e\u043a\u043d\u0438\u0433\u0438 \u0438 \u0440\u0430\u0434\u0438\u043e. \u0418\u0433\u0440\u0430\u0435\u0442 YouTube, SoundCloud \u0438 Spotify \u0438\u0437 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0439-\u0438\u0441\u0442\u043e\u0447\u043d\u0438\u043a\u043e\u0432."
     },
     "asset": "https://github.com/n-ycta/delta-media/releases/download/v0.2.0/delta-media.delta-app",
     "sha256": "f59af88d6eb09eb24feecb716291d99a5735fb85d0c19aa8109d82c8c4eece4a",
@@ -45,7 +45,7 @@
     "icon": "youtube-logo",
     "description": {
       "en": "Search YouTube or paste a link and send it to the player.",
-      "ru": "Поиск по YouTube или ссылка — и сразу в плеер."
+      "ru": "\u041f\u043e\u0438\u0441\u043a \u043f\u043e YouTube \u0438\u043b\u0438 \u0441\u0441\u044b\u043b\u043a\u0430 \u2014 \u0438 \u0441\u0440\u0430\u0437\u0443 \u0432 \u043f\u043b\u0435\u0435\u0440."
     },
     "asset": "https://github.com/n-ycta/delta-media-sources/releases/download/v0.1.0/delta-youtube.delta-app",
     "sha256": "35d6294546d322625ed08023eb5101c7a22137be41510114f04d0c24b37c358b",
@@ -83,7 +83,7 @@
     "icon": "soundcloud-logo",
     "description": {
       "en": "Paste SoundCloud tracks and playlists and send them to the player.",
-      "ru": "Ссылки на треки и плейлисты SoundCloud — в плеер."
+      "ru": "\u0421\u0441\u044b\u043b\u043a\u0438 \u043d\u0430 \u0442\u0440\u0435\u043a\u0438 \u0438 \u043f\u043b\u0435\u0439\u043b\u0438\u0441\u0442\u044b SoundCloud \u2014 \u0432 \u043f\u043b\u0435\u0435\u0440."
     },
     "asset": "https://github.com/n-ycta/delta-media-sources/releases/download/v0.1.0/delta-soundcloud.delta-app",
     "sha256": "fa001da1a802c96cd7cc69a8a3f4723599d06f00a5a1c599ce9b5fe9de5ca790",
@@ -121,7 +121,7 @@
     "icon": "spotify-logo",
     "description": {
       "en": "Paste Spotify links and send them to the player (previews unless signed in).",
-      "ru": "Ссылки Spotify — в плеер (превью, если не выполнен вход)."
+      "ru": "\u0421\u0441\u044b\u043b\u043a\u0438 Spotify \u2014 \u0432 \u043f\u043b\u0435\u0435\u0440 (\u043f\u0440\u0435\u0432\u044c\u044e, \u0435\u0441\u043b\u0438 \u043d\u0435 \u0432\u044b\u043f\u043e\u043b\u043d\u0435\u043d \u0432\u0445\u043e\u0434)."
     },
     "asset": "https://github.com/n-ycta/delta-media-sources/releases/download/v0.1.0/delta-spotify.delta-app",
     "sha256": "328bfc86aaedbe9febd8268775a5a4db0dfccb9b814ef4e651a9ce8e7ce5989c",
