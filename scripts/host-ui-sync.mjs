@@ -53,7 +53,8 @@ if (existsSync("manifest.json")) {
   const man = JSON.parse(read("manifest.json"));
   if (man.version === old) man.version = version;
   if (man.metadata?.ui?.version === old) man.metadata.ui.version = version;
-  writeFileSync("manifest.json", JSON.stringify(man, null, 2) + "\n");
+  const ascii = (t) => t.replace(/[\u007f-\uffff]/g, (c) => "\\u" + c.charCodeAt(0).toString(16).padStart(4, "0"));
+  writeFileSync("manifest.json", ascii(JSON.stringify(man, null, 2)) + "\n");
 }
 let uiVersion = sha.slice(0, 7), bullets = [];
 try {
