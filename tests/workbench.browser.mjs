@@ -12,8 +12,9 @@ const browser = await chromium.launch({
 const page = await browser.newPage({ viewport: { width: 1440, height: 960 } }),
   errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
+// Desktops are switched from the global Delta dock (v0.3.0), not a per-workbench nav.
 const nav = (name) =>
-  page.locator(".wb-nav").getByRole("button", { name, exact: true });
+  page.locator(".dx-dock").getByRole("button", { name, exact: true });
 const top = (name) =>
   page.locator(".wb-topbar").getByRole("button", { name, exact: true });
 const settings = () => top("Настройки").click();
@@ -26,25 +27,20 @@ try {
   await page.goto("http://127.0.0.1:5190/workbench.html");
   await page.waitForSelector(".wb");
   await page.waitForTimeout(500);
-  assert.equal(await page.locator(".wb-nav>button").count(), 5);
-  await page.locator("[data-launcher-toggle]").click();
+  assert.equal((await state()).apps.length, 3, "starter desktops: home, studio, canvas");
+  assert.equal(await page.locator(".wb-nav").count(), 0, "no per-workbench nav");
+  for (const name of ["Консоль", "Главная", "Студия", "Канвас"])
+    assert.equal(await nav(name).count(), 1, `dock entry ${name}`);
+  await nav("Канвас").click();
   await page
-    .locator(".wb-recovery-dock")
-    .getByRole("button", { name: "Приложения", exact: true })
-    .click();
-  await dialog()
-    .locator(".wb-app-choices")
-    .getByRole("button", { name: "Канвас", exact: true })
-    .click();
-  await page
-    .locator("textarea")
+    .locator(".wb-app-surface:not([hidden]) textarea")
     .first()
     .fill("Persistent note — not in layout export");
   await page.waitForTimeout(500);
   let s = await state(),
     canvas = s.apps.find((a) => a.template === "canvas"),
     original = { ...canvas.root.rects[canvas.root.children[0].id] };
-  const header = page.locator(".wb-window>header").first();
+  const header = page.locator(".wb-app-surface:not([hidden]) .wb-window>header").first();
   const box = await header.boundingBox();
   await page.mouse.move(box.x + 100, box.y + 24);
   await page.mouse.down();
@@ -58,7 +54,7 @@ try {
   await page.reload();
   await page.waitForTimeout(400);
   assert.equal(
-    await page.locator("textarea").first().inputValue(),
+    await page.locator(".wb-app-surface:not([hidden]) textarea").first().inputValue(),
     "Persistent note — not in layout export",
   );
   // Real local audio stored in IndexedDB; no mock playback counters.
@@ -81,10 +77,10 @@ try {
       i,
     );
   await page
-    .locator(".wb-localmedia input[type=file]")
+    .locator(".wb-app-surface:not([hidden]) .wb-localmedia input[type=file]")
     .setInputFiles({ name: "tone.wav", mimeType: "audio/wav", buffer: wav });
-  await page.getByRole("button", { name: "tone.wav" }).click();
-  const video = page.locator("video").first();
+  await page.locator(".wb-app-surface:not([hidden])").getByRole("button", { name: "tone.wav" }).click();
+  const video = page.locator(".wb-app-surface:not([hidden]) video").first();
   await video.evaluate((v) => v.play());
   await page.waitForTimeout(1200);
   assert((await video.evaluate((v) => v.currentTime)) > 0.5);
@@ -121,7 +117,7 @@ try {
     .getByRole("button", { name: "Дублировать", exact: true })
     .click();
   await page.waitForTimeout(400);
-  assert.equal((await state()).apps.length, 5);
+  assert.equal((await state()).apps.length, 4);
   await close();
   // Advanced composition creates a real split around a selected component.
   await nav("Студия").click();
@@ -163,18 +159,18 @@ try {
   );
   await page.screenshot({ path: `${output}/workbench-builder-desktop.png` });
   await top("Готово").click();
-  // Every starter theme renders; settings actually persist theme.
+  // Every starter desktop renders under the global theme.
   for (const [name, path] of [
-    ["Медиа", "paper"],
-    ["Студия", "midnight"],
-    ["Канвас", "daylight"],
+    ["Главная", "home"],
+    ["Студия", "studio"],
+    ["Канвас", "canvas"],
   ]) {
     await nav(name).click();
     await page.screenshot({ path: `${output}/workbench-${path}-desktop.png` });
   }
   await page.setViewportSize({ width: 390, height: 844 });
-  await nav("Медиа").click();
-  await page.screenshot({ path: `${output}/workbench-media-mobile.png` });
+  await nav("Главная").click();
+  await page.screenshot({ path: `${output}/workbench-home-mobile.png` });
   assert.equal(
     await page.evaluate(() => document.documentElement.scrollWidth),
     390,
@@ -195,7 +191,7 @@ try {
     buffer: Buffer.from(exported),
   });
   await page.waitForTimeout(500);
-  assert.equal((await state()).apps.length, 4);
+  assert.equal((await state()).apps.length, 3);
   // Corrupt import must leave current valid layout untouched.
   await page.locator(".wb>input[type=file]").setInputFiles({
     name: "bad.json",
@@ -203,12 +199,15 @@ try {
     buffer: Buffer.from('{"version":99,"script":"alert(1)"}'),
   });
   await page.waitForTimeout(400);
-  assert.equal((await state()).apps.length, 4);
+  assert.equal((await state()).apps.length, 3);
   assert(await page.getByRole("alert").count());
   assert.deepEqual(errors, []);
   console.log(
-    "PASS: persistence, real media, keepalive, drag, icon pool, export/import, composition, 4 themes, mobile, modal, invalid import",
+    "PASS: persistence, real media, keepalive, drag, icon pool, export/import, composition, starter desktops via global dock, mobile, modal, invalid import",
   );
+} catch (e) {
+  await page.screenshot({ path: `${output}/workbench-failure.png` }).catch(() => {});
+  throw e;
 } finally {
   await browser.close();
 }

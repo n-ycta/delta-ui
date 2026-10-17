@@ -13,6 +13,42 @@ const p = await b.newPage({ viewport: { width: 1856, height: 1024 } }),
 p.on("pageerror", (e) => errors.push(e.message));
 try {
   await p.goto("http://127.0.0.1:5190/workbench.html");
+  await p.waitForSelector(".wb");
+  // Console is an app since 0.3.0, but a desktop may still embed it full-size (older layouts).
+  const consoleDesk = {
+    version: 1,
+    active: "11111111-1111-4111-8111-111111111111",
+    apps: [
+      {
+        id: "11111111-1111-4111-8111-111111111111",
+        name: "Консоль",
+        icon: "terminal",
+        template: "console",
+        theme: "graphite",
+        nav: "hidden",
+        mobileNav: "hidden",
+        chrome: false,
+        brand: true,
+        logo: true,
+        gap: 8,
+        radius: 12,
+        accent: "#7155da",
+        root: {
+          id: "22222222-2222-4222-8222-222222222222",
+          type: "view",
+          kind: "system",
+          target: "/console",
+          title: "Консоль",
+          icon: "terminal",
+        },
+      },
+    ],
+  };
+  await p.locator(".wb>input[type=file]").setInputFiles({
+    name: "console.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify(consoleDesk)),
+  });
   await p.waitForSelector(".wb .sidebar");
   await p.waitForTimeout(1400);
   assert((await p.locator(".widget").count()) > 0);
@@ -89,16 +125,17 @@ try {
     await p.evaluate(() => document.documentElement.scrollWidth),
     390,
   );
+  const themeBefore = await p.evaluate(() => document.documentElement.dataset.theme);
   await p
     .locator(".topbar > button[title]")
     .filter({ has: p.locator("svg") })
     .first()
     .click();
   await p.waitForTimeout(300);
-  assert.equal(await p.locator(".wb").getAttribute("data-wb-theme"), "paper");
-  assert.equal(
+  // One global theme: the Console toggle flips the whole shell, desktops included.
+  assert.notEqual(
     await p.evaluate(() => document.documentElement.dataset.theme),
-    "light",
+    themeBefore,
   );
   await p.screenshot({ path: `${output}/workbench-parity-mobile-light.png` });
   assert.equal(
@@ -111,6 +148,9 @@ try {
   console.log(
     "PASS full Console routes, node tabs, dashboards and charts, desktop/mobile, no runtime errors",
   );
+} catch (e) {
+  await p.screenshot({ path: `${output}/workbench-parity-failure.png` }).catch(() => {});
+  throw e;
 } finally {
   await b.close();
 }

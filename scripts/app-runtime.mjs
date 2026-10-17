@@ -26,7 +26,7 @@ export const validPath = (p) =>
     .every((v) => /^[a-zA-Z0-9._-]+$/.test(v) && v !== "." && v !== "..");
 export const protocol = (id) => "deltaapp-" + id.replaceAll(".", "-");
 export const APP_CSP =
-  "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https: data: blob:; media-src 'self' https: blob:; worker-src 'self'; connect-src 'self' https: wss:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src https://www.youtube-nocookie.com";
+  "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https: data: blob:; media-src 'self' https: blob:; worker-src 'self'; connect-src 'self' https: wss:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src https://www.youtube-nocookie.com https://w.soundcloud.com https://open.spotify.com";
 export function verify(bytes, expected) {
   if (bytes.length > MAX_PACKAGE || digest(bytes) !== expected.sha256)
     throw Error("package_integrity");

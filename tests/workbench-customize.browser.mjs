@@ -13,7 +13,43 @@ const p = await b.newPage({ viewport: { width: 1440, height: 1000 } }),
 p.on("pageerror", (e) => errors.push(e.message));
 try {
   await p.goto("http://127.0.0.1:5190/workbench.html");
-  await p.waitForSelector(".sidebar");
+  await p.waitForSelector(".wb");
+  // Console is an app since 0.3.0, but a desktop may still embed it full-size (older layouts).
+  const consoleDesk = {
+    version: 1,
+    active: "11111111-1111-4111-8111-111111111111",
+    apps: [
+      {
+        id: "11111111-1111-4111-8111-111111111111",
+        name: "Консоль",
+        icon: "terminal",
+        template: "console",
+        theme: "graphite",
+        nav: "hidden",
+        mobileNav: "hidden",
+        chrome: false,
+        brand: true,
+        logo: true,
+        gap: 8,
+        radius: 12,
+        accent: "#7155da",
+        root: {
+          id: "22222222-2222-4222-8222-222222222222",
+          type: "view",
+          kind: "system",
+          target: "/console",
+          title: "Консоль",
+          icon: "terminal",
+        },
+      },
+    ],
+  };
+  await p.locator(".wb>input[type=file]").setInputFiles({
+    name: "console.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify(consoleDesk)),
+  });
+  await p.waitForSelector(".wb .sidebar");
   await p.locator("[data-launcher-toggle]").click();
   await p
     .locator(".wb-recovery-dock")
@@ -93,6 +129,9 @@ try {
   console.log(
     "PASS heading edits/hiding, summary removal, existing live widget + plugins composition",
   );
+} catch (e) {
+  await p.screenshot({ path: `${output}/workbench-customize-failure.png` }).catch(() => {});
+  throw e;
 } finally {
   await b.close();
 }

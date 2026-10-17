@@ -192,7 +192,7 @@ pub fn mime(path: &str) -> &'static str {
         _ => "application/octet-stream",
     }
 }
-pub const CSP:&str="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https: data: blob:; media-src 'self' https: blob:; worker-src 'self'; connect-src 'self' https: wss:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src https://www.youtube-nocookie.com";
+pub const CSP:&str="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https: data: blob:; media-src 'self' https: blob:; worker-src 'self'; connect-src 'self' https: wss:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src https://www.youtube-nocookie.com https://w.soundcloud.com https://open.spotify.com";
 #[cfg(test)]
 mod tests {
     use super::*;

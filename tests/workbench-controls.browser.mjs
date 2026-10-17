@@ -9,6 +9,13 @@ try {
     errors = [];
   p.on("pageerror", (e) => errors.push(e.message));
   await p.goto("http://127.0.0.1:5190/workbench.html");
+  await p.waitForSelector(".wb");
+  // The compact launcher replaces the top bar on chrome-less desktops.
+  await p.locator(".wb-topbar").getByRole("button", { name: "Настройки", exact: true }).click();
+  await p.getByRole("dialog").getByLabel("Панель среды", { exact: true }).uncheck();
+  await p.getByRole("dialog").getByRole("button", { name: "Закрыть", exact: true }).click();
+  await p.waitForTimeout(800);
+  await p.reload();
   await p.waitForSelector("[data-launcher-toggle]");
   const launcher = p.locator(".wb-control-launcher");
   assert.equal(await launcher.getAttribute("data-expanded"), "false");

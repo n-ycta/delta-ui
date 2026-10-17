@@ -208,8 +208,8 @@ table.t { width: 100%; border-collapse: collapse; font-size: 12.5px; }
 .menu-sep { height: 1px; background: var(--rule); margin: 4px 0; }
 .menu-label { padding: 6px 8px 2px; }
 
-.toasts { position: fixed; bottom: 16px; right: 16px; z-index: 80; display: flex; flex-direction: column; gap: 8px; width: min(380px, calc(100vw - 32px)); }
-.toast { background: var(--ink); color: var(--bg); border-radius: var(--r-md); padding: 10px 12px; display: flex; gap: 10px; align-items: flex-start; animation: rise2 .18s var(--ease); font-size: 12.5px; }
+.toasts { pointer-events: none; position: fixed; bottom: 16px; right: 16px; z-index: 80; display: flex; flex-direction: column; gap: 8px; width: min(380px, calc(100vw - 32px)); }
+.toast { pointer-events: auto; background: var(--ink); color: var(--bg); border-radius: var(--r-md); padding: 10px 12px; display: flex; gap: 10px; align-items: flex-start; animation: rise2 .18s var(--ease); font-size: 12.5px; }
 @keyframes rise2 { from { opacity: 0; transform: translateY(6px); } }
 .toast .bar { width: 3px; align-self: stretch; border-radius: 2px; background: var(--faint); flex-shrink: 0; }
 .toast.success .bar { background: var(--ok); } .toast.warn .bar { background: var(--warn); } .toast.error .bar, .toast.critical .bar { background: var(--err); } .toast.info .bar { background: var(--info); }
