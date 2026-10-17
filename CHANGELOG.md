@@ -10,6 +10,8 @@
 - Dashboard “App” widget embeds an installed app with the usual move/resize.
 - SDK: media session (`reportMedia`, `onMediaCommand`) and catalog-governed intents between apps (`sendIntent`, `onIntent`).
 - Fix: the launcher “Apps” and “Settings” buttons opened the same dialog; distinct icons for Console, desktops and templates.
+- Fix: the toast container no longer covers top-right controls; overlays are anchored to the stage, above the global dock.
+- Catalog: Delta Media 0.2.0 (player, receives `media.play`/`media.enqueue`) and new source apps Delta YouTube, Delta SoundCloud, Delta Spotify 0.1.0 (send those intents). App CSP allows the official SoundCloud and Spotify embeds.
 
 ## 0.1.3
 

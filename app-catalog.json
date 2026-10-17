@@ -2,9 +2,14 @@
   {
     "id": "dev.delta.media",
     "name": "Delta Media",
-    "version": "0.1.0-alpha.3",
-    "asset": "https://github.com/n-ycta/delta-media/releases/download/v0.1.0-alpha.3/delta-media.delta-app",
-    "sha256": "215d1b85f564e0c7c2e20cde670b11feaac3f85cb19cd6279ae50bd69ea9c049",
+    "version": "0.2.0",
+    "icon": "vinyl-record",
+    "description": {
+      "en": "Music, video, podcasts, audiobooks and radio. Plays YouTube, SoundCloud and Spotify items sent by source apps.",
+      "ru": "Музыка, видео, подкасты, аудиокниги и радио. Играет YouTube, SoundCloud и Spotify из приложений-источников."
+    },
+    "asset": "https://github.com/n-ycta/delta-media/releases/download/v0.2.0/delta-media.delta-app",
+    "sha256": "f59af88d6eb09eb24feecb716291d99a5735fb85d0c19aa8109d82c8c4eece4a",
     "runtime": {
       "execution": "web",
       "platforms": [
@@ -24,6 +29,127 @@
       "media.playback",
       "network.https"
     ],
-    "grants": []
+    "grants": [],
+    "intents": {
+      "send": [],
+      "receive": [
+        "media.play",
+        "media.enqueue"
+      ]
+    }
+  },
+  {
+    "id": "dev.delta.youtube",
+    "name": "Delta YouTube",
+    "version": "0.1.0",
+    "icon": "youtube-logo",
+    "description": {
+      "en": "Search YouTube or paste a link and send it to the player.",
+      "ru": "Поиск по YouTube или ссылка — и сразу в плеер."
+    },
+    "asset": "https://github.com/n-ycta/delta-media-sources/releases/download/v0.1.0/delta-youtube.delta-app",
+    "sha256": "35d6294546d322625ed08023eb5101c7a22137be41510114f04d0c24b37c358b",
+    "runtime": {
+      "execution": "web",
+      "platforms": [
+        "android",
+        "windows",
+        "linux",
+        "macos",
+        "ios",
+        "web"
+      ],
+      "architectures": [
+        "any"
+      ]
+    },
+    "permissions": [
+      "storage.local",
+      "network.https"
+    ],
+    "grants": [],
+    "intents": {
+      "send": [
+        "media.play",
+        "media.enqueue"
+      ],
+      "receive": []
+    }
+  },
+  {
+    "id": "dev.delta.soundcloud",
+    "name": "Delta SoundCloud",
+    "version": "0.1.0",
+    "icon": "soundcloud-logo",
+    "description": {
+      "en": "Paste SoundCloud tracks and playlists and send them to the player.",
+      "ru": "Ссылки на треки и плейлисты SoundCloud — в плеер."
+    },
+    "asset": "https://github.com/n-ycta/delta-media-sources/releases/download/v0.1.0/delta-soundcloud.delta-app",
+    "sha256": "fa001da1a802c96cd7cc69a8a3f4723599d06f00a5a1c599ce9b5fe9de5ca790",
+    "runtime": {
+      "execution": "web",
+      "platforms": [
+        "android",
+        "windows",
+        "linux",
+        "macos",
+        "ios",
+        "web"
+      ],
+      "architectures": [
+        "any"
+      ]
+    },
+    "permissions": [
+      "storage.local",
+      "network.https"
+    ],
+    "grants": [],
+    "intents": {
+      "send": [
+        "media.play",
+        "media.enqueue"
+      ],
+      "receive": []
+    }
+  },
+  {
+    "id": "dev.delta.spotify",
+    "name": "Delta Spotify",
+    "version": "0.1.0",
+    "icon": "spotify-logo",
+    "description": {
+      "en": "Paste Spotify links and send them to the player (previews unless signed in).",
+      "ru": "Ссылки Spotify — в плеер (превью, если не выполнен вход)."
+    },
+    "asset": "https://github.com/n-ycta/delta-media-sources/releases/download/v0.1.0/delta-spotify.delta-app",
+    "sha256": "328bfc86aaedbe9febd8268775a5a4db0dfccb9b814ef4e651a9ce8e7ce5989c",
+    "runtime": {
+      "execution": "web",
+      "platforms": [
+        "android",
+        "windows",
+        "linux",
+        "macos",
+        "ios",
+        "web"
+      ],
+      "architectures": [
+        "any"
+      ]
+    },
+    "permissions": [
+      "storage.local",
+      "network.https"
+    ],
+    "grants": [],
+    "intents": {
+      "send": [
+        "media.play",
+        "media.enqueue"
+      ],
+      "receive": []
+    }
   }
 ]
