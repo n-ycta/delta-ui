@@ -41,14 +41,14 @@
   {
     "id": "dev.delta.lifeos",
     "name": "Delta LifeOS",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "icon": "squares-four",
     "description": {
       "ru": "Дневник, задачи, навыки, время и проекты.",
       "en": "Journal, tasks, skills, time and projects."
     },
-    "asset": "https://github.com/n-ycta/delta-lifeos/releases/download/v0.3.1/delta-lifeos.delta-app",
-    "sha256": "08eb4d92261aa801e9a49ea417ede72fccab69c3e1501673fc22092d0c7869fb",
+    "asset": "https://github.com/n-ycta/delta-lifeos/releases/download/v0.3.2/delta-lifeos.delta-app",
+    "sha256": "984a88ecdcb997565bbe24e2f8e70499039c4c78bd766ae5c66efb94fb0411e5",
     "runtime": {
       "execution": "web",
       "platforms": [

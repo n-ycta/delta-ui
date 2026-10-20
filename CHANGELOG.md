@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.6
+
+- Keep persistent app frames in stable DOM order; alternating two applications must not move iframe ancestors or reload their documents.
+- Cover early/missed ready events and allow a separate 35-second RPC deadline.
+- Bound dropdown SVG geometry and hide the retired Vector portable launcher.
+- Publish the verified LifeOS 0.3.2 package.
+
 ## 0.3.5
 
 - Publish verified LifeOS 0.3.1 with one independent app shell, native Delta controls and thirteen dashboard surfaces.

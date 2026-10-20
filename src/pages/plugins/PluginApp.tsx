@@ -106,6 +106,7 @@ export function PluginSurface({
     window.addEventListener("message", receive);
     const node = frame.current;
     node?.addEventListener("load", initialize);
+    initialize(); // Also cover a ready/load event sent before this effect subscribed.
     const offMedia = registerMediaCommander(id, (command) => post({ type: "delta:media-command", command }));
     const offIntents = registerReceiver(id, (intent, payload, from) => post({ type: "delta:intent", intent, payload, from }));
     return () => {

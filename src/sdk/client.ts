@@ -72,7 +72,8 @@ export function applyThemeTokens(tokens: ThemeTokens | undefined, root: HTMLElem
 }
 export function connectPlugin(
   parentOrigin: string,
-  timeoutMs = 5000,
+  timeoutMs = 15000,
+  callTimeoutMs = Math.max(timeoutMs, 35000),
 ): Promise<{
   context: AppContext;
   call(capability: string, args?: Record<string, unknown>): Promise<unknown>;
@@ -96,7 +97,10 @@ export function connectPlugin(
   if (!["http:", "https:", "tauri:"].includes(parentURL.protocol))
     return Promise.reject(Error("invalid_parent"));
   return new Promise((resolve, reject) => {
+    const ready = () => parent.postMessage({ type: "delta:ready" }, origin);
+    const retry = setInterval(ready, 300);
     const timer = setTimeout(() => {
+      clearInterval(retry);
       window.removeEventListener("message", receive);
       reject(Error("host_timeout"));
     }, timeoutMs);
@@ -118,6 +122,7 @@ export function connectPlugin(
       )
         return;
       clearTimeout(timer);
+      clearInterval(retry);
       window.removeEventListener("message", receive);
       const channel = e.data.channel;
       const pending = new Map<
@@ -199,7 +204,7 @@ export function connectPlugin(
             const timer = setTimeout(() => {
               pending.delete(id);
               reject(Error("host_timeout"));
-            }, timeoutMs);
+            }, callTimeoutMs);
             pending.set(id, { resolve, reject, timer });
             parent.postMessage(
               { channel, id, request: { capability, args } },
@@ -219,6 +224,6 @@ export function connectPlugin(
       });
     }
     window.addEventListener("message", receive);
-    parent.postMessage({ type: "delta:ready" }, origin);
+    ready();
   });
 }

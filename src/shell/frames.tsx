@@ -103,7 +103,13 @@ export function FrameHost({ children }: { children: ReactNode }) {
           for (const x of own) keys.set(x.id + (x.surface ? '#' + x.surface : ''), { id:x.id, surface:x.surface });
         }
         for (const f of old) if (runningRef.current.includes(f.id) && !keys.has(f.key)) keys.set(f.key, {id:f.id,surface:f.surface});
-        const next = [...keys].map(([key, {id, surface}]) => {
+        // Stable React keys are not enough for iframes: moving an existing ancestor
+        // in the DOM can reload its browsing context. Keep mounted frame order;
+        // append new frames only, regardless of which application owns a slot now.
+        const order = new Map(old.map((f, i) => [f.key, i]));
+        const next = [...keys].sort(([a], [b]) =>
+          (order.get(a) ?? Number.MAX_SAFE_INTEGER) - (order.get(b) ?? Number.MAX_SAFE_INTEGER)
+        ).map(([key, {id, surface}]) => {
           const candidates = slots.current.filter(
             (x) => x.id === id && x.surface === surface && visibleArea(x.el)>0,
           );
