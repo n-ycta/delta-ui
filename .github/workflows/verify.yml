@@ -15,7 +15,7 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm test && npm run test:apps && npm run test:i18n && npm run build
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:navigation && npm run test:onboarding && npm run test:language && npm run test:profile && npm run test:embedding && npm run test:mobile && npm run test:reliability
+      - run: npm run test:navigation && npm run test:onboarding && npm run test:pairing && npm run test:language && npm run test:profile && npm run test:embedding && npm run test:mobile && npm run test:reliability
       - name: Verify composable workbench
         run: |
           npm run dev -- --host 127.0.0.1 --port 5190 > /tmp/workbench-vite.log 2>&1 &

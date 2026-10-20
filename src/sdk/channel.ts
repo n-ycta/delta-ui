@@ -1,7 +1,8 @@
+import {randomId} from './random';
 import { validateRequest, type CapabilityRequest } from '../host/contract';
 /** Authorization belongs to the parent. This broker never hands its transport or credentials to a plugin. */
 export function pluginChannel(options: { source: Window; origin: string; grants: ReadonlySet<string>; call(request: CapabilityRequest):Promise<unknown> }) {
- const nonce=crypto.randomUUID();let revoked=false;let active=0;
+ const nonce=randomId();let revoked=false;let active=0;
  const receive=async(event:MessageEvent)=>{
   if (revoked||event.source!==options.source||event.origin!==options.origin||event.data?.channel!==nonce) return;
   const {id,request}=event.data;

@@ -1,0 +1,15 @@
+import jsQR from 'jsqr';
+import {createRoot} from 'react-dom/client';
+import {HashRouter} from 'react-router-dom';
+import {ApiProvider} from '../src/app/ApiContext';
+import type {CoreApi} from '../src/api';
+import {PairDialog} from '../src/pages/nodes/PairDialog';
+import {SkinRoot} from '../src/theme/SkinRoot';
+import '../src/ui/controls.css';
+import '../src/styles/tokens.css';
+import '../src/styles/base.css';
+import '../src/styles/components.css';
+(window as any).calls=[];
+(window as any).decodeQr=async()=>{const img=document.querySelector('img')!;await img.decode();const canvas=document.createElement('canvas');canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;const c=canvas.getContext('2d')!;c.drawImage(img,0,0);const b=c.getImageData(0,0,canvas.width,canvas.height);return jsQR(b.data,b.width,b.height)?.data};
+const api={createPairingTicket:async(kind:string,name:string,options:any)=>{(window as any).calls.push({kind,name,options});return {code:'fixture-one-time-code',expiresAt:Date.now()+(location.search.includes('expired')?-1000:600000),command:'unused-desktop-command'}}} as unknown as CoreApi;
+createRoot(document.querySelector('#root')!).render(<ApiProvider api={api}><HashRouter><SkinRoot/><PairDialog open onClose={()=>{}}/></HashRouter></ApiProvider>);

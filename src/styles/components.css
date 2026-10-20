@@ -556,3 +556,10 @@ select option, select optgroup { color: var(--ink); background-color: var(--surf
 .update-node summary strong { flex:1; min-width:120px; overflow-wrap:anywhere; }
 .update-node .update-item { padding:10px 0 10px 16px; }
 .auth-reconnecting { position:fixed; top:58px; right:16px; z-index:10000; max-width:calc(100vw - 32px); }
+
+/* Native enrollment is usable before the shell exists, including on touch screens. */
+.native-onboarding .btn,.native-onboarding .input{min-height:44px;height:auto}
+.native-onboarding .btn{white-space:normal}
+.native-onboarding label.check{display:flex;align-items:flex-start;gap:8px;min-height:44px;padding:8px 0}
+.native-onboarding label.check input{flex:none;margin-top:3px}
+.native-onboarding .panel-body{font-size:14px;line-height:1.5}

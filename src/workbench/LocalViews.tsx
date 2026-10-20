@@ -1,3 +1,4 @@
+import {randomId} from '../sdk/random';
 import { useEffect, useRef, useState } from "react";
 import { WIcon } from "./Icon";
 import { t } from "./strings";
@@ -120,7 +121,7 @@ export function LocalMedia() {
               if (!/^(audio|video)\//.test(file.type))
                 throw Error("Unsupported media type");
               await mediaStore("put", {
-                id: crypto.randomUUID(),
+                id: randomId(),
                 name: file.name,
                 type: file.type,
                 file,

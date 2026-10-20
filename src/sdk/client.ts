@@ -1,3 +1,4 @@
+import {randomId} from './random';
 /** App-side half of the grant-limited Plugin UI channel. No host token or IPC access. */
 export interface AppContext {
   appId: string;
@@ -184,7 +185,7 @@ export function connectPlugin(
         sendIntent(intent, payload = null) {
           if (closed) return Promise.resolve("forbidden");
           return new Promise((resolve) => {
-            const id = crypto.randomUUID();
+            const id = randomId();
             const timer = setTimeout(() => {
               intents.delete(id);
               resolve("forbidden");
@@ -200,7 +201,7 @@ export function connectPlugin(
           if (closed) return Promise.reject(Error("channel_closed"));
           if (pending.size >= 4) return Promise.reject(Error("busy"));
           return new Promise((resolve, reject) => {
-            const id = crypto.randomUUID();
+            const id = randomId();
             const timer = setTimeout(() => {
               pending.delete(id);
               reject(Error("host_timeout"));

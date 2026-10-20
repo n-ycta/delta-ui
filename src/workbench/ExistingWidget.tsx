@@ -1,3 +1,4 @@
+import {randomId} from '../sdk/random';
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useDashboards, usePlugins } from "../app/data";
@@ -63,7 +64,7 @@ export function ExistingWidget() {
     if (!can) return;
     const copy = {
       ...w,
-      id: crypto.randomUUID(),
+      id: randomId(),
       layout: {
         ...w.layout,
         y: Math.max(...d.widgets.map((v) => v.layout.y + v.layout.h), 0),

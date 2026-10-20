@@ -36,7 +36,7 @@ export interface CommandResult { ok: boolean; durationMs: number; output: string
 
 export interface NodeHistory { cpu: Series; mem: Series; latency: Series }
 
-export interface PairingTicket { code: string; expiresAt: number; command: string }
+export interface PairingTicket { code: string; expiresAt: number; command: string; url?: string }
 
 export interface SSHPreflight { ready:boolean; core:{version?:string;supported:boolean;error?:string}; ssh:{available:boolean;path?:string;version?:string;error?:string}; errors:string[];platform:string;checkedAt:number }
 export interface SSHTarget { host:string; port:number; username:string }
@@ -81,7 +81,7 @@ export interface CoreApi {
   getNodeUptime(nodeId: string, days: number): Promise<UptimeCell[]>;
   runNodeCommand(nodeId: string, command: NodeCommandId, args?: Record<string, string>): Promise<CommandResult>;
   updateNodeConnection(nodeId: string, cfg: ConnectionConfig): Promise<NodeInfo>;
-  createPairingTicket(kind: string, name: string): Promise<PairingTicket>;
+  createPairingTicket(kind: string, name: string, options?: { trustAdmin?: boolean }): Promise<PairingTicket>;
   removeNode(nodeId: string): Promise<void>;
 
   // events & notifications

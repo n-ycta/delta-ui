@@ -57,7 +57,7 @@ export class HttpCoreAdapter implements CoreApi {
   getNodeUptime(id: string, days: number) { return this.call('nodes_uptime', { id, days }); }
   runNodeCommand(id: string, command: NodeCommandId, args?: Record<string, string>) { return this.call('nodes_command', { id, command, args }); }
   updateNodeConnection(id: string, config: ConnectionConfig) { return this.call('nodes_connection', { id, config }); }
-  createPairingTicket(kind: string, name: string) { return this.call('nodes_pair', { kind, name }); }
+  createPairingTicket(kind: string, name: string, options: {trustAdmin?:boolean} = {}) { return this.call('nodes_pair', { kind, name, trustAdmin:options.trustAdmin===true }); }
   removeNode(id: string) { return this.call<void>('nodes_remove', { id }); }
   listEvents(query: EventQuery) { return this.call<CoreEvent[]>('events_list', { query }); }
   listNotifications() { return this.call('notifications_list'); }

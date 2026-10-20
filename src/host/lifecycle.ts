@@ -1,5 +1,5 @@
 import {installNativeLinkHandler} from './navigation';
-import {hostBridge} from './contract';import {acceptInvitation} from './NativeConnection';
+import {hostBridge} from './contract';import {acceptInvitation} from './invitations';
 /** OS actions remain private IPC; external content never navigates the privileged document. */
 export function startNativeLifecycle(){const host=hostBridge()!;installNativeLinkHandler(document,url=>host.call({capability:'host.open',args:{url}}));
  let busy=false,lastNotifications=0;const seen=new Set<string>();async function poll(){if(busy)return;busy=true;try{const s=await host.call({capability:'host.platform_status'}) as any;if(s.pendingPairing){acceptInvitation(s.pendingPairing);location.hash='#/settings?tab=connection'}if(typeof s.pendingRoute==='string'&&/^\/plugins\/[a-zA-Z0-9_.-]+$/.test(s.pendingRoute))location.hash='#'+s.pendingRoute;

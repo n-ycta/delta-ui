@@ -2019,13 +2019,26 @@
   },
   "onboarding": {
     "title": "Set up Delta",
-    "description": "The encrypted local node is initialized for startup. Create or import your personal recovery key explicitly; no user identity is created automatically.",
+    "description": "Connect this device to your existing Delta or set up a separate local node.",
     "loading": "Checking local setup…",
     "existing": "Existing identities: {{names}}. Continue without changing them, or enroll another key.",
     "continue": "Continue",
     "generate": "Generate",
     "create": "Create",
-    "pairing": "After setup, open Settings → Connection to scan an invitation image or connect using a link opened by your camera. Pairing requires explicit confirmation."
+    "pairing": "For existing services and data, connect the node in Settings → Connection. Key import alone does not synchronize profiles.",
+    "connectExisting": "Connect to existing Delta",
+    "importExisting": "Use existing key",
+    "newSetup": "Set up separately",
+    "back": "Back",
+    "connectHint": "On your computer or Web console, open Nodes, create an invitation and paste its link or the Core address and code. This phone joins as a separate node; no new personal key is required.",
+    "invitationLink": "Invitation link",
+    "useInvitation": "Use invitation",
+    "useServices": "Use the connected node for services",
+    "peerJoined": "The node is already connected. Complete setup without reusing the invitation code.",
+    "invalidPeer": "The node returned no identifier. Connection is incomplete.",
+    "importHint": "Enter the same personal key or phrase used on your other device. Only the public key is enrolled locally. Import alone does not connect nodes or transfer data.",
+    "localHint": "This sets up a separate local node. It does not connect this device to your existing Delta.",
+    "importAction": "Use key"
   },
   "compatibility": {
     "target": "Device type not supported",
@@ -2344,5 +2357,26 @@
     "updateReady": "A new interface version is ready",
     "reload": "Reload",
     "pluginUi": "Interface"
+  },
+  "pairing": {
+    "close": "Close",
+    "android": "Android phone or tablet",
+    "computer": "Computer or existing server",
+    "chooseHint": "Android connects by link or QR. SSH installs a server; it is not the phone connection flow.",
+    "androidHint": "Enter the existing Core address reachable from the phone. Get a one-time link and QR; no Linux/Windows commands or phone address are needed.",
+    "coreAddress": "Use the Core API address, not the Web Console page address. localhost and 127.0.0.1 on the phone mean the phone itself.",
+    "remoteAdmin": "Allow the new device to administer this node",
+    "accessHint": "Without this option, ordinary capabilities are available; installation, updates and administrative operations are denied. Reverse administrative access is never granted automatically.",
+    "createInvitation": "Create invitation",
+    "qrFailed": "Could not generate QR. Copy the invitation link instead.",
+    "copyFailed": "Clipboard unavailable. Select and copy the link manually.",
+    "expires": "Expires in {{minutes}}:{{seconds}}",
+    "expired": "Invitation expired. Create a new one.",
+    "copyLink": "Copy link",
+    "copied": "Copied",
+    "phoneSteps": "Open the link on the phone or scan the QR with its system camera, then confirm in Delta. If Delta is already configured, paste the link in Settings → Connection.",
+    "downloadAndroid": "Download Delta for Android",
+    "phoneNetwork": "The phone must reach Core over HTTPS or a trusted network/VPN. This is not a NAT relay: controlling the phone directly from another node requires separate inbound reachability.",
+    "newInvitation": "New invitation"
   }
 }

@@ -1,9 +1,11 @@
 import { createRoot } from "react-dom/client";
 import { installHostBridge } from "../src/host/contract";
 import { NativeOnboarding } from "../src/host/NativeOnboarding";
+import "../src/ui/controls.css";
 import "../src/styles/tokens.css";
 import "../src/styles/base.css";
 import "../src/styles/components.css";
+const peers = JSON.parse(localStorage.getItem("fixture.peers") || "[]");
 const keys = JSON.parse(localStorage.getItem("fixture.keys") || "[]"),
   prefs = JSON.parse(localStorage.getItem("fixture.prefs") || "[]");
 (window as any).calls = [];
@@ -20,6 +22,12 @@ installHostBridge({
     switch (request.capability) {
       case "identity.list":
         return keys;
+      case "core.info":return {node_id:request.node||'phone-node'};
+      case "peers.list": return peers;
+      case "peers.join":
+        if(request.args?.code==='invalid')throw Error('Invitation expired');
+        peers.push({node_id:'existing-node',name:'Existing Delta'});localStorage.setItem('fixture.peers',JSON.stringify(peers));return peers.at(-1);
+      case "host.services":localStorage.setItem('fixture.services',String(request.args?.node||''));return {node:request.args?.node};
       case "host.document_list":
         return prefs;
       case "identity.enroll":
@@ -27,6 +35,8 @@ installHostBridge({
         localStorage.setItem("fixture.keys", JSON.stringify(keys));
         return keys[0];
       case "host.document_put":
+        if(localStorage.getItem('fixture.failCompletion')==='once' && (request.args?.value as any)?.mode==='paired'){localStorage.removeItem('fixture.failCompletion');throw Error('Temporary profile write failure')}
+        const old=prefs.findIndex((v:any)=>v.id===(request.args!.value as any).id);if(old>=0)prefs.splice(old,1);
         prefs.push(request.args!.value);
         localStorage.setItem("fixture.prefs", JSON.stringify(prefs));
         return request.args!.value;

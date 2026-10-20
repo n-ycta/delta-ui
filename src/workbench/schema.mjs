@@ -184,7 +184,7 @@ export function validateWorkspace(value) {
     result.apps.forEach((a) => follow(a.id, []));
     return result;
 }
-export const uid = () => crypto.randomUUID();
+export const uid = () => globalThis.crypto.randomUUID?.() || Array.from(globalThis.crypto.getRandomValues(new Uint8Array(16)),n=>n.toString(16).padStart(2,'0')).join('');
 export function visit(tree, fn) {
     fn(tree);
     if (tree.type !== "view")

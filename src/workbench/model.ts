@@ -1,3 +1,4 @@
+import {randomId} from '../sdk/random';
 import { z } from "zod";
 export type Theme = "paper" | "daylight" | "graphite" | "midnight";
 export type Nav = "side" | "top" | "bottom" | "dock" | "hidden";
@@ -236,7 +237,7 @@ export function validateWorkspace(value: unknown): Workspace {
   result.apps.forEach((a) => follow(a.id, []));
   return result;
 }
-export const uid = () => crypto.randomUUID();
+export const uid = () => randomId();
 export function visit(tree: Tree, fn: (n: Tree) => void) {
   fn(tree);
   if (tree.type !== "view") tree.children.forEach((c) => visit(c, fn));
