@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.5
+
+- Publish verified LifeOS 0.3.1 with one independent app shell, native Delta controls and thirteen dashboard surfaces.
+- Keep LifeOS in the persistent dock/FrameHost app-switch lifecycle like Media, separately from Console.
+
 ## 0.3.4
 
 - Pin the reproducible, CI-verified LifeOS 0.2.1 release.
