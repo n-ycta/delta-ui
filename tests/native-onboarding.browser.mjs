@@ -114,7 +114,7 @@ try {
   assert.equal(await linked.locator('input[type=password]').inputValue(),'link-test');
   await linked.close();
   // Capture initial/connection layouts with production design tokens, without credentials.
-  const out=process.env.DELTA_TEST_OUTPUT||'/data/delta-onboarding-qa';await mkdir(out,{recursive:true});
+  const out=process.env.DELTA_TEST_OUTPUT||'/tmp/delta-onboarding-qa';await mkdir(out,{recursive:true});
   for(const width of [390,1440]){
     const visual=await browser.newPage({viewport:{width,height:1000}});
     await visual.addInitScript(()=>localStorage.setItem('delta.language','ru'));

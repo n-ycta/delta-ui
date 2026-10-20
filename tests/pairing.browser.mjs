@@ -3,7 +3,7 @@ import {chromium} from 'playwright';
 import assert from 'node:assert/strict';
 import {mkdir} from 'node:fs/promises';
 const server=await createServer({server:{host:'127.0.0.1',port:0},plugins:[{name:'pairing-fixture',configureServer(s){s.middlewares.use('/__pairing',async(req,res)=>{res.setHeader('Content-Type','text/html');res.end(await s.transformIndexHtml('/__pairing','<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><div id="root"></div><script type="module" src="/tests/pairing.fixture.tsx"></script></body></html>'))})}}]});
-await server.listen();const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||chromium.executablePath(),args:['--no-sandbox']});const url=`http://127.0.0.1:${server.httpServer.address().port}/__pairing`,out=process.env.DELTA_TEST_OUTPUT||'/data/delta-pairing-qa';await mkdir(out,{recursive:true});
+await server.listen();const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||chromium.executablePath(),args:['--no-sandbox']});const url=`http://127.0.0.1:${server.httpServer.address().port}/__pairing`,out=process.env.DELTA_TEST_OUTPUT||'/tmp/delta-pairing-qa';await mkdir(out,{recursive:true});
 try{
  for(const width of [390,1440]){
   const p=await browser.newPage({viewport:{width,height:1000}}),errors=[];p.on('pageerror',e=>errors.push(e.message));
