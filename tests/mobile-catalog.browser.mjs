@@ -280,14 +280,14 @@ try {
       .locator(".viz-option");
     assert.equal(
       await surfaces.count(),
-      10,
-      "whole app plus nine named surfaces must be discoverable",
+      14,
+      "whole app plus thirteen named surfaces must be discoverable",
     );
     await page.keyboard.press("Escape");
     await context.close();
   }
   console.log(
-    "PASS: LifeOS UI-only generated dashboard opens on mobile/desktop; app launch requested; all nine surfaces directly listed in widget picker (deterministic host fixture).",
+    "PASS: LifeOS UI-only generated dashboard opens on mobile/desktop; app launch requested; all thirteen surfaces directly listed in widget picker (deterministic host fixture).",
   );
   console.log(
     "PASS: actual shell/catalog at 320/360/390/1440, RU/EN, light/dark; zero horizontal overflow; centered view icons; real clicks for mock install, tabs and manager; mobile player and hidden-dock reveal.",

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.4
+
+- Pin the reproducible, CI-verified LifeOS 0.2.1 release.
+- Correct mobile widget-picker acceptance for the whole app plus thirteen named surfaces.
+
 ## 0.3.3
 
 - Replace the retired Vector catalog entry with Delta LifeOS 0.2.0 and thirteen composable surfaces.
