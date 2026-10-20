@@ -1,3 +1,4 @@
+import {migrateLifeOSReferences} from '../sdk/lifeosMigration';
 import { validateWorkspace, type Workspace } from "./model";
 import { starters, template } from "./templates";
 const MIGRATED = "delta.workbench.v2-apps";
@@ -40,7 +41,11 @@ export function loadWorkspace(): { state: Workspace; recovered: boolean } {
       } catch {}
       return { state: starters(), recovered: false };
     }
-    const parsed=validateWorkspace(JSON.parse(raw));
+    const parsed=validateWorkspace(migrateLifeOSReferences(JSON.parse(raw)));
+    if(JSON.stringify(parsed)!==JSON.stringify(JSON.parse(raw))){
+      localStorage.setItem(key+'.before-lifeos',raw);
+      localStorage.setItem(key,JSON.stringify(parsed));
+    }
     let next=migrate(parsed);
     if(!localStorage.getItem('delta.workbench.app-duplicates-v4')) {
       const apps=next.apps.filter(a=>!(a.root.type==='view'&&((a.root.kind==='system'&&a.root.target==='/console')||(a.root.kind==='plugin'&&a.root.target==='dev.delta.media'))));

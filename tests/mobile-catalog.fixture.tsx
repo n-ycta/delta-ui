@@ -12,7 +12,7 @@ import "../src/styles/tokens.css";
 import "../src/styles/base.css";
 import "../src/styles/components.css";
 const installed: typeof catalog = location.search.includes("installed=vector")
-  ? catalog.filter((a) => a.id === "dev.delta.vector")
+  ? catalog.filter((a) => a.id === "dev.delta.lifeos")
   : [];
 (window as any).mobileFixture = {
   calls: [],

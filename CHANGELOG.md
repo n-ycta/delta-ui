@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.3
+
+- Replace the retired Vector catalog entry with Delta LifeOS 0.2.0 and thirteen composable surfaces.
+- Grant only explicit LifeOS capabilities and deny retired Vector access.
+- Migrate workbench app identities with a backup while preserving widget geometry and notes.
+
 ## 0.3.2
 
 - Preserve the authenticated shell through transient Web restarts; distinguish actual authorization rejection and localize reconnect feedback.

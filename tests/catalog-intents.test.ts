@@ -39,16 +39,16 @@ test('a current process does not hide an older installed interface update',()=>{
 });
 
 import {readUiContributions} from '../src/sdk/surfaces';
-test('Vector is in the install catalog with nine composable surfaces and no ambient grants',()=>{
- const vector=raw.find((a:any)=>a.id==='dev.delta.vector');
- assert(vector,'A GitHub release alone must not hide Vector from the install catalog');
- assert.equal(vector.icon,'compass');
- assert.equal(vector.runtime.execution,'web');
- assert.match(vector.asset,/\/delta-vector\/releases\/download\/v[^/]+\/delta-vector\.delta-app$/);
- assert.equal(readCatalog(raw).filter(a=>a.id===vector.id).length,1);
- const contribution=readUiContributions(vector);
+test('LifeOS is in the install catalog with thirteen composable surfaces and no ambient grants',()=>{
+ const lifeos=raw.find((a:any)=>a.id==='dev.delta.lifeos');
+ assert(lifeos,'A GitHub release alone must not hide LifeOS from the install catalog');
+ assert.equal(lifeos.icon,'squares-four');
+ assert.equal(lifeos.runtime.execution,'web');
+ assert.match(lifeos.asset,/\/delta-lifeos\/releases\/download\/v[^/]+\/delta-lifeos\.delta-app$/);
+ assert.equal(readCatalog(raw).filter(a=>a.id===lifeos.id).length,1);
+ const contribution=readUiContributions(lifeos);
  assert(contribution);
- assert.deepEqual(contribution.surfaces.map(s=>s.id),['today','capture','tasks','journal','calendar','practices','projects','skills','review']);
+ assert.deepEqual(contribution.surfaces.map(s=>s.id),['today','capture','tasks','journal','calendar','practices','projects','skills','review','habits','planner','rewards','statistics']);
  assert(contribution.surfaces.every(s=>s.instance==='shared'));
- assert.deepEqual(vector.grants,[]);
+ assert.deepEqual(lifeos.grants,[]);
 });

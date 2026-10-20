@@ -39,16 +39,16 @@
     }
   },
   {
-    "id": "dev.delta.vector",
-    "name": "Delta Vector",
-    "version": "0.1.0",
-    "icon": "compass",
+    "id": "dev.delta.lifeos",
+    "name": "Delta LifeOS",
+    "version": "0.2.0",
+    "icon": "squares-four",
     "description": {
-      "en": "Tasks, journal, calendar and practices without streak pressure.",
-      "ru": "Задачи, дневник, календарь и практики без давления серий."
+      "ru": "Дневник, задачи, навыки, время и проекты.",
+      "en": "Journal, tasks, skills, time and projects."
     },
-    "asset": "https://github.com/n-ycta/delta-vector/releases/download/v0.1.0/delta-vector.delta-app",
-    "sha256": "e084c49a3d2649b5a5a4f6c24cd4fa628c9a69c5d02434b737328b469da2ade5",
+    "asset": "https://github.com/n-ycta/delta-lifeos/releases/download/v0.2.0/delta-lifeos.delta-app",
+    "sha256": "37a1ffa1ebe408061de3683203eedf2eb8f68383c10d47d113ba55512de7f14f",
     "runtime": {
       "execution": "web",
       "platforms": [
@@ -177,6 +177,54 @@
             "ru": "Обзор"
           },
           "icon": "compass",
+          "kind": "widget",
+          "minWidth": 280,
+          "minHeight": 240,
+          "instance": "shared"
+        },
+        {
+          "id": "habits",
+          "name": {
+            "en": "Habits",
+            "ru": "Привычки"
+          },
+          "icon": "repeat",
+          "kind": "widget",
+          "minWidth": 280,
+          "minHeight": 240,
+          "instance": "shared"
+        },
+        {
+          "id": "planner",
+          "name": {
+            "en": "Time planner",
+            "ru": "Планировщик"
+          },
+          "icon": "clock",
+          "kind": "widget",
+          "minWidth": 280,
+          "minHeight": 240,
+          "instance": "shared"
+        },
+        {
+          "id": "rewards",
+          "name": {
+            "en": "Rewards",
+            "ru": "Награды"
+          },
+          "icon": "sketch-logo",
+          "kind": "widget",
+          "minWidth": 280,
+          "minHeight": 240,
+          "instance": "shared"
+        },
+        {
+          "id": "statistics",
+          "name": {
+            "en": "Statistics",
+            "ru": "Статистика"
+          },
+          "icon": "chart-bar",
           "kind": "widget",
           "minWidth": 280,
           "minHeight": 240,

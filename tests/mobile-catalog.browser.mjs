@@ -68,7 +68,7 @@ try {
         assert.equal(
           await page
             .locator(".plug")
-            .filter({ hasText: "dev.delta.vector" })
+            .filter({ hasText: "dev.delta.lifeos" })
             .count(),
           1,
         );
@@ -251,7 +251,7 @@ try {
       `http://127.0.0.1:${server.httpServer.address().port}/__mobile?installed=vector#/dashboards`,
     );
     const card = page.locator(
-      'a.plug[href="#/dashboards/gen_ui_dev.delta.vector"]',
+      'a.plug[href="#/dashboards/gen_ui_dev.delta.lifeos"]',
     );
     await card.waitFor();
     await card.click();
@@ -260,7 +260,7 @@ try {
       window.mobileFixture.calls.some(
         (c) =>
           c.capability === "host.apps_launch" &&
-          c.args?.id === "dev.delta.vector",
+          c.args?.id === "dev.delta.lifeos",
       ),
     );
     assert.equal(await page.locator(".react-grid-item").count(), 1);
@@ -276,7 +276,7 @@ try {
     await drawer.waitFor();
     const surfaces = drawer
       .locator(".panel")
-      .filter({ hasText: "Delta Vector" })
+      .filter({ hasText: "Delta LifeOS" })
       .locator(".viz-option");
     assert.equal(
       await surfaces.count(),
@@ -287,7 +287,7 @@ try {
     await context.close();
   }
   console.log(
-    "PASS: Vector UI-only generated dashboard opens on mobile/desktop; app launch requested; all nine surfaces directly listed in widget picker (deterministic host fixture).",
+    "PASS: LifeOS UI-only generated dashboard opens on mobile/desktop; app launch requested; all nine surfaces directly listed in widget picker (deterministic host fixture).",
   );
   console.log(
     "PASS: actual shell/catalog at 320/360/390/1440, RU/EN, light/dark; zero horizontal overflow; centered view icons; real clicks for mock install, tabs and manager; mobile player and hidden-dock reveal.",

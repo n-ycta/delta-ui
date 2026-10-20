@@ -8,11 +8,11 @@ import {
   generateSurfaceDashboard,
   surfaceDashboardApps,
 } from "../src/core/registry/surfaceDashboards";
-const app = readInstalled(catalog).find((a) => a.id === "dev.delta.vector")!;
-test("UI-first Vector gets a valid, stable starter without inventing metrics or permissions", () => {
-  assert.equal(app.surfaces.length, 9);
+const app = readInstalled(catalog).find((a) => a.id === "dev.delta.lifeos")!;
+test("UI-first LifeOS gets a valid, stable starter without inventing metrics or permissions", () => {
+  assert.equal(app.surfaces.length, 13);
   const d = DashboardConfig.parse(generateSurfaceDashboard(app));
-  assert.equal(d.id, "gen_ui_dev.delta.vector");
+  assert.equal(d.id, "gen_ui_dev.delta.lifeos");
   assert.equal(d.generatedFrom, app.id);
   assert.equal(d.widgets.length, 1);
   assert.deepEqual(d.widgets[0].display, {

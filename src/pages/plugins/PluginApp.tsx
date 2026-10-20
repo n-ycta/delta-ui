@@ -13,10 +13,10 @@ import { registerReceiver, routeIntent } from "../../shell/intents";
 /** Full-page app route. The frame itself lives in the root FrameHost and survives navigation. */
 export function PluginApp() {
   const { id } = useParams();
-  return id ? <AppSlot id={id} className="dx-app-page" /> : null;
+  return id ? <AppSlot id={id==='dev.delta.vector'?'dev.delta.lifeos':id} className="dx-app-page" /> : null;
 }
 export function PluginSurface({
-  id,
+  id: requestedId,
   surface,
   inline = false,
   themeOverride,
@@ -26,6 +26,7 @@ export function PluginSurface({
   inline?: boolean;
   themeOverride?: "light" | "dark";
 }) {
+  const id=requestedId==='dev.delta.vector'?'dev.delta.lifeos':requestedId;
   const resolvedTheme = useResolvedTheme();
   const skin = useSkin();
   const density = usePrefs((s) => s.density);
