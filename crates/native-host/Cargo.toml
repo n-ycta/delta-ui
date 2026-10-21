@@ -7,12 +7,12 @@ license = "Apache-2.0"
 [dependencies]
 delta-app-runtime = {path="../app-runtime"}
 reqwest = {version="0.12",default-features=false,features=["rustls-tls"]}
-delta-host-runtime = {git="https://github.com/n-ycta/delta",rev="e841d9ad283b78cfc383f1fc8653e77e2c050216"}
+delta-host-runtime = {path="../../../delta/crates/host-runtime"}
 serde_json = "1"
 tauri = {version="2",features=[]}
 
 [target.'cfg(not(target_os = "android"))'.dependencies]
-delta-host-runtime = {git="https://github.com/n-ycta/delta",rev="e841d9ad283b78cfc383f1fc8653e77e2c050216",features=["desktop"]}
+delta-host-runtime = {path="../../../delta/crates/host-runtime",features=["desktop"]}
 tauri = {version="2",features=["tray-icon"]}
 
 [target.'cfg(not(target_os = "android"))'.dependencies.tauri-plugin-single-instance]

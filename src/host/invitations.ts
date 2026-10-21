@@ -10,3 +10,6 @@ export function acceptInvitation(text:string){
  try{const u=new URL(text),code=u.searchParams.get('code');if(u.protocol!=='delta:'||u.hostname!=='pair'||!u.searchParams.get('url')||!code||code.length>256||text.length>2048)throw Error();pairingAddress(u.searchParams.get('url')!);pendingInvitation=text;window.dispatchEvent(new Event('delta:pairing-invitation'));}catch{throw Error(tr('native.invalidQr'))}
 }
 export function invitationLink(url:string,code:string){return 'delta://pair?'+new URLSearchParams({url:pairingAddress(url),code}).toString()}
+
+declare global { interface Window { __deltaAcceptPair?: (text: string) => void } }
+if (typeof window !== "undefined") window.__deltaAcceptPair = (text: string) => { try { acceptInvitation(text); } catch { /* the join screen reports a bad link */ } };
