@@ -8,7 +8,7 @@ import uiPackage from '../../package.json';
 import { Updates } from './Updates';
 import { isCoreEndpoint } from '../api/endpoints';
 import { tr, language, setLanguage } from '../i18n';
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   AlertTriangle,
@@ -233,19 +233,24 @@ function General() {
 
 
 function AndroidUpdate({ current }: { current: string }) {
-  const [state, setState] = useState<{ latest?: string; url?: string; error?: string; busy?: boolean }>({});
+  const [state, setState] = useState<{ latest?: string; url?: string; sha256?: string; error?: string; busy?: boolean }>({});
   const check = async () => {
-    setState({ busy: true });
+    setState((s) => ({ ...s, busy: true, error: undefined }));
     try {
       const res = await fetch('https://api.github.com/repos/n-ycta/delta-android/releases/latest');
       if (!res.ok) throw Error('update_check_failed');
       const release = await res.json();
       const asset = (release.assets || []).find((a: any) => String(a.name || '').endsWith('.apk'));
-      setState(asset ? { latest: String(release.tag_name || '').replace(/^v/, ''), url: asset.browser_download_url } : {});
+      const digest = (release.assets || []).find((a: any) => /SHA256SUMS|\.apk\.sha256$/i.test(String(a.name || '')));
+      const sums = digest ? await fetch(digest.browser_download_url).then((r) => r.text()) : '';
+      const line = sums.split(/\n/).find((row) => row.includes(String(asset?.name || '')) || /\.apk\b/.test(row));
+      const sha256 = (line || '').trim().split(/\s+/)[0];
+      setState(asset && /^[0-9a-f]{64}$/i.test(sha256) ? { latest: String(release.tag_name || '').replace(/^v/, ''), url: asset.browser_download_url, sha256 } : { error: 'signed_apk_missing' });
     } catch (e) { setState({ error: (e as Error).message }); }
   };
-  const newer = state.latest && state.latest.split('.').map(Number).some((n, i) => n > Number(current.split('.')[i] || 0));
-  return <><dt>APK</dt><dd>{newer ? <button className="dx-btn primary" disabled={state.busy} onClick={() => void hostBridge()?.call({ capability: 'host.update', args: { version: state.latest, url: state.url } })}>{`Install ${state.latest}`}</button> : <button className="dx-btn" disabled={state.busy} onClick={() => void check()}>{state.error ? 'Retry update check' : 'Check for app update'}</button>}</dd></>;
+  useEffect(() => { void check(); }, [current]);
+  const newer = !!state.latest && state.latest.split('.').map(Number).some((n, i) => n > Number(current.split('.')[i] || 0));
+  return <><dt>APK</dt><dd>{newer ? <button className="dx-btn primary" disabled={state.busy} onClick={() => void hostBridge()?.call({ capability: 'host.update', args: { version: state.latest, url: state.url, sha256: state.sha256 } })}>{`Install ${state.latest}`}</button> : state.error ? <button className="dx-btn" onClick={() => void check()}>Retry update check</button> : <span className="muted">{current}</span>}</dd></>;
 }
 function Connection() {
   const api = useApi();
