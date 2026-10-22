@@ -115,8 +115,9 @@
 .dx-card-actions button:hover { background: var(--hover); color: var(--ink); }
 .dx-card-actions button.on { color: var(--accent); }
 .dx-badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; border-radius: 9px; background: var(--warn); color: var(--bg); font-size: 11px; font-style: normal; font-weight: 700; display: grid; place-items: center; }
-.dx-card-catalog { flex-direction: row; align-items: center; gap: 8px; padding-right: 12px; }
-.dx-card-catalog .dx-card-main { cursor: default; flex-direction: row; align-items: center; }
+.dx-card-catalog { flex-direction: column; align-items: stretch; gap: 12px; padding: 12px; }
+.dx-card-catalog .dx-card-main { cursor: default; flex-direction: row; align-items: center; min-width: 0; }
+.dx-card-catalog .dx-btn { align-self: flex-end; white-space: nowrap; }
 .dx-card-preview { position: relative; display: block; aspect-ratio: 16 / 10; width: 100%; border-radius: var(--r-md); background: var(--wallpaper, var(--sunken)); border: var(--border-w, 1px) solid var(--rule); overflow: hidden; }
 .dx-card-badge { position: absolute; left: 8px; bottom: 8px; display: grid; place-items: center; width: 28px; height: 28px; border-radius: var(--r-sm); background: var(--surface); color: var(--accent); box-shadow: var(--shadow, none); }
 .dx-pv { position: absolute; inset: 8px; display: flex; }

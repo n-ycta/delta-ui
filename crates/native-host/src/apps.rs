@@ -101,9 +101,9 @@ pub async fn call(app: &tauri::AppHandle, method: &str, a: &Value) -> Result<Val
                 return Err("not_installed".into());
             }
             let protocol = delta_app_runtime::protocol(id);
-            #[cfg(any(target_os = "windows", target_os = "android"))]
+            #[cfg(target_os = "windows")]
             let url = format!("http://{protocol}.localhost/index.html");
-            #[cfg(not(any(target_os = "windows", target_os = "android")))]
+            #[cfg(not(target_os = "windows"))]
             let url = format!("{protocol}://localhost/index.html");
             Ok(json!({"url":url,"id":id,"name":item["name"],"grants":[]}))
         }

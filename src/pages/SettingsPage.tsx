@@ -231,6 +231,22 @@ function General() {
   );
 }
 
+
+function AndroidUpdate({ current }: { current: string }) {
+  const [state, setState] = useState<{ latest?: string; url?: string; error?: string; busy?: boolean }>({});
+  const check = async () => {
+    setState({ busy: true });
+    try {
+      const res = await fetch('https://api.github.com/repos/n-ycta/delta-android/releases/latest');
+      if (!res.ok) throw Error('update_check_failed');
+      const release = await res.json();
+      const asset = (release.assets || []).find((a: any) => String(a.name || '').endsWith('.apk'));
+      setState(asset ? { latest: String(release.tag_name || '').replace(/^v/, ''), url: asset.browser_download_url } : {});
+    } catch (e) { setState({ error: (e as Error).message }); }
+  };
+  const newer = state.latest && state.latest.split('.').map(Number).some((n, i) => n > Number(current.split('.')[i] || 0));
+  return <><dt>APK</dt><dd>{newer ? <button className="dx-btn primary" disabled={state.busy} onClick={() => void hostBridge()?.call({ capability: 'host.update', args: { version: state.latest, url: state.url } })}>{`Install ${state.latest}`}</button> : <button className="dx-btn" disabled={state.busy} onClick={() => void check()}>{state.error ? 'Retry update check' : 'Check for app update'}</button>}</dd></>;
+}
 function Connection() {
   const api = useApi();
   const current = readConnectionSettings();
@@ -294,6 +310,7 @@ function Connection() {
               <dd className="mono">{uiPackage.version}</dd>
               <dt>{tr('host.shell')}</dt>
               <dd className="mono">{info.data.hostVersion ?? '—'}</dd>
+              {hostBridge() && <AndroidUpdate current={uiPackage.version} />}
               <dt>{tr('pages.SettingsPage.s_7117989d8a')}</dt>
               <dd className="mono">{PANEL_CONTRACT_VERSION}</dd>
               <dt>{tr('pages.SettingsPage.s_8db46ea789')}</dt>
