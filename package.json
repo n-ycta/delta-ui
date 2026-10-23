@@ -11,7 +11,7 @@
     "typecheck": "tsc -b --noEmit",
     "test": "tsx tests/run.ts && npm run test:host && npm run test:workbench",
     "test:i18n": "node scripts/check-i18n.cjs && node scripts/check-locales.cjs",
-    "test:host": "tsx --test tests/host-channel.test.ts tests/native-projection.test.ts tests/native-navigation.test.ts tests/compatibility.test.ts tests/auth-errors.test.ts tests/vector-grants.test.ts tests/node-telemetry.test.ts tests/mobile-layout.test.ts tests/native-update.test.ts tests/invitations.test.ts",
+    "test:host": "tsx --test tests/host-channel.test.ts tests/native-projection.test.ts tests/native-navigation.test.ts tests/compatibility.test.ts tests/auth-errors.test.ts tests/vector-grants.test.ts tests/node-telemetry.test.ts tests/mobile-layout.test.ts tests/native-update.test.ts tests/invitations.test.ts tests/app-updates.test.ts",
     "test:navigation": "node tests/native-navigation.browser.mjs",
     "test:onboarding": "node tests/native-onboarding.browser.mjs",
     "test:language": "node tests/language-settings.browser.mjs",

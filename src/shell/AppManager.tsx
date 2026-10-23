@@ -7,6 +7,7 @@ import { usePrefs } from "../app/stores";
 import { SkinPicker } from "../theme/SkinPicker";
 import { useDock, type DockPosition } from "./state";
 import { useCatalog, useInstalledApps } from "./apps";
+import { newerCatalogApps } from "./appUpdates";
 import { useLaunchers, type Launcher } from "./launchers";
 import { useRunningApps } from "./frames";
 import { useLauncherActions, useOpenLauncher, ContextMenu } from "./Dock";
@@ -58,6 +59,8 @@ function Card({ l, meta, actions, children }: { l: Launcher; meta?: string; acti
     </div>
   );
 }
+/** id@version already attempted this session, so a failing update is not retried on every mount or render. */
+const triedUpdates = new Set<string>();
 function AppsTab({ live }: { live: boolean }) {
   const { all, desktops } = useLaunchers(live);
   const installed = useInstalledApps(live);
@@ -80,12 +83,14 @@ function AppsTab({ live }: { live: boolean }) {
   const apps = all.filter((l) => l.kind !== "desk");
   const available = catalog.filter((c) => !installed.some((i) => i.id === c.id));
   const updates = catalog.filter((c) => installed.find((i) => i.id === c.id && i.version !== c.version));
-  const pending = updates.map((c) => c.id + "@" + c.version).join("|");
+  const auto = newerCatalogApps(catalog, installed, triedUpdates);
+  const pending = auto.map((c) => c.id + "@" + c.version).join("|");
   useEffect(() => {
-    const id = pending.split("@")[0];
-    if (!live || busy || !id) return;
-    void install(id, true);
-  }, [live, pending]);
+    const next = auto[0];
+    if (!live || busy || !next) return;
+    triedUpdates.add(next.id + "@" + next.version);
+    void install(next.id, true);
+  }, [live, busy, pending]);
   return (
     <>
       <p className="dx-hint">{s("appsHint")}</p>
