@@ -90,8 +90,8 @@ pub async fn call(method: &str, a: &Value) -> Result<Value, String> {
                 .await;
                 if let Ok(mut s) = state().lock() {
                     match result {
-                        Ok(path) => {
-                            s.sum = file_sum(&path).unwrap_or([0; 32]);
+                        Ok((_, sum)) => {
+                            s.sum = sum;
                             s.state = "ready";
                         }
                         Err(e) => {

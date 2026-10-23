@@ -236,9 +236,11 @@ impl Verifier {
     pub fn received(&self) -> u64 {
         self.received
     }
-    pub fn finish(self, expected: &[u8; 32]) -> Result<(), VerifyError> {
-        if self.hasher.finalize().as_slice() == expected {
-            Ok(())
+    /// The digest of everything fed so far, if it equals `expected`.
+    pub fn finish(self, expected: &[u8; 32]) -> Result<[u8; 32], VerifyError> {
+        let digest: [u8; 32] = self.hasher.finalize().into();
+        if &digest == expected {
+            Ok(digest)
         } else {
             Err(VerifyError::ChecksumMismatch)
         }
@@ -333,7 +335,7 @@ mod tests {
         v.update(&data[..4]).unwrap();
         v.update(&data[4..]).unwrap();
         assert_eq!(v.received(), 9);
-        assert_eq!(v.finish(&expected), Ok(()));
+        assert_eq!(v.finish(&expected), Ok(expected));
         let mut v = Verifier::new(100);
         v.update(data).unwrap();
         assert_eq!(v.finish(&[0u8; 32]), Err(VerifyError::ChecksumMismatch));
@@ -386,7 +388,7 @@ pub mod net {
     }
 
     /// Streams `url` into `dest`, hashing as it goes. The file only appears under `dest` after the checksum matched.
-    pub async fn download_to(c: &reqwest::Client, url: &str, limit: u64, expected: &[u8; 32], dest: &Path, mut progress: impl FnMut(u64)) -> Result<(), String> {
+    pub async fn download_to(c: &reqwest::Client, url: &str, limit: u64, expected: &[u8; 32], dest: &Path, mut progress: impl FnMut(u64)) -> Result<[u8; 32], String> {
         let mut resp = c.get(url).send().await.map_err(|e| if e.is_redirect() { "untrusted_redirect".to_string() } else { "network_failed".to_string() })?;
         if !resp.status().is_success() {
             return Err(format!("download_http_{}", resp.status().as_u16()));
@@ -406,9 +408,9 @@ pub mod net {
             Ok(())
         }
         .await;
-        let result = result.and_then(|_| verifier.finish(expected).map_err(|_| "checksum_mismatch".to_string())).and_then(|_| file.sync_all().map_err(|_| "storage_failed".to_string()));
+        let result = result.and_then(|_| verifier.finish(expected).map_err(|_| "checksum_mismatch".to_string())).and_then(|d| file.sync_all().map(|_| d).map_err(|_| "storage_failed".to_string()));
         match result {
-            Ok(()) => std::fs::rename(&part, dest).map_err(|_| "storage_failed".to_string()),
+            Ok(digest) => std::fs::rename(&part, dest).map(|_| digest).map_err(|_| "storage_failed".to_string()),
             Err(e) => {
                 let _ = std::fs::remove_file(&part);
                 Err(e)
@@ -416,8 +418,8 @@ pub mod net {
         }
     }
 
-    /// Downloads `SHA256SUMS` and the APK of an official release into `dir/delta.apk` (verified).
-    pub async fn download_release(c: &reqwest::Client, version: &str, asset: &str, size_hint: u64, dir: &Path, progress: impl FnMut(u64)) -> Result<PathBuf, String> {
+    /// Downloads `SHA256SUMS` and the APK of an official release into `dir/delta.apk` (verified); returns the path and its SHA-256.
+    pub async fn download_release(c: &reqwest::Client, version: &str, asset: &str, size_hint: u64, dir: &Path, progress: impl FnMut(u64)) -> Result<(PathBuf, [u8; 32]), String> {
         let sums_url = asset_url(version, SUMS).ok_or("invalid_version")?;
         let apk_url = asset_url(version, asset).ok_or("invalid_version")?;
         std::fs::create_dir_all(dir).map_err(|_| "storage_failed".to_string())?;
@@ -435,8 +437,8 @@ pub mod net {
         let expected = sum_for(&String::from_utf8_lossy(&text), asset).ok_or("checksum_missing")?;
         let limit = if size_hint > 0 { size_hint.min(MAX_APK_BYTES) } else { MAX_APK_BYTES };
         let dest = dir.join("delta.apk");
-        download_to(c, &apk_url, limit, &expected, &dest, progress).await?;
-        Ok(dest)
+        let digest = download_to(c, &apk_url, limit, &expected, &dest, progress).await?;
+        Ok((dest, digest))
     }
 
     #[cfg(test)]
@@ -479,7 +481,7 @@ pub mod net {
             let dir = tmp();
             let c = reqwest::Client::new();
             let mut last = 0;
-            download_to(&c, &url, 1_000_000, &good, &dir.join("delta.apk"), |n| last = n).await.unwrap();
+            assert_eq!(download_to(&c, &url, 1_000_000, &good, &dir.join("delta.apk"), |n| last = n).await, Ok(good));
             assert_eq!(last, 100_000);
             assert_eq!(std::fs::read(dir.join("delta.apk")).unwrap(), body);
             assert!(!dir.join("delta.part").exists());
