@@ -79,6 +79,13 @@ function AppsTab({ live }: { live: boolean }) {
   };
   const apps = all.filter((l) => l.kind !== "desk");
   const available = catalog.filter((c) => !installed.some((i) => i.id === c.id));
+  const updates = catalog.filter((c) => installed.find((i) => i.id === c.id && i.version !== c.version));
+  const pending = updates.map((c) => c.id + "@" + c.version).join("|");
+  useEffect(() => {
+    const id = pending.split("@")[0];
+    if (!live || busy || !id) return;
+    void install(id, true);
+  }, [live, pending]);
   return (
     <>
       <p className="dx-hint">{s("appsHint")}</p>
@@ -99,7 +106,7 @@ function AppsTab({ live }: { live: boolean }) {
       </div>
       {installed.length > 0 && catalog.some((c) => installed.find((i) => i.id === c.id && i.version !== c.version)) && (
         <div className="dx-row-actions">
-          {catalog.filter((c) => installed.find((i) => i.id === c.id && i.version !== c.version)).map((c) => (
+          {updates.map((c) => (
             <button key={c.id} className="dx-btn" disabled={!!busy} onClick={() => confirm(s("updateAsk")) && void install(c.id, true)}>
               <WIcon name="arrow-circle-up" size={16} />{`${s("update")} ${c.name} → ${c.version}`}
             </button>

@@ -1974,7 +1974,14 @@
     "permission": "Allow notifications in Android system settings if requested.",
     "scan": "Scan",
     "invalidQr": "No valid Delta invitation found",
-    "qr": "Invitation QR"
+    "qr": "Invitation QR",
+    "stopScan": "Stop camera",
+    "noCamera": "Camera is unavailable. Paste the invitation link instead.",
+    "waiting": "Waiting for an invitation link or QR.",
+    "ready": "Invitation found. Confirm to connect this phone.",
+    "unreachable": "That invitation points at the other computer itself. Create it again from a reachable address.",
+    "expired": "This invitation expired or was already used. Create a new one.",
+    "cannotReach": "The phone cannot reach that node. Check the network, then try the link again."
   },
   "auth": {
     "title": "Sign in",
