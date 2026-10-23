@@ -3,8 +3,8 @@ export const MIN = 60_000, HOUR = 3_600_000, DAY = 86_400_000;
 
 const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto', style: 'short' });
 
-export function ago(ts: number | string | undefined, now = Date.now()): string {
-  if (ts === undefined) return '—';
+export function ago(ts: number | string | null | undefined, now = Date.now()): string {
+  if (ts == null) return '—';
   const t = typeof ts === 'string' ? Date.parse(ts) : ts;
   const d = t - now;
   const a = Math.abs(d);

@@ -54,7 +54,7 @@ export const NodeInfo = z.object({
   address: z.string(),
   location: z.string().optional(),
   status: NodeStatus,
-  lastSeen: z.number(),
+  lastSeen: z.number().nullable(),
   uptimeSec: z.number(),
   agentVersion: z.string(),
   cpu: z.number(),

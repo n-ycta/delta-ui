@@ -66,7 +66,7 @@ export class MockCoreAdapter implements CoreApi {
     this.db = this.load();
     // keep node "liveness" fresh relative to now after reload
     const t = Date.now();
-    this.db.nodes.forEach((n) => { if (n.status !== 'offline') n.lastSeen = Math.max(n.lastSeen, t - 10e3 - (n.id === 'pixel-8' ? 85e3 : 0)); });
+    this.db.nodes.forEach((n) => { if (n.status !== 'offline') n.lastSeen = Math.max(n.lastSeen ?? 0, t - 10e3 - (n.id === 'pixel-8' ? 85e3 : 0)); });
     if (typeof window !== 'undefined') window.addEventListener('storage', (e) => { if (e.key === CONTROL_KEY) this.control = readMockControl(); });
   }
 
@@ -270,7 +270,7 @@ export class MockCoreAdapter implements CoreApi {
       const memPct = n.memTotal ? (n.memUsed / n.memTotal) * 100 : 40;
       const h = { cpu: nodeSeries(nodeId, 'cpu', rangeMs, Math.max(n.cpu, 8)), mem: nodeSeries(nodeId, 'mem', rangeMs, Math.max(memPct, 20)), latency: nodeSeries(nodeId, 'latency', rangeMs, n.latencyMs ?? 30) };
       if (n.status === 'offline') {
-        const cut = n.lastSeen;
+        const cut = n.lastSeen ?? 0;
         for (const s of [h.cpu, h.mem, h.latency]) s.points = s.points.map((p) => (p.t > cut ? { ...p, v: null } : p));
       }
       return h;

@@ -34,6 +34,7 @@ import {
   DAY,
   HOUR,
 } from '../../core/lib/format';
+import { fmtSeen, nodeShare } from '../../core/lib/nodes';
 import {
   Badge,
   Button,
@@ -151,7 +152,7 @@ export function NodeDetail() {
           <AlertTriangle size={15} />
           <span className="grow">
             {tr('pages.nodes.NodeDetail.s_da3f9eba3e')}
-            {fmtDateTime(n.lastSeen)}
+            {fmtSeen(n.lastSeen)}
             {tr('pages.nodes.NodeDetail.s_2bbb749eef')}
           </span>
           <Button size="sm" onClick={() => setParams({ tab: 'connection' })}>
@@ -303,11 +304,17 @@ function Overview({ n }: { n: NodeInfo }) {
           <div>
             <div className="label">{tr('pages.nodes.NodeDetail.s_f63c10e017')}</div>
             <div className="v">
-              {fmtBytes(n.memUsed)}
-              <small>
-                {tr('pages.nodes.NodeDetail.s_36fee9f368')}
-                {fmtBytes(n.memTotal)}
-              </small>
+              {nodeShare(n, 'memory') === null ? (
+                '—'
+              ) : (
+                <>
+                  {fmtBytes(n.memUsed)}
+                  <small>
+                    {tr('pages.nodes.NodeDetail.s_36fee9f368')}
+                    {fmtBytes(n.memTotal)}
+                  </small>
+                </>
+              )}
             </div>
           </div>
           <div>
@@ -483,7 +490,7 @@ function Overview({ n }: { n: NodeInfo }) {
               </>
             )}
             <dt>{tr('pages.nodes.NodeDetail.s_25d548189f')}</dt>
-            <dd>{fmtDateTime(n.lastSeen)}</dd>
+            <dd>{fmtSeen(n.lastSeen)}</dd>
             <dt>{tr('pages.nodes.NodeDetail.s_5e52520af4')}</dt>
             <dd className="row wrap gap-1">
               {n.tags.map((t) => (
@@ -498,19 +505,18 @@ function Overview({ n }: { n: NodeInfo }) {
           <div className="col gap-3">
             {[
               [tr('runtime.cpuLabel'), n.cpu / 100],
-              [tr('pages.nodes.NodeDetail.s_f63c10e017'), n.memUsed / n.memTotal],
-              [tr('pages.nodes.NodeDetail.s_ca040760a3'), n.diskUsed / n.diskTotal],
+              [tr('pages.nodes.NodeDetail.s_f63c10e017'), nodeShare(n, 'memory')],
+              [tr('pages.nodes.NodeDetail.s_ca040760a3'), nodeShare(n, 'disk')],
             ].map(([l, v]) => (
               <div key={l as string} className="col" style={{ gap: 4 }}>
                 <div className="row" style={{ fontSize: 12 }}>
                   <span className="muted">{l}</span>
                   <span className="spacer" />
                   <span className="num">
-                    {Math.round((v as number) * 100)}
-                    {tr('pages.nodes.NodeDetail.s_4345cb1fa2')}
+                    {v === null ? '—' : <>{Math.round((v as number) * 100)}{tr('pages.nodes.NodeDetail.s_4345cb1fa2')}</>}
                   </span>
                 </div>
-                <Meter value={v as number} tone={tone(v as number)} />
+                <Meter value={v as number | null} tone={v === null ? undefined : tone(v as number)} />
               </div>
             ))}
           </div>

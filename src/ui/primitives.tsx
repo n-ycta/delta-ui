@@ -74,8 +74,8 @@ export function Field({ label, help, error, children, extra }: { label?: ReactNo
 
 export function Kbd({ children }: { children: ReactNode }) { return <kbd className="kbd">{children}</kbd>; }
 
-export function Meter({ value, tone, title }: { value: number; tone?: 'ok' | 'warn' | 'err'; title?: string }) {
-  const v = Math.max(0, Math.min(1, value));
+export function Meter({ value, tone, title }: { value: number | null; tone?: 'ok' | 'warn' | 'err'; title?: string }) {
+  const v = value == null || !Number.isFinite(value) ? 0 : Math.max(0, Math.min(1, value));
   const t = tone ?? (v > 0.9 ? 'err' : v > 0.75 ? 'warn' : undefined);
   return <div className={`meter ${t ?? ''}`} title={title}><span style={{ width: `${v * 100}%` }} /></div>;
 }

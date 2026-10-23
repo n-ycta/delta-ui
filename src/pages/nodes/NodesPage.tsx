@@ -6,6 +6,7 @@ import { BatteryLow, Plus, Search } from '../../ui/icons';
 import { useNodes } from '../../app/data';
 import { NODE_KIND_LABEL, type NodeInfo } from '../../core/contracts';
 import { ago, fmtBytes } from '../../core/lib/format';
+import { countNodes, nodeShare } from '../../core/lib/nodes';
 import { Badge, Button, Meter, PageHead, StatusBadge } from '../../ui/primitives';
 import { Empty, ErrorState, SkeletonRows } from '../../ui/states';
 import { Icon } from '../../ui/Icon';
@@ -52,12 +53,13 @@ export function NodesPage() {
             : sort === 'cpu'
               ? b.cpu - a.cpu
               : sort === 'seen'
-                ? b.lastSeen - a.lastSeen
+                ? (b.lastSeen ?? 0) - (a.lastSeen ?? 0)
                 : order[a.status] - order[b.status] || a.name.localeCompare(b.name),
         ),
     [all, kind, status, q, sort],
   );
-  const by = (s: NodeInfo['status']) => all.filter((n) => n.status === s).length;
+  const counts = countNodes(all);
+  const by = (s: NodeInfo['status']) => counts[s];
   return (
     <div className="page">
       <PageHead
@@ -256,7 +258,7 @@ export function NodesPage() {
                       )}
                     </td>
                     <td>
-                      {off ? (
+                      {off || nodeShare(n, 'memory') === null ? (
                         <span className="faint">{tr('pages.nodes.NodesPage.s_1b93795b97')}</span>
                       ) : (
                         <div className="col" style={{ gap: 3 }}>
@@ -264,18 +266,22 @@ export function NodesPage() {
                             {fmtBytes(n.memUsed)} {tr('pages.nodes.NodesPage.s_0d0c4ddd7c')}
                             {fmtBytes(n.memTotal)}
                           </span>
-                          <Meter value={n.memUsed / n.memTotal} />
+                          <Meter value={nodeShare(n, 'memory')} />
                         </div>
                       )}
                     </td>
                     <td>
-                      <div className="col" style={{ gap: 3 }}>
-                        <span className="num" style={{ fontSize: 11.5 }}>
-                          {Math.round((n.diskUsed / n.diskTotal) * 100)}
-                          {tr('pages.nodes.NodesPage.s_4345cb1fa2')}
-                        </span>
-                        <Meter value={n.diskUsed / n.diskTotal} />
-                      </div>
+                      {nodeShare(n, 'disk') === null ? (
+                        <span className="faint">{tr('pages.nodes.NodesPage.s_1b93795b97')}</span>
+                      ) : (
+                        <div className="col" style={{ gap: 3 }}>
+                          <span className="num" style={{ fontSize: 11.5 }}>
+                            {Math.round(nodeShare(n, 'disk')! * 100)}
+                            {tr('pages.nodes.NodesPage.s_4345cb1fa2')}
+                          </span>
+                          <Meter value={nodeShare(n, 'disk')} />
+                        </div>
+                      )}
                     </td>
                     <td className="num">
                       {off || n.latencyMs === undefined ? '—' : `${n.latencyMs}`}

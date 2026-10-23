@@ -17,7 +17,7 @@ export function useAlerts(): { alerts: Alert[]; loading: boolean } {
   const plugins = usePlugins();
   const alerts: Alert[] = [];
   nodes.data?.forEach((n) => {
-    if (n.status === 'offline') alerts.push({ id: `n-${n.id}`, tone: 'err', title: tr("widgets.system.AlertsWidget.s_3079b7f6d3", { p0: (n.name) }), detail: tr("widgets.system.AlertsWidget.s_003b65fd23", { p0: (ago(n.lastSeen)) }), to: `/nodes/${n.id}`, ts: n.lastSeen });
+    if (n.status === 'offline') alerts.push({ id: `n-${n.id}`, tone: 'err', title: tr("widgets.system.AlertsWidget.s_3079b7f6d3", { p0: (n.name) }), detail: tr("widgets.system.AlertsWidget.s_003b65fd23", { p0: (ago(n.lastSeen)) }), to: `/nodes/${n.id}`, ts: n.lastSeen ?? undefined });
     else if (n.status === 'degraded') alerts.push({ id: `n-${n.id}`, tone: 'warn', title: tr("widgets.system.AlertsWidget.s_fad683ad1b", { p0: (n.name) }), detail: n.errors[0]?.message ?? tr("widgets.system.AlertsWidget.s_40e796b718"), to: `/nodes/${n.id}`, ts: n.errors[0]?.ts });
     if (n.diskTotal && n.diskUsed / n.diskTotal > 0.9) alerts.push({ id: `d-${n.id}`, tone: 'warn', title: tr("widgets.system.AlertsWidget.s_3321cc425b", { p0: (n.name), p1: (Math.round((n.diskUsed / n.diskTotal) * 100)) }), detail: tr("widgets.system.AlertsWidget.s_497e8052bf"), to: `/nodes/${n.id}` });
     if (n.battery && n.battery.level < 0.15 && !n.battery.charging) alerts.push({ id: `b-${n.id}`, tone: 'warn', title: tr("widgets.system.AlertsWidget.s_20e7c1b55e", { p0: (n.name), p1: (Math.round(n.battery.level * 100)) }), detail: tr("widgets.system.AlertsWidget.s_2e8d5e7497"), to: `/nodes/${n.id}` });

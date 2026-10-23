@@ -26,6 +26,7 @@ import { useDashboards, useNodes, usePlugins } from "../app/data";
 import { usePrefs, useRole, useUi, useRuntimeAccess } from "../app/stores";
 import { ROLE_LABEL } from "../core/contracts";
 import { hasUpdate } from "../core/registry/plugins";
+import { countNodes } from "../core/lib/nodes";
 import { Icon } from "../ui/Icon";
 
 function Item({
@@ -82,9 +83,8 @@ export function Sidebar() {
       ["error", "degraded"].includes(p.instance.status),
     ).length ?? 0;
   const updates = plugins.data?.filter(hasUpdate).length ?? 0;
-  const nodeIssues =
-    nodes.data?.filter((n) => n.status !== "online").length ?? 0;
-  const online = nodes.data?.filter((n) => n.status !== "offline").length;
+  const nodeCounts = countNodes(nodes.data);
+  const nodeIssues = nodeCounts.total - nodeCounts.online;
   const pinned = (dashboards.data ?? []).filter(
     (d) => d.origin !== "home" && d.pinned,
   );
@@ -183,7 +183,7 @@ export function Sidebar() {
           to="/nodes"
           icon={<Server size={16} />}
           label={tr("layout.Sidebar.s_3293ac18db")}
-          count={nodes.data ? `${online}/${nodes.data.length}` : undefined}
+          count={nodes.data ? `${nodeCounts.reachable}/${nodeCounts.total}` : undefined}
           alert={nodeIssues > 0}
         />
         <Item
