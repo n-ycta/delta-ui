@@ -69,7 +69,10 @@ impl Ver {
     }
 }
 
-/// Strictly newer. Equal or older (a downgrade) is never an update; unparsable input is never newer.
+/// "Update available" policy: strictly newer by semver, pre-releases included (`1.0.0-rc.1 < 1.0.0`, so an rc
+/// user is offered the final). Equal or older is never an update; unparsable input is never newer.
+/// The app does not compare Android `versionCode` to decide availability; the downgrade ban by `versionCode`
+/// is enforced by Android itself, and the Kotlin installer refuses only a `versionCode` LOWER than the current one.
 pub fn newer(current: &str, candidate: &str) -> bool {
     match (parse_version(current), parse_version(candidate)) {
         (Some(c), Some(n)) => n.cmp(&c) == std::cmp::Ordering::Greater,
@@ -117,8 +120,8 @@ pub fn choose_asset<'a>(names: &[&'a str], abis: &[&str]) -> Option<&'a str> {
     names.iter().find(|n| **n == APK).copied()
 }
 
-/// Best newer release from the GitHub API answer (one release object or an array of them).
-/// Drafts are ignored; pre-releases only on the `Pre` channel; a release needs the APK and `SHA256SUMS`.
+/// Best release by `newer` (semver, see there) from the GitHub API answer (one release object or an array of them).
+/// Tags must be `v<semver>`. Drafts are ignored; pre-releases only on the `Pre` channel; a release needs the APK and `SHA256SUMS`.
 pub fn pick(releases: &Value, channel: Channel, current: &str, abis: &[&str]) -> Option<Offer> {
     let list: Vec<&Value> = match releases {
         Value::Array(a) => a.iter().collect(),
@@ -397,6 +400,8 @@ mod tests {
         assert_eq!(pick(&all, Channel::Stable, "0.1.16", &[]), None, "nothing newer, drafts and unsigned releases ignored");
         // the /releases/latest answer is a single object
         assert_eq!(pick(&release("v0.1.16", false, false, &ok), Channel::Stable, "0.1.15", &[]).unwrap().version, "0.1.16");
+        // an rc user is offered the final release of the same version
+        assert_eq!(pick(&release("v1.0.0", false, false, &ok), Channel::Stable, "1.0.0-rc.1", &[]).unwrap().version, "1.0.0");
         assert_eq!(pick(&json!("nope"), Channel::Stable, "0.1.15", &[]), None);
     }
 
