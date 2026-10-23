@@ -103,6 +103,7 @@ pub async fn call(app: &tauri::AppHandle, method: &str, a: &Value) -> Result<Val
             let protocol = delta_app_runtime::protocol(id);
             #[cfg(target_os = "windows")]
             let url = format!("http://{protocol}.localhost/index.html");
+            // NOTE: Android form from the owner handoff; confirm on a device that wry serves it (it may need http://{protocol}.localhost like Windows).
             #[cfg(not(target_os = "windows"))]
             let url = format!("{protocol}://localhost/index.html");
             Ok(json!({"url":url,"id":id,"name":item["name"],"grants":[]}))
