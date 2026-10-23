@@ -131,8 +131,10 @@ pub fn pick(releases: &Value, channel: Channel, current: &str, abis: &[&str]) ->
             continue;
         }
         let Some(tag) = r["tag_name"].as_str() else { continue };
-        let Some(ver) = parse_version(tag) else { continue };
-        if !newer(current, tag) {
+        // the download URL is built as `.../download/v<version>/`, so a tag without the `v` would 404
+        let Some(bare) = tag.strip_prefix('v') else { continue };
+        let Some(ver) = parse_version(bare).filter(|_| valid_version(bare)) else { continue };
+        if !newer(current, bare) {
             continue;
         }
         let assets = r["assets"].as_array().cloned().unwrap_or_default();
@@ -142,7 +144,7 @@ pub fn pick(releases: &Value, channel: Channel, current: &str, abis: &[&str]) ->
         }
         let Some(asset) = choose_asset(&names, abis) else { continue };
         let size = assets.iter().find(|a| a["name"] == asset).and_then(|a| a["size"].as_u64()).unwrap_or(0);
-        let offer = Offer { version: tag.trim_start_matches('v').to_string(), size, asset: asset.to_string() };
+        let offer = Offer { version: bare.to_string(), size, asset: asset.to_string() };
         if best.as_ref().map(|(b, _)| ver.cmp(b) == std::cmp::Ordering::Greater).unwrap_or(true) {
             best = Some((ver, offer));
         }
@@ -290,6 +292,7 @@ mod tests {
             release("v0.1.17", false, false, &[APK]),
             release("v0.1.15", false, false, &ok),
             release("nightly", false, false, &ok),
+            release("0.9.9", false, false, &ok), // no `v`: the download URL would 404
         ]);
         let stable = pick(&all, Channel::Stable, "0.1.15", &[]).unwrap();
         assert_eq!((stable.version.as_str(), stable.asset.as_str(), stable.size), ("0.1.16", APK, 1234));
@@ -353,13 +356,26 @@ pub mod net {
 
     const API: &str = "https://api.github.com/repos/n-ycta/delta-android/releases";
 
+    /// `allowed_url` on the parsed, normalised URL (what reqwest actually connects to): lower-cased host, no
+    /// default port, no credentials. A trailing-dot host (`example.com.`) is not in the allow-list and is refused.
+    pub fn allowed_reqwest_url(u: &reqwest::Url, hop: usize) -> bool {
+        u.scheme() == "https" && u.port().is_none() && u.username().is_empty() && u.password().is_none() && u.host_str().is_some() && {
+            if hop == 0 {
+                allowed_url(u.as_str(), 0)
+            } else {
+                hop <= MAX_REDIRECTS && CDN_HOSTS.contains(&u.host_str().unwrap_or(""))
+            }
+        }
+    }
+
     pub fn client() -> Result<reqwest::Client, String> {
         reqwest::Client::builder()
             .user_agent("delta-android-updater")
             .connect_timeout(Duration::from_secs(20))
             .read_timeout(Duration::from_secs(60))
+            .https_only(true)
             .redirect(reqwest::redirect::Policy::custom(|attempt| {
-                if allowed_url(attempt.url().as_str(), attempt.previous().len()) {
+                if allowed_reqwest_url(attempt.url(), attempt.previous().len()) {
                     attempt.follow()
                 } else {
                     attempt.error("untrusted_redirect")
@@ -471,6 +487,18 @@ pub mod net {
             let _ = std::fs::remove_dir_all(&d);
             std::fs::create_dir_all(&d).unwrap();
             d
+        }
+
+        #[test]
+        fn normalised_urls_are_checked_not_the_raw_string() {
+            let ok = |s: &str, hop| allowed_reqwest_url(&reqwest::Url::parse(s).unwrap(), hop);
+            assert!(ok("HTTPS://OBJECTS.GITHUBUSERCONTENT.COM/a", 1), "host is lower-cased by the parser");
+            assert!(ok("https://objects.githubusercontent.com:443/a", 1), "the default port is dropped by the parser");
+            assert!(ok(&asset_url("0.1.16", APK).unwrap(), 0));
+            for bad in ["https://objects.githubusercontent.com./a", "https://objects.githubusercontent.com%2eevil.com/a", "https://objects.githubusercontent.com:8443/a", "https://u:p@objects.githubusercontent.com/a", "http://objects.githubusercontent.com/a"] {
+                assert!(!reqwest::Url::parse(bad).map(|u| allowed_reqwest_url(&u, 1)).unwrap_or(false), "{bad}");
+            }
+            assert!(!ok("https://objects.githubusercontent.com/a", MAX_REDIRECTS + 1) && !ok("https://objects.githubusercontent.com/a", 0));
         }
 
         #[tokio::test]
