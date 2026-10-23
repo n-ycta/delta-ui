@@ -477,6 +477,31 @@ mod tests {
     }
 
     #[test]
+    fn checksum_lines_edge_cases() {
+        let (a, b) = ("aa".repeat(32), "bb".repeat(32));
+        assert_eq!(sum_for(&format!("{a}  {APK}\r\n{b}  other\r\n"), APK), Some([0xaa; 32]), "CRLF");
+        assert_eq!(sum_for(&format!("{a}  {APK}\r\n{b}  other\r\n"), "other"), Some([0xbb; 32]));
+        assert_eq!(sum_for(&format!("{a}  {APK}\n{b}  {APK}\n"), APK), Some([0xaa; 32]), "first line wins");
+        assert_eq!(sum_for(&format!("{a}  ./{APK}\n"), APK), None, "`./name` is refused");
+        assert_eq!(sum_for(&format!("{a}\t{APK}\n"), APK), Some([0xaa; 32]), "tab separator");
+        assert_eq!(sum_for(&format!("{a}  {APK}.sig\n"), APK), None, "no prefix match");
+    }
+
+    #[test]
+    fn release_choice_edge_cases() {
+        let ok = [APK, SUMS];
+        assert_eq!(pick(&release("0.2.0", false, false, &ok), Channel::Stable, "0.1.0", &[]), None, "tag without `v` would 404");
+        assert_eq!(pick(&release("vv0.2.0", false, false, &ok), Channel::Stable, "0.1.0", &[]), None);
+        let no_size = json!({"tag_name": "v0.2.0", "assets": [{"name": APK}, {"name": SUMS}]});
+        assert_eq!(pick(&no_size, Channel::Stable, "0.1.0", &[]).unwrap().size, 0, "missing size means unknown");
+        let many = json!([release("v1.0.0-rc.2", true, false, &ok), release("v1.0.0-rc.10", true, false, &ok), release("v1.0.0-rc.1", true, false, &ok)]);
+        assert_eq!(pick(&many, Channel::Pre, "0.9.0", &[]).unwrap().version, "1.0.0-rc.10", "best of several pre-releases");
+        let abi = release("v0.2.0", false, false, &[APK, SUMS, "Delta-Android-arm64-v8a.apk"]);
+        assert_eq!(pick(&abi, Channel::Stable, "0.1.0", &["arm64-v8a"]).unwrap().asset, "Delta-Android-arm64-v8a.apk");
+        assert_eq!(pick(&abi, Channel::Stable, "0.1.0", &["x86"]).unwrap().asset, APK);
+    }
+
+    #[test]
     fn verifier_checks_hash_and_caps_size() {
         let data = b"hello apk";
         let expected: [u8; 32] = Sha256::digest(data).into();
@@ -582,8 +607,14 @@ pub mod net {
 
     /// Downloads `SHA256SUMS` and the APK of an official release into `dir/delta.apk` (verified); returns the path and its SHA-256.
     pub async fn download_release(c: &reqwest::Client, version: &str, asset: &str, size_hint: u64, dir: &Path, progress: impl FnMut(u64)) -> Result<(PathBuf, [u8; 32]), String> {
-        let sums_url = asset_url(version, SUMS).ok_or("invalid_version")?;
-        let apk_url = asset_url(version, asset).ok_or("invalid_version")?;
+        asset_url(version, SUMS).ok_or("invalid_version")?;
+        asset_url(version, asset).ok_or("invalid_version")?;
+        download_release_from(c, |name| asset_url(version, name).unwrap_or_default(), asset, size_hint, dir, progress).await
+    }
+
+    /// `download_release` with the URL of each file (`SHA256SUMS`, the asset) supplied by `url_for`; tests point it at loopback.
+    async fn download_release_from(c: &reqwest::Client, url_for: impl Fn(&str) -> String, asset: &str, size_hint: u64, dir: &Path, progress: impl FnMut(u64)) -> Result<(PathBuf, [u8; 32]), String> {
+        let (sums_url, apk_url) = (url_for(SUMS), url_for(asset));
         std::fs::create_dir_all(dir).map_err(|_| "storage_failed".to_string())?;
         let mut resp = c.get(&sums_url).send().await.map_err(|_| "network_failed".to_string())?;
         if !resp.status().is_success() {
@@ -633,6 +664,99 @@ pub mod net {
             let _ = std::fs::remove_dir_all(&d);
             std::fs::create_dir_all(&d).unwrap();
             d
+        }
+
+        enum Resp {
+            Ok(Vec<u8>),
+            Status(u16),
+            /// Declares `Content-Length: declared`, sends `body` and closes.
+            Cut { declared: usize, body: Vec<u8> },
+        }
+
+        /// Loopback server: request path -> response; returns the base URL (`http://127.0.0.1:port`).
+        async fn serve_routes(routes: Vec<(&'static str, Resp)>) -> String {
+            let l = TcpListener::bind("127.0.0.1:0").await.unwrap();
+            let addr = l.local_addr().unwrap();
+            let routes = std::sync::Arc::new(routes);
+            tokio::spawn(async move {
+                loop {
+                    let (mut s, _) = l.accept().await.unwrap();
+                    let routes = routes.clone();
+                    tokio::spawn(async move {
+                        let mut buf = [0u8; 2048];
+                        let n = s.read(&mut buf).await.unwrap_or(0);
+                        let req = String::from_utf8_lossy(&buf[..n]).to_string();
+                        let path = req.split_whitespace().nth(1).unwrap_or("").to_string();
+                        let (head, body) = match routes.iter().find(|(p, _)| *p == path).map(|(_, r)| r) {
+                            Some(Resp::Ok(b)) => (format!("HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n", b.len()), b.clone()),
+                            Some(Resp::Cut { declared, body }) => (format!("HTTP/1.1 200 OK\r\nContent-Length: {declared}\r\nConnection: close\r\n\r\n"), body.clone()),
+                            Some(Resp::Status(c)) => (format!("HTTP/1.1 {c} X\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"), vec![]),
+                            None => ("HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n".to_string(), vec![]),
+                        };
+                        let _ = s.write_all(head.as_bytes()).await;
+                        let _ = s.write_all(&body).await;
+                        let _ = s.shutdown().await;
+                    });
+                }
+            });
+            format!("http://{addr}")
+        }
+
+        fn leftovers(dir: &Path) -> bool {
+            dir.join("delta.apk").exists() || dir.join("delta.part").exists()
+        }
+
+        #[tokio::test]
+        async fn release_download_failures_are_coded_and_leave_nothing_behind() {
+            let apk = vec![5u8; 10_000];
+            let sums = format!("{}  {APK}\n", hex(&Sha256::digest(&apk).into()));
+            let c = reqwest::Client::new();
+            let run = |base: String, size_hint: u64, dir: PathBuf| async move {
+                let r = download_release_from(&reqwest::Client::new(), |n| format!("{base}/{n}"), APK, size_hint, &dir, |_| {}).await;
+                (r, dir)
+            };
+
+            // happy path returns the digest of the stream
+            let base = serve_routes(vec![("/SHA256SUMS", Resp::Ok(sums.clone().into_bytes())), ("/Delta-Android-arm64-x86_64.apk", Resp::Ok(apk.clone()))]).await;
+            let (r, dir) = run(base, 10_000, tmp()).await;
+            assert_eq!(r.unwrap().1, <[u8; 32]>::from(Sha256::digest(&apk)));
+            assert!(dir.join("delta.apk").exists());
+
+            // SHA256SUMS over 4 KiB
+            let base = serve_routes(vec![("/SHA256SUMS", Resp::Ok(vec![b'x'; MAX_SUMS_BYTES + 1]))]).await;
+            let (r, dir) = run(base, 0, tmp()).await;
+            assert_eq!(r.unwrap_err(), "size_limit");
+            assert!(!leftovers(&dir));
+
+            // no line for the asset
+            let base = serve_routes(vec![("/SHA256SUMS", Resp::Ok(format!("{}  other.apk\n", "aa".repeat(32)).into_bytes()))]).await;
+            let (r, dir) = run(base, 0, tmp()).await;
+            assert_eq!(r.unwrap_err(), "checksum_missing");
+            assert!(!leftovers(&dir));
+
+            // the APK is missing (404), and so is SHA256SUMS
+            let base = serve_routes(vec![("/SHA256SUMS", Resp::Ok(sums.clone().into_bytes()))]).await;
+            let (r, dir) = run(base, 0, tmp()).await;
+            assert_eq!(r.unwrap_err(), "download_http_404");
+            assert!(!leftovers(&dir));
+            let (r, _) = run(serve_routes(vec![]).await, 0, tmp()).await;
+            assert_eq!(r.unwrap_err(), "download_http_404");
+
+            // connection cut mid-stream: fewer bytes than Content-Length
+            let base = serve_routes(vec![("/SHA256SUMS", Resp::Ok(sums.clone().into_bytes())), ("/Delta-Android-arm64-x86_64.apk", Resp::Cut { declared: 10_000, body: apk[..3_000].to_vec() })]).await;
+            let (r, dir) = run(base, 0, tmp()).await;
+            assert_eq!(r.unwrap_err(), "network_failed");
+            assert!(!leftovers(&dir), "neither .part nor apk");
+
+            // Content-Length above the limit: refused before anything is written
+            let base = serve_routes(vec![("/a.apk", Resp::Cut { declared: 10_000, body: vec![] })]).await;
+            let dir = tmp();
+            assert_eq!(download_to(&c, &format!("{base}/a.apk"), 100, &[0; 32], &dir.join("delta.apk"), |_| {}).await, Err("size_limit".into()));
+            assert!(!leftovers(&dir));
+
+            // plain status codes from download_to
+            let base = serve_routes(vec![("/a.apk", Resp::Status(500))]).await;
+            assert_eq!(download_to(&c, &format!("{base}/a.apk"), 100, &[0; 32], &dir.join("delta.apk"), |_| {}).await, Err("download_http_500".into()));
         }
 
         #[test]
