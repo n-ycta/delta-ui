@@ -9,6 +9,11 @@ export function nodeShare(n: NodeInfo, kind: 'memory' | 'disk'): number | null {
   return total > 0 && Number.isFinite(used) ? used / total : null;
 }
 
+/** CPU load 0..100, or null when the host reports no CPU telemetry (mobile core, unreachable peer). */
+export function nodeCpu(n: NodeInfo): number | null {
+  return n.telemetryUnavailable?.includes('cpu') || !Number.isFinite(n.cpu) ? null : n.cpu;
+}
+
 /** Time of the last contact; null = never seen (not 1970). */
 export function fmtSeen(ts: number | null | undefined): string {
   return ts == null ? '—' : fmtDateTime(ts);

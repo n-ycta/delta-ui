@@ -6,7 +6,7 @@ import { Dot, Meter } from '../../ui/primitives';
 import { Icon } from '../../ui/Icon';
 import { NODE_STATUS } from '../../ui/status';
 import { ago } from '../../core/lib/format';
-import { nodeShare } from '../../core/lib/nodes';
+import { nodeCpu, nodeShare } from '../../core/lib/nodes';
 import { ErrorState, SkeletonRows } from '../../ui/states';
 
 export const NODE_ICON: Record<string, string> = { vps: 'server', android: 'smartphone', desktop: 'monitor', sbc: 'cpu', container: 'container' };
@@ -30,7 +30,7 @@ export function NodeGridWidget(_: WidgetProps) {
               <div className="muted" style={{ fontSize: 11.5 }}>{tr("widgets.system.NodeGridWidget.s_1fd2d7a11c")}{ago(n.lastSeen)}</div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: '28px 1fr 34px', gap: '3px 6px', alignItems: 'center', fontSize: 10.5, fontFamily: 'var(--font-mono)', color: 'var(--muted)' }}>
-                <span>{tr("widgets.system.NodeGridWidget.s_ff221d4752")}</span><Meter value={n.cpu / 100} /><span style={{ textAlign: 'right' }}>{Math.round(n.cpu)}{tr("widgets.system.NodeGridWidget.s_4345cb1fa2")}</span>
+                <span>{tr("widgets.system.NodeGridWidget.s_ff221d4752")}</span><Meter value={nodeCpu(n) === null ? null : n.cpu / 100} /><span style={{ textAlign: 'right' }}>{nodeCpu(n) === null ? '—' : <>{Math.round(n.cpu)}{tr("widgets.system.NodeGridWidget.s_4345cb1fa2")}</>}</span>
                 <span>{tr("widgets.system.NodeGridWidget.s_0063393cf0")}</span><Meter value={nodeShare(n, 'memory')} /><span style={{ textAlign: 'right' }}>{nodeShare(n, 'memory') === null ? '—' : <>{Math.round(nodeShare(n, 'memory')! * 100)}{tr("widgets.system.NodeGridWidget.s_4345cb1fa2")}</>}</span>
               </div>
             )}

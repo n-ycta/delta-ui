@@ -6,7 +6,7 @@ import { BatteryLow, Plus, Search } from '../../ui/icons';
 import { useNodes } from '../../app/data';
 import { NODE_KIND_LABEL, type NodeInfo } from '../../core/contracts';
 import { ago, fmtBytes } from '../../core/lib/format';
-import { countNodes, nodeShare } from '../../core/lib/nodes';
+import { countNodes, nodeCpu, nodeShare } from '../../core/lib/nodes';
 import { Badge, Button, Meter, PageHead, StatusBadge } from '../../ui/primitives';
 import { Empty, ErrorState, SkeletonRows } from '../../ui/states';
 import { Icon } from '../../ui/Icon';
@@ -245,7 +245,7 @@ export function NodesPage() {
                       <StatusBadge {...NODE_STATUS[n.status]} pulse={n.status === 'online'} />
                     </td>
                     <td>
-                      {off ? (
+                      {off || nodeCpu(n) === null ? (
                         <span className="faint">{tr('pages.nodes.NodesPage.s_1b93795b97')}</span>
                       ) : (
                         <div className="col" style={{ gap: 3 }}>

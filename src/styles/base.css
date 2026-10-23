@@ -1,5 +1,7 @@
 *, *::before, *::after { box-sizing: border-box; }
 html, body, #root { height: 100%; }
+/* A wide child must never make a phone WebView zoom out to a desktop-sized viewport. */
+html, body { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
 body {
   margin: 0; background: var(--bg); color: var(--ink);
   font-family: var(--font-sans); font-size: var(--fs-md); line-height: var(--lh);

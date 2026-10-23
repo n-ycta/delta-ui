@@ -34,7 +34,7 @@ import {
   DAY,
   HOUR,
 } from '../../core/lib/format';
-import { fmtSeen, nodeShare } from '../../core/lib/nodes';
+import { fmtSeen, nodeCpu, nodeShare } from '../../core/lib/nodes';
 import {
   Badge,
   Button,
@@ -299,7 +299,7 @@ function Overview({ n }: { n: NodeInfo }) {
               {tr('pages.nodes.NodeDetail.s_1e138246dc')}
               {n.cores} {tr('pages.nodes.NodeDetail.s_aa45b5efaf')}
             </div>
-            <div className="v">{off ? '—' : `${Math.round(n.cpu)}%`}</div>
+            <div className="v">{off || nodeCpu(n) === null ? '—' : `${Math.round(n.cpu)}%`}</div>
           </div>
           <div>
             <div className="label">{tr('pages.nodes.NodeDetail.s_f63c10e017')}</div>
@@ -504,7 +504,7 @@ function Overview({ n }: { n: NodeInfo }) {
         <Panel title={tr('pages.nodes.NodeDetail.s_c6e47aac4b')}>
           <div className="col gap-3">
             {[
-              [tr('runtime.cpuLabel'), n.cpu / 100],
+              [tr('runtime.cpuLabel'), nodeCpu(n) === null ? null : n.cpu / 100],
               [tr('pages.nodes.NodeDetail.s_f63c10e017'), nodeShare(n, 'memory')],
               [tr('pages.nodes.NodeDetail.s_ca040760a3'), nodeShare(n, 'disk')],
             ].map(([l, v]) => (
