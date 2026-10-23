@@ -2,21 +2,16 @@
 //! only connects them to the Kotlin platform and keeps progress state. The WebView passes no paths or URLs.
 use delta_native_update as upd;
 use serde_json::{json, Value};
-use std::{path::PathBuf, sync::{Mutex, OnceLock}};
+use std::{path::PathBuf, sync::{Mutex, MutexGuard, OnceLock}};
 
-#[derive(Clone, Default)]
-struct State {
-    state: &'static str, // "" = idle
-    received: u64,
-    total: u64,
-    version: String,
-    error: String,
-    sum: [u8; 32],
+fn state() -> &'static Mutex<upd::UpdateState> {
+    static S: OnceLock<Mutex<upd::UpdateState>> = OnceLock::new();
+    S.get_or_init(|| Mutex::new(upd::UpdateState::default()))
 }
 
-fn state() -> &'static Mutex<State> {
-    static S: OnceLock<Mutex<State>> = OnceLock::new();
-    S.get_or_init(|| Mutex::new(State::default()))
+/// A task that panicked while holding the lock must not disable updates for the rest of the process.
+fn lock() -> MutexGuard<'static, upd::UpdateState> {
+    state().lock().unwrap_or_else(|e| e.into_inner())
 }
 
 fn env() -> Result<Value, String> {
@@ -43,10 +38,14 @@ pub async fn call(method: &str, a: &Value) -> Result<Value, String> {
         "host.update_check" => {
             let env = env()?;
             let found = offer(&env, channel(a)?).await?;
-            if found.is_none() && state().lock().map_err(|_| "update_busy")?.state != "downloading" {
-                // nothing newer: drop a stale cached APK (for example after the update was installed)
-                let _ = std::fs::remove_dir_all(dir(&env)?);
-                *state().lock().map_err(|_| "update_busy")? = State::default();
+            if found.is_none() {
+                // nothing newer: drop a stale cached APK (for example after the update was installed), but never
+                // under an active download or install; the check and the clean-up share one lock
+                let mut s = lock();
+                if s.check_cleanup_allowed() {
+                    let _ = std::fs::remove_dir_all(dir(&env)?);
+                    s.reset();
+                }
             }
             Ok(json!({
                 "current": env["versionName"], "latest": found.as_ref().map(|o| o.version.clone()),
@@ -68,63 +67,55 @@ pub async fn call(method: &str, a: &Value) -> Result<Value, String> {
             }
             // the version must be a real, newer release on the chosen channel; this also yields asset and size
             let found = offer(&env, channel(a)?).await?.filter(|o| o.version == version).ok_or("version_not_offered")?;
-            {
-                let mut s = state().lock().map_err(|_| "update_busy")?;
-                if s.state == "downloading" {
-                    return Err("update_busy".into());
-                }
-                *s = State { state: "downloading", total: found.size, version: version.clone(), ..State::default() };
-            }
+            let generation = lock().begin_download(&version, found.size)?;
             let target = dir(&env)?;
             let _ = std::fs::remove_dir_all(&target);
-            tokio::spawn(async move {
+            let task = tokio::spawn(async move {
                 let result = async {
                     let client = upd::net::client()?;
                     upd::net::download_release(&client, &found.version, &found.asset, found.size, &target, |n| {
-                        if let Ok(mut s) = state().lock() {
-                            s.received = n;
-                        }
+                        lock().progress(generation, n);
                     })
                     .await
+                    .map(|(_, sum)| sum)
                 }
                 .await;
-                if let Ok(mut s) = state().lock() {
-                    match result {
-                        Ok((_, sum)) => {
-                            s.sum = sum;
-                            s.state = "ready";
-                        }
-                        Err(e) => {
-                            s.state = "failed";
-                            s.error = e;
-                        }
-                    }
+                lock().finish(generation, result);
+            });
+            // a panic in the task would leave "downloading" forever: the watcher turns it into a failure
+            tokio::spawn(async move {
+                if task.await.is_err() {
+                    lock().finish(generation, Err("update_failed".into()));
                 }
             });
             Ok(json!({"started": true}))
         }
         "host.update_status" => {
-            let s = state().lock().map_err(|_| "update_busy")?.clone();
-            Ok(json!({"state": if s.state.is_empty() { "idle" } else { s.state }, "received": s.received, "total": s.total, "version": s.version, "error": s.error}))
+            let s = lock().clone();
+            Ok(json!({"state": s.phase.as_str(), "received": s.received, "total": s.total, "version": s.version, "error": s.error}))
         }
         "host.update_install" => {
-            let version = a["version"].as_str().ok_or("invalid_version")?;
-            let s = state().lock().map_err(|_| "update_busy")?.clone();
-            if s.state != "ready" || s.version != version {
-                return Err("update_not_ready".into());
-            }
-            let env = env()?;
-            let apk = dir(&env)?.join("delta.apk");
-            // the cache is app-private, but verify once more that the file is still the one that was checked
-            if file_sum(&apk)? != s.sum {
-                return Err("checksum_mismatch".into());
-            }
-            // Kotlin reports failures as {"error": code}: a thrown exception would reach us only as a generic failure
-            let out = crate::android::platform("update_install", &json!({"path": apk.to_string_lossy(), "version": version}))?;
-            if let Some(code) = out["error"].as_str() {
-                return Err(code.to_string());
-            }
-            Ok(json!({"prompted": true}))
+            let version = a["version"].as_str().ok_or("invalid_version")?.to_string();
+            let sum = lock().begin_install(&version)?;
+            // hashing 100+ MB and the Kotlin call block: keep them off the async workers
+            let result = tokio::task::spawn_blocking(move || {
+                let apk = dir(&env()?)?.join("delta.apk");
+                // the cache is app-private, but verify once more that the file is still the one that was checked
+                if file_sum(&apk)? != sum {
+                    return Err("checksum_mismatch".to_string());
+                }
+                // Kotlin gets the expected digest from our state, never from the WebView, and reports failures
+                // as {"error": code}: a thrown exception would reach us only as a generic failure
+                let out = crate::android::platform("update_install", &json!({"path": apk.to_string_lossy(), "version": version, "sha256": upd::hex(&sum)}))?;
+                match out["error"].as_str() {
+                    Some(code) => Err(code.to_string()),
+                    None => Ok(json!({"prompted": true})),
+                }
+            })
+            .await
+            .unwrap_or_else(|_| Err("update_failed".to_string()));
+            lock().end_install(result.is_ok());
+            result
         }
         _ => Err("unsupported".into()),
     }

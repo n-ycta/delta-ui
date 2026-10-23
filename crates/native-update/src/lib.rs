@@ -189,6 +189,103 @@ pub fn sum_for(text: &str, name: &str) -> Option<[u8; 32]> {
     None
 }
 
+/// Lower-case hex of a digest (what the Kotlin installer compares against).
+pub fn hex(d: &[u8; 32]) -> String {
+    d.iter().map(|b| format!("{b:02x}")).collect()
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum Phase {
+    #[default]
+    Idle,
+    Downloading,
+    Ready,
+    Installing,
+    Failed,
+}
+
+impl Phase {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Phase::Idle => "idle",
+            Phase::Downloading => "downloading",
+            Phase::Ready => "ready",
+            Phase::Installing => "installing",
+            Phase::Failed => "failed",
+        }
+    }
+}
+
+/// Progress of the single update the host handles at a time. Pure: the host wraps it in a mutex.
+/// Every download gets a new `generation`; a task may write only while its own generation is current.
+#[derive(Debug, Clone, Default)]
+pub struct UpdateState {
+    pub phase: Phase,
+    pub received: u64,
+    pub total: u64,
+    pub version: String,
+    pub error: String,
+    /// SHA-256 of the verified APK, set when the download finishes.
+    pub sum: [u8; 32],
+    generation: u64,
+}
+
+impl UpdateState {
+    /// Starts a download and returns its generation; busy while downloading or installing.
+    pub fn begin_download(&mut self, version: &str, total: u64) -> Result<u64, &'static str> {
+        if matches!(self.phase, Phase::Downloading | Phase::Installing) {
+            return Err("update_busy");
+        }
+        let generation = self.generation + 1;
+        *self = UpdateState { phase: Phase::Downloading, total, version: version.to_string(), generation, ..Default::default() };
+        Ok(generation)
+    }
+    /// Progress from the task of `generation`; false if that task is stale.
+    pub fn progress(&mut self, generation: u64, received: u64) -> bool {
+        let live = self.generation == generation && self.phase == Phase::Downloading;
+        if live {
+            self.received = received;
+        }
+        live
+    }
+    /// Result of the task of `generation` (the verified digest or an error code); false if it is stale.
+    pub fn finish(&mut self, generation: u64, result: Result<[u8; 32], String>) -> bool {
+        if self.generation != generation || self.phase != Phase::Downloading {
+            return false;
+        }
+        match result {
+            Ok(sum) => (self.phase, self.sum) = (Phase::Ready, sum),
+            Err(e) => (self.phase, self.error) = (Phase::Failed, e),
+        }
+        true
+    }
+    /// A cache clean-up or reset must not touch an active download or install.
+    pub fn check_cleanup_allowed(&self) -> bool {
+        !matches!(self.phase, Phase::Downloading | Phase::Installing)
+    }
+    /// Back to idle (caller checked `check_cleanup_allowed` under the same lock). Generation keeps counting.
+    pub fn reset(&mut self) {
+        *self = UpdateState { generation: self.generation + 1, ..Default::default() };
+    }
+    /// Moves a ready update of `version` to installing and returns the digest it must still have.
+    pub fn begin_install(&mut self, version: &str) -> Result<[u8; 32], &'static str> {
+        match self.phase {
+            Phase::Installing => Err("update_busy"),
+            Phase::Ready if self.version == version => {
+                self.phase = Phase::Installing;
+                Ok(self.sum)
+            }
+            _ => Err("update_not_ready"),
+        }
+    }
+    /// After the installer answered: an error returns to `Ready`, success stays `Installing`.
+    pub fn end_install(&mut self, ok: bool) {
+        if self.phase == Phase::Installing && !ok {
+            self.phase = Phase::Ready;
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum VerifyError {
     SizeLimit,
@@ -328,6 +425,55 @@ mod tests {
         assert_eq!(sum_for("zz  Delta-Android-arm64-x86_64.apk", APK), None);
         assert_eq!(sum_for(&format!("{}  {APK}", "ab".repeat(31)), APK), None, "short hash");
         assert_eq!(sum_for(&format!("{}  {APK}", "gg".repeat(32)), APK), None, "non-hex");
+    }
+
+    #[test]
+    fn stale_downloads_cannot_overwrite_a_newer_one() {
+        let mut s = UpdateState::default();
+        let g1 = s.begin_download("0.1.16", 10).unwrap();
+        assert_eq!(s.begin_download("0.1.17", 10), Err("update_busy"), "one download at a time");
+        assert!(s.finish(g1, Err("network_failed".into())) && s.phase == Phase::Failed);
+        let g2 = s.begin_download("0.1.17", 20).unwrap();
+        assert!(g2 > g1);
+        assert!(!s.progress(g1, 5) && !s.finish(g1, Ok([1; 32])), "old generation is ignored");
+        assert_eq!((s.phase, s.received, s.version.as_str()), (Phase::Downloading, 0, "0.1.17"));
+        assert!(s.progress(g2, 7) && s.finish(g2, Ok([2; 32])) && s.phase == Phase::Ready && s.sum == [2; 32]);
+        assert!(!s.finish(g2, Err("late".into())) && s.phase == Phase::Ready, "a task reports once");
+    }
+
+    #[test]
+    fn check_cleanup_never_resets_active_work() {
+        let mut s = UpdateState::default();
+        assert!(s.check_cleanup_allowed());
+        let g = s.begin_download("0.1.16", 1).unwrap();
+        assert!(!s.check_cleanup_allowed(), "downloading");
+        s.finish(g, Ok([3; 32]));
+        assert!(s.check_cleanup_allowed());
+        s.begin_install("0.1.16").unwrap();
+        assert!(!s.check_cleanup_allowed(), "installing");
+        s.end_install(false);
+        s.reset();
+        assert_eq!(s.phase, Phase::Idle);
+        assert!(!s.finish(g, Ok([9; 32])), "reset invalidates tasks of earlier generations");
+    }
+
+    #[test]
+    fn install_is_single_shot_and_returns_to_ready_on_error() {
+        let mut s = UpdateState::default();
+        assert_eq!(s.begin_install("0.1.16"), Err("update_not_ready"));
+        let g = s.begin_download("0.1.16", 1).unwrap();
+        assert_eq!(s.begin_install("0.1.16"), Err("update_not_ready"), "still downloading");
+        s.finish(g, Ok([4; 32]));
+        assert_eq!(s.begin_install("0.1.99"), Err("update_not_ready"), "other version");
+        assert_eq!(s.begin_install("0.1.16"), Ok([4; 32]));
+        assert_eq!(s.begin_install("0.1.16"), Err("update_busy"), "double tap");
+        assert_eq!(s.begin_download("0.1.17", 1), Err("update_busy"));
+        s.end_install(false);
+        assert_eq!(s.phase, Phase::Ready);
+        s.begin_install("0.1.16").unwrap();
+        s.end_install(true);
+        assert_eq!(s.phase, Phase::Installing);
+        assert_eq!(hex(&[0xab; 32]), "ab".repeat(32));
     }
 
     #[test]
