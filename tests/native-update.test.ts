@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { CHECK_EVERY_MS, dueForCheck, megabytes, normalizeUpdatePrefs, updateErrorKey } from '../src/host/updates';
+import { CHECK_EVERY_MS, KNOWN, dueForCheck, megabytes, normalizeUpdatePrefs, updateErrorKey } from '../src/host/updates';
 import { tr } from '../src/i18n';
 
 test('stored preferences are normalized and never trusted blindly', () => {
@@ -24,6 +24,14 @@ test('every host error code maps to a translated message', () => {
   }
   assert.equal(updateErrorKey('github_http_403'), 'nativeUpdate.err_http');
   assert.equal(updateErrorKey('<script>'), 'nativeUpdate.err_unknown');
+});
+
+test('every known error code has a real translation, not the bare key', () => {
+  for (const code of KNOWN) {
+    const key = updateErrorKey(code);
+    assert.equal(key, `nativeUpdate.err_${code}`);
+    assert.notEqual(tr(key), key, code);
+  }
 });
 
 test('sizes are shown in megabytes', () => {

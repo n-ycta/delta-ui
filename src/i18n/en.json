@@ -2409,6 +2409,14 @@
     "err_storage_failed": "Not enough storage or the file could not be saved.",
     "err_install_permission_required": "Allow Delta to install apps in the system settings that just opened, then press Install again.",
     "err_unsupported": "Updates are not supported on this device.",
+    "err_install_failed": "The system installer could not start the update.",
+    "err_update_invalid": "The downloaded update is not valid.",
+    "err_invalid_channel": "Unknown update channel.",
+    "err_response_too_large": "GitHub returned an unexpectedly large answer. Try again later.",
+    "err_bad_release_json": "GitHub returned an unreadable release list. Try again later.",
+    "err_client_failed": "Could not set up a secure connection.",
+    "err_update_env_invalid": "Could not read the app version on this device.",
+    "err_update_failed": "The update stopped unexpectedly. Try again.",
     "err_http": "GitHub did not return the release. Try again later.",
     "err_unknown": "The update failed."
   }

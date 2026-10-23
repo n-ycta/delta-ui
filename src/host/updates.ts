@@ -21,8 +21,9 @@ export function dueForCheck(p: UpdatePrefs, now: number): boolean {
   return p.enabled && now - p.lastCheck >= CHECK_EVERY_MS;
 }
 
-const KNOWN = new Set(['metered_consent_required', 'not_newer', 'size_limit', 'checksum_mismatch', 'untrusted_redirect', 'update_busy',
-  'update_not_ready', 'version_not_offered', 'network_failed', 'install_permission_required', 'unsupported', 'storage_failed', 'checksum_missing']);
+export const KNOWN = new Set(['metered_consent_required', 'not_newer', 'size_limit', 'checksum_mismatch', 'untrusted_redirect', 'update_busy',
+  'update_not_ready', 'version_not_offered', 'network_failed', 'install_permission_required', 'unsupported', 'storage_failed', 'checksum_missing',
+  'install_failed', 'update_invalid', 'invalid_channel', 'response_too_large', 'bad_release_json', 'client_failed', 'update_env_invalid', 'update_failed']);
 
 /** i18n key for a host error code; unknown codes never leak raw text into the UI. */
 export function updateErrorKey(code: unknown): string {
