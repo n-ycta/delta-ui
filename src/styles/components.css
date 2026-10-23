@@ -327,7 +327,7 @@ mark { background: var(--accent-weak); color: inherit; border-radius: 2px; }
   .mobile-only { display: inline-flex !important; }
   .desktop-only { display: none !important; }
   .search-trigger { width: auto; }
-  .search-trigger .st-text { display: none; }
+  .search-trigger .st-text, .search-trigger .kbd { display: none; }
   .page { padding: 16px 14px 40px; }
   .page-title { font-size: 20px; }
   .topbar { padding: 0 10px; gap: 6px; }
@@ -542,6 +542,8 @@ select option, select optgroup { color: var(--ink); background-color: var(--surf
   .plug-foot { font-size: 12px; line-height: 1.5; }
   .topbar > .btn.icon { min-width: 44px; min-height: 44px; }
 }
+/* touch devices have no keyboard shortcut to advertise */
+@media (pointer: coarse) { .search-trigger .kbd { display: none; } }
 @media (pointer: coarse) {
   .content { scrollbar-width: none; }
   .content::-webkit-scrollbar { display: none; }
