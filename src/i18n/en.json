@@ -2037,7 +2037,7 @@
     "importExisting": "Use existing key",
     "newSetup": "Set up separately",
     "back": "Back",
-    "connectHint": "On your computer or Web console, open Nodes, create an invitation and paste its link or the Core address and code. This phone joins as a separate node; no new personal key is required.",
+    "connectHint": "On your computer or Web console, open Nodes, create an invitation and scan its QR code with this phone. This phone joins as a separate node; no new personal key is required.",
     "invitationLink": "Invitation link",
     "useInvitation": "Use invitation",
     "useServices": "Use the connected node for services",

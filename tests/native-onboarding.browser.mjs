@@ -24,7 +24,7 @@ const server = await createServer({
 await server.listen();
 const browser = await chromium.launch({
   executablePath: process.env.CHROMIUM_PATH || chromium.executablePath(),
-  args: ["--no-sandbox"],
+  args: ["--no-sandbox","--use-fake-device-for-media-stream","--use-fake-ui-for-media-stream"],
 });
 try {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -84,16 +84,19 @@ try {
   const pair=await browser.newPage({viewport:{width:390,height:844}});
   await pair.goto(page.url());
   await pair.getByRole('button',{name:'Connect to existing Delta',exact:true}).click();
-  await pair.getByLabel('Core URL',{exact:false}).count().catch(()=>0);
-  const inputs=pair.locator('input.input');
-  await inputs.nth(1).fill('https://delta.example');
-  await inputs.nth(2).fill('invalid');
+  // The join screen has exactly two buttons and no fields; the invitation arrives by QR or intent only.
+  const joinBox=pair.getByTestId('native-join');await joinBox.waitFor();
+  assert.equal(await joinBox.locator('button').count(),2);
+  assert.equal(await joinBox.locator('input,textarea,select').count(),0);
+  assert(await pair.getByRole('button',{name:'Join',exact:true}).isDisabled());
+  await pair.evaluate(()=>window.__deltaAcceptPair('delta://pair?url=https%3A%2F%2Fdelta.example&code=invalid'));
+  await pair.getByText('Invitation from delta.example',{exact:false}).waitFor();
   await pair.getByRole('button',{name:'Join',exact:true}).click();
   await pair.getByRole('alert').waitFor();
   assert.equal(await pair.locator('#shell-ready').count(),0);
   assert(!(await pair.evaluate(()=>window.calls.some(c=>c.capability==='identity.enroll'))));
   await pair.evaluate(()=>localStorage.setItem('fixture.failCompletion','once'));
-  await inputs.nth(2).fill('valid-test-invitation');
+  await pair.evaluate(()=>window.__deltaAcceptPair('delta join https://delta.example valid-test-invitation'));
   await pair.getByRole('button',{name:'Join',exact:true}).click();
   await pair.getByText('Temporary profile write failure',{exact:true}).waitFor();
   await pair.getByRole('button',{name:'Continue',exact:true}).click();
@@ -102,17 +105,33 @@ try {
   assert.equal(pairCalls.filter(c=>c.capability==='peers.join').length,2); // invalid, then successful; no replay
   assert.equal(pairCalls.find(c=>c.capability==='peers.join').args.trust_admin,false);
   assert(!pairCalls.some(c=>c.capability==='identity.enroll'));
-  assert.equal(await pair.evaluate(()=>localStorage.getItem('fixture.services')),'existing-node');
+  assert(pairCalls.some(c=>c.capability==='core.info'&&c.node==='existing-node')); // joined node verified; service-node choice lives in Settings
   await pair.reload();await pair.locator('#shell-ready').waitFor();
   await pair.close();
   // Deep-link invitation received while onboarding is open enters the connection screen.
   const linked=await browser.newPage({viewport:{width:390,height:844}});
   await linked.goto(page.url());await linked.getByRole('button',{name:'Connect to existing Delta',exact:true}).waitFor();
   await linked.evaluate(async()=>{const m=await import('/src/host/NativeConnection.tsx');m.acceptInvitation('delta://pair?url=https%3A%2F%2Fdelta.example&code=link-test')});
-  await linked.locator('input[type=url]').waitFor();
-  assert.equal(await linked.locator('input[type=url]').inputValue(),'https://delta.example');
-  assert.equal(await linked.locator('input[type=password]').inputValue(),'link-test');
+  await linked.getByText('Invitation from delta.example',{exact:false}).waitFor();
+  assert.equal(await linked.getByTestId('native-join').locator('input').count(),0);
   await linked.close();
+  // Live camera: video plays after Scan; every track ends on Stop and on unmount.
+  const cam=await browser.newPage({viewport:{width:390,height:844}});
+  await cam.addInitScript(()=>{window.streams=[];const g=navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);navigator.mediaDevices.getUserMedia=async c=>{const m=await g(c);window.streams.push(m);return m}});
+  await cam.goto(page.url());await cam.getByRole('button',{name:'Connect to existing Delta',exact:true}).click();
+  const live=cam.getByTestId('native-join');
+  await live.getByRole('button',{name:'Scan',exact:true}).click();
+  await cam.waitForFunction(()=>{const v=document.querySelector('video');return v&&v.readyState>=2&&v.videoWidth>0&&!v.paused});
+  assert.equal(await live.locator('button').count(),2);
+  assert.equal(await live.locator('input').count(),0);
+  await cam.screenshot({path:`${process.env.DELTA_TEST_OUTPUT||'/tmp/delta-onboarding-qa'}/join-scanning-390.png`});
+  await live.getByRole('button',{name:'Stop camera',exact:true}).click();
+  assert(await cam.evaluate(()=>window.streams.every(m=>m.getTracks().every(t=>t.readyState==='ended'))));
+  await live.getByRole('button',{name:'Scan',exact:true}).click();
+  await cam.waitForFunction(()=>window.streams.length===2&&window.streams[1].getTracks().some(t=>t.readyState==='live'));
+  await cam.getByRole('button',{name:'Back',exact:true}).click(); // unmount while scanning
+  await cam.waitForFunction(()=>window.streams.every(m=>m.getTracks().every(t=>t.readyState==='ended')));
+  await cam.close();
   // Capture initial/connection layouts with production design tokens, without credentials.
   const out=process.env.DELTA_TEST_OUTPUT||'/tmp/delta-onboarding-qa';await mkdir(out,{recursive:true});
   for(const width of [390,1440]){
