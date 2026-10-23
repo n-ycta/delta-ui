@@ -12,6 +12,7 @@ jobs:
           node-version: '24'
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo test --manifest-path crates/app-runtime/Cargo.toml
+      - run: cargo test --manifest-path crates/native-update/Cargo.toml --features net
       - run: npm ci --ignore-scripts
       - run: npm test && npm run test:apps && npm run test:i18n && npm run build
       - run: npx playwright install --with-deps chromium

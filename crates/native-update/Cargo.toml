@@ -1,0 +1,17 @@
+[package]
+name = "delta-native-update"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+description = "Pure decision logic for in-app Android updates: versions, release choice, checksums, trusted URLs"
+
+[dependencies]
+serde_json = "1"
+sha2 = "0.10"
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"], optional = true }
+
+[features]
+net = ["dep:reqwest"]
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt", "macros", "net", "io-util"] }
