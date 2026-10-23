@@ -2,6 +2,7 @@
 import type {HostBridge,CapabilityRequest} from './contract';
 import {DashboardConfig,PluginManifest} from '../core/contracts';
 import {tr} from '../i18n';
+import {hubAddress,isLoopbackUrl,loopbackRefusal} from './invitations';
 import {validateWorkspace} from '../workbench/model';
 type Obj=Record<string,any>;
 const targets:Record<string,string>={'mcp_list':'mcp.list','mcp_catalog':'mcp.catalog','mcp_create':'mcp.create','mcp_revoke':'mcp.revoke','updates_status':'updater.status','updates_check':'updater.check','updates_settings':'updater.settings','updates_install':'updater.install','nodes_ssh_preflight':'provision.preflight','nodes_ssh_probe':'provision.probe','nodes_ssh_install':'provision.install','nodes_ssh_status':'provision.status','nodes_history':'observability.history','nodes_uptime':'observability.uptime','events_list':'observability.events'};
@@ -9,14 +10,6 @@ const fail=(code:string,message:string):never=>{throw Object.assign(Error(messag
 export function projectNative(raw:HostBridge):HostBridge{
  let serviceNode:string|undefined,prefsLoaded=false,cache:Promise<Obj[]>|undefined,cacheAt=0;
  const call=async(capability:string,args:Obj={},node?:string):Promise<any>=>{if(['packages.plan','packages.install'].includes(capability)&&(await raw.info()).kind==='android'){const local=await raw.call({capability:'core.info'}) as Obj;if(!node||node===local.node_id)fail('unsupported',tr('compatibility.installer'))}try{return await raw.call({capability,args,...(node?{node}:{})})}catch(e){const x=e as Obj;throw Object.assign(Error(x.message||x.code||String(e)),{code:x.code||'unavailable'})}};
-
- const reachableUrls=async(configured:string)=>{
-  const seen=new Set<string>(); const out:string[]=[];
-  const add=(v:unknown)=>{try{const u=new URL(String(v||'').trim());if(!['http:','https:'].includes(u.protocol)||!u.hostname)return;const text=u.origin;if(!seen.has(text)){seen.add(text);out.push(text)}}catch{}};
-  add(configured);
-  try{const peers=await call('peers.list');for(const peer of peers||[]){if(!peer||peer.online===false)continue;const url=String(peer.url||'');if(/127\.0\.0\.1|localhost/.test(url))continue;try{const probe=new URL('/v1/capabilities',url);const res=await fetch(probe,{method:'GET',signal:AbortSignal.timeout(1500)});if(res.status===401)add(probe.origin)}catch{}}}catch{}
-  return out;
- };
 
  const docs=(namespace:string)=>call('host.document_list',{namespace});
  const put=(namespace:string,key:string,value:Obj)=>call('host.document_put',{namespace,key,value});
@@ -62,7 +55,7 @@ export function projectNative(raw:HostBridge):HostBridge{
    case'metrics_query':{const p=await find(a.query.pluginId),m=p.manifest.metrics?.find((m:Obj)=>m.id===a.query.metricId);if(!m)fail('not_found','Metric not found');if(m.queryCapability){if(!m.queryCapability.startsWith(p.componentId+'.'))fail('bad_request','Invalid plugin metric endpoint');return call(m.queryCapability,{query:a.query,_locale:a._locale},await destination(p,a.query.nodeId))}return service('observability.query',a)}
    case'nodes_list':{const local=await call('core.info'),nodes=[await nodeInfo(local)],peers=await call('peers.list');const seen=new Set([local.node_id]);for(const p of peers){if(seen.has(p.node_id))continue;seen.add(p.node_id);const base={id:p.node_id,name:p.name,kind:p.kind||'desktop',os:p.kind||'',arch:'',address:p.url||'',status:p.online===false?'offline':'online',lastSeen:typeof p.last_seen==='number'?Math.round(p.last_seen*1000):null,telemetryUnavailable:['cpu','memory','disk','processCpu','processMemory'],uptimeSec:0,agentVersion:p.version||'',cpu:0,cores:0,memTotal:0,memUsed:0,diskTotal:0,diskUsed:0,tags:[],pluginIds:[],components:[],processes:[],allowedCommands:[],trustedAdmin:!!p.trusted_admin};try{const i=await call('core.info',{},p.node_id);const info=await nodeInfo({...i,kind:i.kind||p.kind,url:i.url||p.url},p.node_id);nodes.push({...base,...info,status:p.online===false?'offline':'online',address:info.address||p.url||'',kind:info.kind||p.kind||'desktop',trustedAdmin:p.trusted_admin})}catch{nodes.push({...base,errors:[{ts:Date.now(),code:'unavailable',message:p.error||tr('host.unavailable'),component:'peers',count:1}]})}}return nodes}
    case'nodes_command':{const local=await call('core.info');const cap=a.command==='ping'?'core.info':a.command==='restart-component'?'supervisor.restart':a.command==='exec'?'exec.run':fail('bad_request','Unknown command');const args=a.command==='restart-component'?{id:a.args?.component}:a.command==='exec'?{command:JSON.parse(a.args?.cmd||'[]')}:{};const t=Date.now();const r=await call(cap,args,a.id===local.node_id?undefined:a.id);return{ok:true,durationMs:Date.now()-t,output:[JSON.stringify(r)]}}
-   case'nodes_pair':{const r=await call('peers.invite',{trust_admin:a.trustAdmin===true});const urls=await reachableUrls(r.url);return{code:r.code,url:urls[0]||r.url,urls,expiresAt:Date.now()+(r.expires_in||600)*1000,command:r.command}}
+   case'nodes_pair':{let url:string|undefined;if(a.url){try{url=hubAddress(a.url)}catch(e){fail('bad_request',(e as Error).message)}}let r:Obj;try{r=await call('peers.invite',{trust_admin:a.trustAdmin===true,...(url?{url}:{})})}catch(e){if(loopbackRefusal(e))fail('bad_request',tr('pairing.hubUrlRequired'));throw e}if(isLoopbackUrl(String(r.url||'')))fail('bad_request',tr('pairing.hubUrlRequired'));return{code:r.code,url:r.url,expiresAt:Date.now()+(r.expires_in||600)*1000,command:r.command}}
    case'nodes_remove':return call('peers.remove',{node:a.id});case'nodes_trust':return call('peers.trust',{node:a.id,admin:a.admin});
    case'dashboards_list':{const ds=await docs('dashboards');if(!ds.some((d:Obj)=>d.origin==='home')){const now=Date.now(),home={id:'home',name:tr('host.title'),origin:'home',range:'24h',refreshSec:30,pinned:false,createdAt:now,updatedAt:now,widgets:[{id:'nodes',type:'node-grid',typeVersion:'1.0.0',source:{kind:'system',feed:'nodes'},display:{},layout:{x:0,y:0,w:12,h:8}},{id:'plugins',type:'plugin-activity',typeVersion:'1.0.0',source:{kind:'system',feed:'plugins'},display:{},layout:{x:0,y:8,w:12,h:8}}]};await put('dashboards','home',home);ds.unshift(home)}return ds}
    case'dashboards_save':return put('dashboards',a.dashboard.id,DashboardConfig.parse(a.dashboard));case'dashboards_delete':return call('host.document_delete',{namespace:'dashboards',key:a.id});

@@ -8,6 +8,11 @@ export function pairingAddress(value:string){
  if(!['https:','http:'].includes(url.protocol)||!url.hostname||url.username||url.password||/[?#]/.test(text)||text.length>512)throw Error(tr('auth.invalidEndpoint'));
  return url.toString().replace(/\/$/,'');
 }
+export function isLoopbackUrl(value:string){try{const u=new URL(pairingAddress(value));return LOOPBACK.test(u.hostname)||u.port==='0'}catch{return false}}
+/** Address a hub may advertise in invitations: LAN/VPN/public, never this device. */
+export function hubAddress(value:string){const a=pairingAddress(value);if(isLoopbackUrl(a))throw Error(tr('pairing.hubUrlRequired'));return a}
+/** The core refuses to invite with a loopback url. */
+export const loopbackRefusal=(e:unknown)=>/loopback|allow_local|127\.|localhost|0\.0\.0\.0/i.test(e instanceof Error?e.message:String((e as any)?.message??e));
 /** Reads every format Delta issues: delta://pair link, `delta join <url> <code>` command, or the invite JSON. */
 export function parseInvitation(input:string):{url:string;code:string}{
  const bad=()=>Error(tr('native.invalidQr')),text=input.trim();
@@ -21,8 +26,7 @@ export function parseInvitation(input:string):{url:string;code:string}{
  }
  if(typeof url!=='string'||typeof code!=='string'||!url.trim()||!code||code.length>256)throw bad();
  let addr:string;try{addr=pairingAddress(url)}catch{throw bad()}
- const u=new URL(addr);
- if(LOOPBACK.test(u.hostname)||u.port==='0')throw Error(tr('native.unreachable'));
+ if(isLoopbackUrl(addr))throw Error(tr('native.unreachable'));
  return{url:addr,code};
 }
 export function takeInvitation(){const value=pendingInvitation;pendingInvitation='';return value;}

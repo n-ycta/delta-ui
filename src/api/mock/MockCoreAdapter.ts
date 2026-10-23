@@ -368,7 +368,7 @@ export class MockCoreAdapter implements CoreApi {
       return n;
     });
   }
-  createPairingTicket(kind: string, name: string, _options?: {trustAdmin?:boolean}): Promise<PairingTicket> {
+  createPairingTicket(kind: string, name: string, _options?: {trustAdmin?:boolean;url?:string}): Promise<PairingTicket> {
     return this.net(() => {
       const code = Math.random().toString(36).slice(2, 6).toUpperCase() + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
       this.audit('node.pairing.create', `${name} (${kind})`);

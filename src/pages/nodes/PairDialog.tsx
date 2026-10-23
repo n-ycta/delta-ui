@@ -16,13 +16,13 @@ export function PairDialog({ open, onClose }: { open:boolean; onClose:()=>void }
  const [trustHub,setTrustHub]=useState(false),[trustRemote,setTrustRemote]=useState(false);
  const [ticket,setTicket]=useState<PairingTicket|null>(null),[now,setNow]=useState(Date.now()),[qr,setQr]=useState(''),[error,setError]=useState(''),[copied,setCopied]=useState(false);
  const android=kind==='android';
- const create=useMutation(api=>api.createPairingTicket(kind,`${kind}-new`,{trustAdmin:trustRemote}),{onSuccess:t=>{setNow(Date.now());setTicket(t)}});
+ const create=useMutation(api=>api.createPairingTicket(kind,`${kind}-new`,{trustAdmin:trustRemote,url:valid(hub)?pairingAddress(hub):undefined}),{onSuccess:t=>{setNow(Date.now());setTicket(t)}});
  useEffect(()=>{if(open){setMethod('choose');setTicket(null);setQr('');setError('');setTrustHub(false);setCopied(false)}},[open]);
  useEffect(()=>{if(open)setTrustRemote(kind==='android')},[open,kind]); // owner explicitly pairs their own phone
  useEffect(()=>{if(!ticket)return;const timer=setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(timer)},[ticket]);
  const left=ticket?Math.max(0,Math.round((ticket.expiresAt-now)/1000)):0;
  const valid=(v:string)=>{try{pairingAddress(v);return true}catch{return false}};
- const link=ticket&&valid(hub)?invitationLink(hub,ticket.code):'';
+ const link=ticket&&valid(hub)?invitationLink(ticket.url||hub,ticket.code):'';
  useEffect(()=>{let active=true;setQr('');if(link&&android)void QRCode.toDataURL(link,{width:256,margin:2,errorCorrectionLevel:'M'}).then(v=>{if(active)setQr(v)}).catch(()=>{if(active)setError(tr('pairing.qrFailed'))});return()=>{active=false}},[link,android]);
  const quote=(v:string)=>"'"+v.replaceAll("'",os==='linux'?"'\"'\"'":"''")+"'";
  const command=ticket&&!android?(os==='linux'?`curl -fsSL https://raw.githubusercontent.com/n-ycta/delta/main/install.sh -o /tmp/delta-install.sh && sh /tmp/delta-install.sh --plugins none --listen 0.0.0.0 --public-url ${quote(device)} --join-url ${quote(hub)} --join-code ${quote(ticket.code)} ${trustHub?'--trust-hub':''}`:`$p=Join-Path $env:TEMP 'delta-install.ps1'; Invoke-WebRequest https://raw.githubusercontent.com/n-ycta/delta/main/install.ps1 -OutFile $p; & $p -Plugins 'none' -Listen '0.0.0.0' -PublicUrl ${quote(device)} -JoinUrl ${quote(hub)} -JoinCode ${quote(ticket.code)} ${trustHub?'-TrustHub':''}`):'';

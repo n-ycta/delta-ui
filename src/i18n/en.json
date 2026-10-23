@@ -2372,6 +2372,7 @@
     "chooseHint": "Android connects by link or QR. SSH installs a server; it is not the phone connection flow.",
     "androidHint": "Enter the existing Core address reachable from the phone. Get a one-time link and QR; no Linux/Windows commands or phone address are needed.",
     "coreAddress": "Use the Core API address, not the Web Console page address. localhost and 127.0.0.1 on the phone mean the phone itself.",
+    "hubUrlRequired": "Enter a LAN/VPN address of this node. A local (127.0.0.1) address cannot be used in an invitation.",
     "phoneAdmin": "The phone will be able to manage this node.",
     "remoteAdmin": "Allow the new device to administer this node",
     "accessHint": "Without this option, ordinary capabilities are available; installation, updates and administrative operations are denied. Reverse administrative access is never granted automatically.",

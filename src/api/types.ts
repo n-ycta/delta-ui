@@ -81,7 +81,7 @@ export interface CoreApi {
   getNodeUptime(nodeId: string, days: number): Promise<UptimeCell[]>;
   runNodeCommand(nodeId: string, command: NodeCommandId, args?: Record<string, string>): Promise<CommandResult>;
   updateNodeConnection(nodeId: string, cfg: ConnectionConfig): Promise<NodeInfo>;
-  createPairingTicket(kind: string, name: string, options?: { trustAdmin?: boolean }): Promise<PairingTicket>;
+  createPairingTicket(kind: string, name: string, options?: { trustAdmin?: boolean; url?: string }): Promise<PairingTicket>;
   removeNode(nodeId: string): Promise<void>;
 
   // events & notifications
