@@ -2,7 +2,7 @@
 //! only connects them to the Kotlin platform and keeps progress state. The WebView passes no paths or URLs.
 use delta_native_update as upd;
 use serde_json::{json, Value};
-use std::{path::PathBuf, sync::{Mutex, MutexGuard, OnceLock}};
+use std::{path::PathBuf, sync::{Mutex, MutexGuard, OnceLock}, time::Instant};
 
 fn state() -> &'static Mutex<upd::UpdateState> {
     static S: OnceLock<Mutex<upd::UpdateState>> = OnceLock::new();
@@ -42,7 +42,7 @@ pub async fn call(method: &str, a: &Value) -> Result<Value, String> {
                 // nothing newer: drop a stale cached APK (for example after the update was installed), but never
                 // under an active download or install; the check and the clean-up share one lock
                 let mut s = lock();
-                if s.check_cleanup_allowed() {
+                if s.check_cleanup_allowed(Instant::now()) {
                     let _ = std::fs::remove_dir_all(dir(&env)?);
                     s.reset();
                 }
@@ -67,7 +67,7 @@ pub async fn call(method: &str, a: &Value) -> Result<Value, String> {
             }
             // the version must be a real, newer release on the chosen channel; this also yields asset and size
             let found = offer(&env, channel(a)?).await?.filter(|o| o.version == version).ok_or("version_not_offered")?;
-            let generation = lock().begin_download(&version, found.size)?;
+            let generation = lock().begin_download(&version, found.size, Instant::now())?;
             let target = dir(&env)?;
             let _ = std::fs::remove_dir_all(&target);
             let task = tokio::spawn(async move {
@@ -91,12 +91,13 @@ pub async fn call(method: &str, a: &Value) -> Result<Value, String> {
             Ok(json!({"started": true}))
         }
         "host.update_status" => {
-            let s = lock().clone();
-            Ok(json!({"state": s.phase.as_str(), "received": s.received, "total": s.total, "version": s.version, "error": s.error}))
+            let mut s = lock();
+            let phase = s.status(Instant::now());
+            Ok(json!({"state": phase.as_str(), "received": s.received, "total": s.total, "version": s.version, "error": s.error}))
         }
         "host.update_install" => {
             let version = a["version"].as_str().ok_or("invalid_version")?.to_string();
-            let sum = lock().begin_install(&version)?;
+            let sum = lock().begin_install(&version, Instant::now())?;
             // hashing 100+ MB and the Kotlin call block: keep them off the async workers
             let result = tokio::task::spawn_blocking(move || {
                 let apk = dir(&env()?)?.join("delta.apk");

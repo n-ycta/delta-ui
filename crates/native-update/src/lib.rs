@@ -2,6 +2,7 @@
 //! decides what is newer, which asset to take, whether a URL is trusted and whether bytes match.
 use serde_json::Value;
 use sha2::{Digest, Sha256};
+use std::time::{Duration, Instant};
 
 pub const APK: &str = "Delta-Android-arm64-x86_64.apk";
 pub const SUMS: &str = "SHA256SUMS";
@@ -10,6 +11,8 @@ const CDN_HOSTS: [&str; 2] = ["objects.githubusercontent.com", "release-assets.g
 pub const MAX_APK_BYTES: u64 = 200 * 1024 * 1024;
 pub const MAX_SUMS_BYTES: usize = 4096;
 pub const MAX_REDIRECTS: usize = 3;
+/// How long `Installing` blocks other work: the system dialog may be cancelled without any callback to us.
+pub const INSTALL_PHASE_TTL: Duration = Duration::from_secs(120);
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Ver {
@@ -231,11 +234,24 @@ pub struct UpdateState {
     /// SHA-256 of the verified APK, set when the download finishes.
     pub sum: [u8; 32],
     generation: u64,
+    installing_since: Option<Instant>,
 }
 
 impl UpdateState {
+    /// Lets an expired `Installing` fall back to `Ready` (digest and version are still in the state).
+    fn tick(&mut self, now: Instant) {
+        if self.phase == Phase::Installing && self.installing_since.is_none_or(|t| now.saturating_duration_since(t) >= INSTALL_PHASE_TTL) {
+            self.phase = Phase::Ready;
+        }
+    }
+    /// Current phase, with an expired install shown as `Ready`.
+    pub fn status(&mut self, now: Instant) -> Phase {
+        self.tick(now);
+        self.phase
+    }
     /// Starts a download and returns its generation; busy while downloading or installing.
-    pub fn begin_download(&mut self, version: &str, total: u64) -> Result<u64, &'static str> {
+    pub fn begin_download(&mut self, version: &str, total: u64, now: Instant) -> Result<u64, &'static str> {
+        self.tick(now);
         if matches!(self.phase, Phase::Downloading | Phase::Installing) {
             return Err("update_busy");
         }
@@ -263,7 +279,8 @@ impl UpdateState {
         true
     }
     /// A cache clean-up or reset must not touch an active download or install.
-    pub fn check_cleanup_allowed(&self) -> bool {
+    pub fn check_cleanup_allowed(&mut self, now: Instant) -> bool {
+        self.tick(now);
         !matches!(self.phase, Phase::Downloading | Phase::Installing)
     }
     /// Back to idle (caller checked `check_cleanup_allowed` under the same lock). Generation keeps counting.
@@ -271,11 +288,12 @@ impl UpdateState {
         *self = UpdateState { generation: self.generation + 1, ..Default::default() };
     }
     /// Moves a ready update of `version` to installing and returns the digest it must still have.
-    pub fn begin_install(&mut self, version: &str) -> Result<[u8; 32], &'static str> {
+    pub fn begin_install(&mut self, version: &str, now: Instant) -> Result<[u8; 32], &'static str> {
+        self.tick(now);
         match self.phase {
             Phase::Installing => Err("update_busy"),
             Phase::Ready if self.version == version => {
-                self.phase = Phase::Installing;
+                (self.phase, self.installing_since) = (Phase::Installing, Some(now));
                 Ok(self.sum)
             }
             _ => Err("update_not_ready"),
@@ -434,11 +452,11 @@ mod tests {
 
     #[test]
     fn stale_downloads_cannot_overwrite_a_newer_one() {
-        let mut s = UpdateState::default();
-        let g1 = s.begin_download("0.1.16", 10).unwrap();
-        assert_eq!(s.begin_download("0.1.17", 10), Err("update_busy"), "one download at a time");
+        let (mut s, t) = (UpdateState::default(), Instant::now());
+        let g1 = s.begin_download("0.1.16", 10, t).unwrap();
+        assert_eq!(s.begin_download("0.1.17", 10, t), Err("update_busy"), "one download at a time");
         assert!(s.finish(g1, Err("network_failed".into())) && s.phase == Phase::Failed);
-        let g2 = s.begin_download("0.1.17", 20).unwrap();
+        let g2 = s.begin_download("0.1.17", 20, t).unwrap();
         assert!(g2 > g1);
         assert!(!s.progress(g1, 5) && !s.finish(g1, Ok([1; 32])), "old generation is ignored");
         assert_eq!((s.phase, s.received, s.version.as_str()), (Phase::Downloading, 0, "0.1.17"));
@@ -448,14 +466,14 @@ mod tests {
 
     #[test]
     fn check_cleanup_never_resets_active_work() {
-        let mut s = UpdateState::default();
-        assert!(s.check_cleanup_allowed());
-        let g = s.begin_download("0.1.16", 1).unwrap();
-        assert!(!s.check_cleanup_allowed(), "downloading");
+        let (mut s, t) = (UpdateState::default(), Instant::now());
+        assert!(s.check_cleanup_allowed(t));
+        let g = s.begin_download("0.1.16", 1, t).unwrap();
+        assert!(!s.check_cleanup_allowed(t), "downloading");
         s.finish(g, Ok([3; 32]));
-        assert!(s.check_cleanup_allowed());
-        s.begin_install("0.1.16").unwrap();
-        assert!(!s.check_cleanup_allowed(), "installing");
+        assert!(s.check_cleanup_allowed(t));
+        s.begin_install("0.1.16", t).unwrap();
+        assert!(!s.check_cleanup_allowed(t), "installing");
         s.end_install(false);
         s.reset();
         assert_eq!(s.phase, Phase::Idle);
@@ -464,18 +482,18 @@ mod tests {
 
     #[test]
     fn install_is_single_shot_and_returns_to_ready_on_error() {
-        let mut s = UpdateState::default();
-        assert_eq!(s.begin_install("0.1.16"), Err("update_not_ready"));
-        let g = s.begin_download("0.1.16", 1).unwrap();
-        assert_eq!(s.begin_install("0.1.16"), Err("update_not_ready"), "still downloading");
+        let (mut s, t) = (UpdateState::default(), Instant::now());
+        assert_eq!(s.begin_install("0.1.16", t), Err("update_not_ready"));
+        let g = s.begin_download("0.1.16", 1, t).unwrap();
+        assert_eq!(s.begin_install("0.1.16", t), Err("update_not_ready"), "still downloading");
         s.finish(g, Ok([4; 32]));
-        assert_eq!(s.begin_install("0.1.99"), Err("update_not_ready"), "other version");
-        assert_eq!(s.begin_install("0.1.16"), Ok([4; 32]));
-        assert_eq!(s.begin_install("0.1.16"), Err("update_busy"), "double tap");
-        assert_eq!(s.begin_download("0.1.17", 1), Err("update_busy"));
+        assert_eq!(s.begin_install("0.1.99", t), Err("update_not_ready"), "other version");
+        assert_eq!(s.begin_install("0.1.16", t), Ok([4; 32]));
+        assert_eq!(s.begin_install("0.1.16", t), Err("update_busy"), "double tap");
+        assert_eq!(s.begin_download("0.1.17", 1, t), Err("update_busy"));
         s.end_install(false);
         assert_eq!(s.phase, Phase::Ready);
-        s.begin_install("0.1.16").unwrap();
+        s.begin_install("0.1.16", t).unwrap();
         s.end_install(true);
         assert_eq!(s.phase, Phase::Installing);
         assert_eq!(hex(&[0xab; 32]), "ab".repeat(32));
@@ -504,6 +522,26 @@ mod tests {
         let abi = release("v0.2.0", false, false, &[APK, SUMS, "Delta-Android-arm64-v8a.apk"]);
         assert_eq!(pick(&abi, Channel::Stable, "0.1.0", &["arm64-v8a"]).unwrap().asset, "Delta-Android-arm64-v8a.apk");
         assert_eq!(pick(&abi, Channel::Stable, "0.1.0", &["x86"]).unwrap().asset, APK);
+    }
+
+    #[test]
+    fn installing_expires_after_the_ttl() {
+        let (mut s, t) = (UpdateState::default(), Instant::now());
+        let g = s.begin_download("0.1.16", 1, t).unwrap();
+        s.finish(g, Ok([6; 32]));
+        s.begin_install("0.1.16", t).unwrap();
+        let almost = t + INSTALL_PHASE_TTL - Duration::from_secs(1);
+        assert_eq!(s.status(almost), Phase::Installing);
+        assert_eq!(s.begin_install("0.1.16", almost), Err("update_busy"));
+        assert_eq!(s.begin_download("0.1.17", 1, almost), Err("update_busy"));
+        assert!(!s.check_cleanup_allowed(almost));
+        let late = t + INSTALL_PHASE_TTL;
+        assert!(s.check_cleanup_allowed(late), "expired: clean-up allowed");
+        assert_eq!(s.status(late), Phase::Ready);
+        assert_eq!(s.begin_install("0.1.16", late), Ok([6; 32]), "install may be retried");
+        assert_eq!(s.status(late + Duration::from_secs(1)), Phase::Installing, "the TTL restarts");
+        let mut s2 = s.clone();
+        assert!(s2.begin_download("0.1.17", 1, late + INSTALL_PHASE_TTL).is_ok(), "download allowed once expired");
     }
 
     #[test]
