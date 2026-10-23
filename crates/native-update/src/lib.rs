@@ -193,6 +193,27 @@ pub enum VerifyError {
     ChecksumMismatch,
 }
 
+/// Plain streaming SHA-256 (no size cap) for re-checking a file already on disk.
+pub struct Hasher(Sha256);
+
+impl Hasher {
+    pub fn new() -> Self {
+        Self(Sha256::new())
+    }
+    pub fn update(&mut self, chunk: &[u8]) {
+        self.0.update(chunk);
+    }
+    pub fn finish(self) -> [u8; 32] {
+        self.0.finalize().into()
+    }
+}
+
+impl Default for Hasher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Streaming hash with a hard size cap: feed chunks as they arrive, then `finish`.
 pub struct Verifier {
     hasher: Sha256,
