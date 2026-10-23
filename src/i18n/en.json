@@ -2378,5 +2378,10 @@
     "downloadAndroid": "Download Delta for Android",
     "phoneNetwork": "The phone must reach Core over HTTPS or a trusted network/VPN. This is not a NAT relay: controlling the phone directly from another node requires separate inbound reachability.",
     "newInvitation": "New invitation"
+  },
+  "nodeLimits": {
+    "processes": "This node does not run supervised processes (for example the phone's built-in node). Manage processes on a paired desktop or VPS node.",
+    "components": "This node cannot start, stop or restart components. Use a paired desktop or VPS node for that.",
+    "console": "Shell commands are not available on this node, only ping. Run commands on a paired desktop or VPS node."
   }
 }

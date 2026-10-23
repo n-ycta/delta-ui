@@ -34,7 +34,7 @@ import {
   DAY,
   HOUR,
 } from '../../core/lib/format';
-import { fmtSeen, nodeCpu, nodeShare } from '../../core/lib/nodes';
+import { fmtSeen, nodeCpu, nodeLacks, nodeShare } from '../../core/lib/nodes';
 import {
   Badge,
   Button,
@@ -207,12 +207,12 @@ export function NodeDetail() {
         ]}
       />
       {tab === 'overview' && <Overview n={n} />}
-      {tab === 'processes' && <Processes n={n} />}
+      {tab === 'processes' && <><Limited n={n} group="supervisor" text="nodeLimits.processes" /><Processes n={n} /></>}
       {tab === 'plugins' && <NodePlugins n={n} />}
-      {tab === 'components' && <Components n={n} />}
+      {tab === 'components' && <><Limited n={n} group="supervisor" text="nodeLimits.components" /><Components n={n} /></>}
       {tab === 'errors' && <Errors n={n} />}
       {tab === 'events' && <NodeEvents n={n} />}
-      {tab === 'console' && <Console n={n} />}
+      {tab === 'console' && <><Limited n={n} group="exec" text="nodeLimits.console" /><Console n={n} /></>}
       {tab === 'connection' && <Connection n={n} />}
     </div>
   );
@@ -552,6 +552,16 @@ function ErrorList({ errors }: { errors: NodeInfo['errors'] }) {
           </Badge>
         </div>
       ))}
+    </div>
+  );
+}
+
+/** A calm explanation instead of a failing page when the node simply has no such capability group. */
+function Limited({ n, group, text }: { n: NodeInfo; group: 'supervisor' | 'exec' | 'packages'; text: string }) {
+  if (!nodeLacks(n, group)) return null;
+  return (
+    <div className="banner info" role="note" style={{ borderRadius: 6, border: 0, marginBottom: 16 }}>
+      <span className="grow">{tr(text)}</span>
     </div>
   );
 }

@@ -64,6 +64,7 @@ export function seedNodes(): NodeInfo[] {
       id: 'pixel-8', name: 'Pixel 8', kind: 'android', os: 'Android 15', arch: 'arm64-v8a', address: 'relay://pixel-8', location: tr("api.mock.seed.s_b80e9c3d89"),
       status: 'degraded', lastSeen: t - 95 * 1000, uptimeSec: 3 * 86400 + 7200, agentVersion: '1.8.1', cpu: 9, cores: 8, memUsed: 5.6 * GB, memTotal: 8 * GB, diskUsed: 88 * GB, diskTotal: 128 * GB,
       battery: { level: 0.34, charging: false }, latencyMs: 210, tempC: 34,
+      missingCapabilities: ['supervisor', 'exec', 'packages'], // the mobile core has no supervisor, shell or installer
       tags: ['mobile', 'primary'], pluginIds: ['dev.delta.typing', 'dev.delta.health', 'dev.delta.screen', 'dev.delta.finance'],
       components: [
         { id: 'delta-agent', name: 'delta-agent (Android)', version: '1.8.1', latest: '1.8.2', status: 'outdated', restartable: true },

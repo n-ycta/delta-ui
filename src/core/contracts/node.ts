@@ -59,6 +59,8 @@ export const NodeInfo = z.object({
   agentVersion: z.string(),
   cpu: z.number(),
   telemetryUnavailable: z.array(z.string()).optional(),
+  /** Capability groups this node does not offer at all (e.g. the mobile core has no supervisor, exec or packages). */
+  missingCapabilities: z.array(z.string()).optional(),
   cores: z.number(),
   memUsed: z.number(),
   memTotal: z.number(),

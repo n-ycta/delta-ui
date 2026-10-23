@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { nodeCpu } from '../src/core/lib/nodes';
+import { nodeCpu, nodeLacks } from '../src/core/lib/nodes';
 
 const read = (p: string) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
 
@@ -34,4 +34,12 @@ test('the nodes table turns into cards on phones instead of widening the page', 
   const css = read('src/styles/components.css');
   assert.match(css, /@media \(max-width: 760px\)[^{]*\{[^]*?\.nodes-table tr \{ display: grid/);
   assert.match(read('src/pages/nodes/NodesPage.tsx'), /<table className="t nodes-table">/);
+});
+
+test('a node without supervisor/exec/packages says so instead of failing', () => {
+  const mobile = { missingCapabilities: ['supervisor', 'exec', 'packages'] };
+  assert.equal(nodeLacks(mobile, 'exec'), true);
+  assert.equal(nodeLacks({}, 'supervisor'), false, 'unknown (offline peer) is not reported as missing');
+  assert.match(read('src/host/projection.ts'), /missingCapabilities:\['supervisor','exec','packages'\]\.filter/);
+  assert.match(read('src/pages/nodes/NodeDetail.tsx'), /group="exec" text="nodeLimits\.console"/);
 });
