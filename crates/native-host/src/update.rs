@@ -119,7 +119,11 @@ pub async fn call(method: &str, a: &Value) -> Result<Value, String> {
             if file_sum(&apk)? != s.sum {
                 return Err("checksum_mismatch".into());
             }
-            crate::android::platform("update_install", &json!({"path": apk.to_string_lossy(), "version": version}))?;
+            // Kotlin reports failures as {"error": code}: a thrown exception would reach us only as a generic failure
+            let out = crate::android::platform("update_install", &json!({"path": apk.to_string_lossy(), "version": version}))?;
+            if let Some(code) = out["error"].as_str() {
+                return Err(code.to_string());
+            }
             Ok(json!({"prompted": true}))
         }
         _ => Err("unsupported".into()),
