@@ -15,7 +15,7 @@ try{
   await p.getByAltText('Invitation QR').waitFor();
   const link=await p.locator('input[readonly]').inputValue(),parsed=new URL(link);assert.equal(parsed.protocol,'delta:');assert.equal(parsed.searchParams.get('url'),'https://delta.example:7700');assert.equal(parsed.searchParams.get('code'),'fixture-one-time-code');
   const decoded=await p.evaluate(()=>window.decodeQr());assert.equal(decoded,link);
-  assert.equal((await p.evaluate(()=>window.calls))[0].options.trustAdmin,false);
+  assert.equal((await p.evaluate(()=>window.calls))[0].options.trustAdmin,true);
   assert.equal(await p.locator('pre').count(),0,'No Linux command in Android invitation');
   assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   await p.screenshot({path:`${out}/android-${width}.png`,fullPage:true});

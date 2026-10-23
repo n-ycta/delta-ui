@@ -1978,8 +1978,8 @@
     "stopScan": "Stop camera",
     "noCamera": "Camera is unavailable. Paste the invitation link instead.",
     "waiting": "Waiting for an invitation link or QR.",
-    "ready": "Invitation found. Confirm to connect this phone.",
-    "unreachable": "That invitation points at the other computer itself. Create it again from a reachable address.",
+    "ready": "Invitation from {{host}}. Tap Join to connect this phone.",
+    "unreachable": "The invitation points at the device it was created on. Create it with a LAN/VPN address.",
     "expired": "This invitation expired or was already used. Create a new one.",
     "cannotReach": "The phone cannot reach that node. Check the network, then try the link again."
   },
@@ -2372,6 +2372,7 @@
     "chooseHint": "Android connects by link or QR. SSH installs a server; it is not the phone connection flow.",
     "androidHint": "Enter the existing Core address reachable from the phone. Get a one-time link and QR; no Linux/Windows commands or phone address are needed.",
     "coreAddress": "Use the Core API address, not the Web Console page address. localhost and 127.0.0.1 on the phone mean the phone itself.",
+    "phoneAdmin": "The phone will be able to manage this node.",
     "remoteAdmin": "Allow the new device to administer this node",
     "accessHint": "Without this option, ordinary capabilities are available; installation, updates and administrative operations are denied. Reverse administrative access is never granted automatically.",
     "createInvitation": "Create invitation",

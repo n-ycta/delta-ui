@@ -17,7 +17,8 @@ export function PairDialog({ open, onClose }: { open:boolean; onClose:()=>void }
  const [ticket,setTicket]=useState<PairingTicket|null>(null),[now,setNow]=useState(Date.now()),[qr,setQr]=useState(''),[error,setError]=useState(''),[copied,setCopied]=useState(false);
  const android=kind==='android';
  const create=useMutation(api=>api.createPairingTicket(kind,`${kind}-new`,{trustAdmin:trustRemote}),{onSuccess:t=>{setNow(Date.now());setTicket(t)}});
- useEffect(()=>{if(open){setMethod('choose');setTicket(null);setQr('');setError('');setTrustHub(false);setTrustRemote(false);setCopied(false)}},[open]);
+ useEffect(()=>{if(open){setMethod('choose');setTicket(null);setQr('');setError('');setTrustHub(false);setCopied(false)}},[open]);
+ useEffect(()=>{if(open)setTrustRemote(kind==='android')},[open,kind]); // owner explicitly pairs their own phone
  useEffect(()=>{if(!ticket)return;const timer=setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(timer)},[ticket]);
  const left=ticket?Math.max(0,Math.round((ticket.expiresAt-now)/1000)):0;
  const valid=(v:string)=>{try{pairingAddress(v);return true}catch{return false}};
@@ -43,6 +44,7 @@ export function PairDialog({ open, onClose }: { open:boolean; onClose:()=>void }
     <label className="check"><input type="checkbox" checked={trustHub} onChange={e=>setTrustHub(e.target.checked)}/>{tr('polish.trustHub')}</label>
    </>}
    <label className="check"><input type="checkbox" checked={trustRemote} onChange={e=>setTrustRemote(e.target.checked)}/>{tr('pairing.remoteAdmin')}</label>
+   {android&&trustRemote&&<p className="muted">{tr('pairing.phoneAdmin')}</p>}
    <p className="muted">{tr('pairing.accessHint')}</p>
    {create.error&&<div role="alert" className="banner err">{create.error.message}</div>}
   </div>:<div className="col gap-3">
