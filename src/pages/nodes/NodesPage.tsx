@@ -206,7 +206,7 @@ export function NodesPage() {
       )}
       {list.length > 0 && (
         <div className="panel table-wrap">
-          <table className="t">
+          <table className="t nodes-table">
             <thead>
               <tr>
                 <th>{tr('pages.nodes.NodesPage.s_564eba1527')}</th>
@@ -244,7 +244,7 @@ export function NodesPage() {
                     <td>
                       <StatusBadge {...NODE_STATUS[n.status]} pulse={n.status === 'online'} />
                     </td>
-                    <td>
+                    <td data-label={tr('pages.nodes.NodesPage.s_ff221d4752')}>
                       {off || nodeCpu(n) === null ? (
                         <span className="faint">{tr('pages.nodes.NodesPage.s_1b93795b97')}</span>
                       ) : (
@@ -257,7 +257,7 @@ export function NodesPage() {
                         </div>
                       )}
                     </td>
-                    <td>
+                    <td data-label={tr('pages.nodes.NodesPage.s_f63c10e017')}>
                       {off || nodeShare(n, 'memory') === null ? (
                         <span className="faint">{tr('pages.nodes.NodesPage.s_1b93795b97')}</span>
                       ) : (
@@ -270,7 +270,7 @@ export function NodesPage() {
                         </div>
                       )}
                     </td>
-                    <td>
+                    <td data-label={tr('pages.nodes.NodesPage.s_ca040760a3')}>
                       {nodeShare(n, 'disk') === null ? (
                         <span className="faint">{tr('pages.nodes.NodesPage.s_1b93795b97')}</span>
                       ) : (

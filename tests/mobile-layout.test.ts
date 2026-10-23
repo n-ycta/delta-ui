@@ -29,3 +29,9 @@ test('cpu is null (shown as a dash) when the host reports no CPU telemetry', () 
   assert.equal(nodeCpu({ cpu: 0, telemetryUnavailable: ['cpu'] } as any), null);
   assert.equal(nodeCpu({ cpu: 12 } as any), 12);
 });
+
+test('the nodes table turns into cards on phones instead of widening the page', () => {
+  const css = read('src/styles/components.css');
+  assert.match(css, /@media \(max-width: 760px\)[^{]*\{[^]*?\.nodes-table tr \{ display: grid/);
+  assert.match(read('src/pages/nodes/NodesPage.tsx'), /<table className="t nodes-table">/);
+});
