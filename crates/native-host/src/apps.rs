@@ -101,10 +101,11 @@ pub async fn call(app: &tauri::AppHandle, method: &str, a: &Value) -> Result<Val
                 return Err("not_installed".into());
             }
             let protocol = delta_app_runtime::protocol(id);
-            #[cfg(target_os = "windows")]
+            // Windows and Android serve custom protocols as http://<scheme>.localhost; the Android emulator check
+            // ("Installed Media must render in its isolated app-origin") fails with {protocol}://localhost.
+            #[cfg(any(target_os = "windows", target_os = "android"))]
             let url = format!("http://{protocol}.localhost/index.html");
-            // NOTE: Android form from the owner handoff; confirm on a device that wry serves it (it may need http://{protocol}.localhost like Windows).
-            #[cfg(not(target_os = "windows"))]
+            #[cfg(not(any(target_os = "windows", target_os = "android")))]
             let url = format!("{protocol}://localhost/index.html");
             Ok(json!({"url":url,"id":id,"name":item["name"],"grants":[]}))
         }
