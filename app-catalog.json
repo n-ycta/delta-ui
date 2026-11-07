@@ -2,14 +2,14 @@
   {
     "id": "dev.delta.media",
     "name": "Delta Media",
-    "version": "0.3.6",
+    "version": "0.3.10",
     "icon": "vinyl-record",
     "description": {
       "ru": "Музыка, видео, радио и подключаемые источники в одном интерфейсе.",
       "en": "Music, video, radio and connected providers in one interface."
     },
-    "asset": "https://github.com/n-ycta/delta-media/releases/download/v0.3.6/delta-media.delta-app",
-    "sha256": "ce4a491b06de21c82bc119f6cac8fcd7eaf7ada9a35b95f82a18299129231794",
+    "asset": "https://github.com/n-ycta/delta-media/releases/download/v0.3.10/delta-media.delta-app",
+    "sha256": "c6c064f4d9572b7933a7abfe3e23b5531529d3df6b5f13668d5e4c958957e3bd",
     "runtime": {
       "execution": "web",
       "platforms": [
